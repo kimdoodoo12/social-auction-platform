@@ -60,7 +60,7 @@ INSERT INTO organization (name, description, address, manager, manager_phone, ag
 -- 상품 (product_id = auction_id 로 1:1 매칭)
 -- background: 상품 제작 배경/사연
 -- ------------------------------------------------------------
-INSERT INTO products (name, organization_id, category_id, start_price, decription, background, CREATED_AT, UPDATE_AT) VALUES
+INSERT INTO products (name, organization_id, category_id, start_price, description, background, CREATED_AT, UPDATE_AT) VALUES
 ('옻칠 나무 찻잔 세트',       1,  3,  30000,  '호두나무를 깎아 옻칠로 마감한 찻잔 2인 세트입니다.',                  '햇살공방 훈련생들이 3개월간 한 점씩 직접 깎고 칠해 완성했습니다.',               '2026-08-25 10:00:00', NULL),
 ('유기농 사과 선물세트 5kg',  2,  1,  25000,  '무농약 인증을 받은 양평산 부사 사과 5kg(14~16과)입니다.',             '올해 첫 수확한 사과로, 수익금은 조합 청년농 교육에 쓰입니다.',                 '2026-08-28 09:30:00', NULL),
 ('우리밀 수제 쿠키 선물상자', 3,  1,  15000,  '우리밀과 유기농 설탕으로 구운 쿠키 20입 선물상자입니다.',             '자활 참여자들이 제과기능사 자격을 준비하며 구운 쿠키입니다.',                   '2026-08-30 14:00:00', '2026-09-02 10:00:00'),
