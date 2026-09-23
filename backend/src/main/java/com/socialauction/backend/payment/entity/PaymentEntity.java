@@ -1,5 +1,6 @@
 package com.socialauction.backend.payment.entity;
 
+import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.member.entity.MemberEntity;
 
 import jakarta.persistence.Entity;
@@ -27,7 +28,9 @@ public class PaymentEntity {
     private int paymentPrice;
     private boolean paymentStatus;
 
-    
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn (name = "auctionId")
+    private AuctionEntity auctionEntity;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "memberId")
