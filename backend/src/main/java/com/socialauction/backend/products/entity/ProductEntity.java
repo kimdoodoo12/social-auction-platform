@@ -1,6 +1,8 @@
 package com.socialauction.backend.products.entity;
 
+import com.socialauction.backend.category.entity.CategoryEntity;
 import com.socialauction.backend.global.BaseTime;
+import com.socialauction.backend.organization.entity.OrganizationEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

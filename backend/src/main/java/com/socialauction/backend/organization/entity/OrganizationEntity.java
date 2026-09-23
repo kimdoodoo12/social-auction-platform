@@ -47,6 +47,6 @@ public class OrganizationEntity {
     private String agreement_info;
 
     @Column
-    private String buisness_registration_number;
+    private String businessRegistrationNumber;
     
 }
