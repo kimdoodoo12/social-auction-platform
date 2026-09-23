@@ -2,6 +2,8 @@ package com.socialauction.backend.member.entity;
 
 import java.time.LocalDateTime;
 
+import com.socialauction.backend.global.BaseTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity 
 @Table (name = "member")
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
-public class MemberEntity {
+public class MemberEntity extends BaseTime{
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer memberId;
@@ -26,9 +28,9 @@ public class MemberEntity {
     private String name;
     private String email;
     private String phone;
+    private boolean isActive;
 
-    
-    private LocalDateTime createAt;
+    private LocalDateTime lockedAt;
     
     // 관리자 인지 회원인지 
     @Builder.Default
