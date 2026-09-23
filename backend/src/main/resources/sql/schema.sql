@@ -12,7 +12,8 @@ CREATE TABLE member (
   CREATED_AT DATETIME NOT NULL,
   UPDATED_AT DATETIME,
   status VARCHAR(20), -- 회원상태(정지, 정상, 잠금, 탈퇴)
-  is_active BOOLEAN -- 관리자 여부
+  is_active BOOLEAN ,-- 관리자 여부
+  locked_At DateTime
   # 입찰내역, 낙찰내역은 입찰로그 JOIN하여 조회
 );
   

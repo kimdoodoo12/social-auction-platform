@@ -1,6 +1,7 @@
 package com.socialauction.backend.payment.entity;
 
 import com.socialauction.backend.auction.entity.AuctionEntity;
+import com.socialauction.backend.global.BaseTime;
 import com.socialauction.backend.member.entity.MemberEntity;
 
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity 
 @Table (name = "payment")
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
-public class PaymentEntity {
+public class PaymentEntity extends BaseTime{
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer paymentId;
