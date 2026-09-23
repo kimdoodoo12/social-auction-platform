@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.global.BaseTime;
 import com.socialauction.backend.products.entity.ProductEntity;
 
@@ -26,7 +27,7 @@ import lombok.ToString;
 @Entity 
 @Table (name = "auction")
 @NoArgsConstructor @AllArgsConstructor @Data @Builder 
-public class AuctionEntity extends BaseTime {
+public class AuctionEntity  {
     
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
@@ -41,13 +42,13 @@ public class AuctionEntity extends BaseTime {
     @Column 
     private String auctionStatus;
 
-    @OneToOne(mappedBy = "auctionEntity")
+    @OneToOne
     @JoinColumn (name = "product_id")
     private ProductEntity productEntity;
 
 
-    @OneToMany (mappedBy = "bidEntity")
-    @ToString .Exclude
+    @OneToMany (mappedBy = "auctionEntity")
+    @ToString.Exclude
     @Builder.Default
-    private List<AuctionEntity> auctionList = new ArrayList<>();
+    private List<BidEntity> bidList = new ArrayList<>();
 }

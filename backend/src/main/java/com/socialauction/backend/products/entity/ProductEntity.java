@@ -19,16 +19,18 @@ public class ProductEntity extends BaseTime{
     
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer product_id;
+    private Integer productId;
     private String name;
     
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
-    private OrganizationEntity organization_id;
+    private OrganizationEntity organizationEntity;
+
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "category_id")
-    private CategoryEntity category_id;
-    private Integer start_price;
+    private CategoryEntity categoryEntity;
+    
+    private Integer startPrice;
     private String description;
     private String background;
     

@@ -14,7 +14,7 @@ USE ieum;
 -- 회원 (1번은 관리자, 8~10번은 정지/잠금/탈퇴 케이스)
 -- password: 개발용 평문 '1234' (암호화 적용 시 해시값으로 교체)
 -- ------------------------------------------------------------
-INSERT INTO member (login_id, password, name, email, phone, CREATED_AT, UPDATED_AT, status, is_active) VALUES
+INSERT INTO member (login_id, password, name, email, phone, CREATED_AT, UPDATED_AT, ROLE, status) VALUES
 ('admin',      '1234', '관리자', 'admin@ieum.kr',          '010-0000-0000', '2026-01-02 09:00:00', NULL,                  '정상', TRUE),
 ('kimminji',   '1234', '김민지', 'minji.kim@example.com',  '010-2345-6789', '2026-01-15 14:22:10', '2026-06-03 11:05:00', '정상', FALSE),
 ('leejunho',   '1234', '이준호', 'junho.lee@example.com',  '010-3456-7890', '2026-02-03 20:11:45', NULL,                  '정상', FALSE),
@@ -60,7 +60,7 @@ INSERT INTO organization (name, description, address, manager, manager_phone, ag
 -- 상품 (product_id = auction_id 로 1:1 매칭)
 -- background: 상품 제작 배경/사연
 -- ------------------------------------------------------------
-INSERT INTO products (name, organization_id, category_id, start_price, description, background, CREATED_AT, UPDATE_AT) VALUES
+INSERT INTO products (name, organization_id, category_id, start_price, description, background, CREATED_AT, UPDATED_AT) VALUES
 ('옻칠 나무 찻잔 세트',       1,  3,  30000,  '호두나무를 깎아 옻칠로 마감한 찻잔 2인 세트입니다.',                  '햇살공방 훈련생들이 3개월간 한 점씩 직접 깎고 칠해 완성했습니다.',               '2026-08-25 10:00:00', NULL),
 ('유기농 사과 선물세트 5kg',  2,  1,  25000,  '무농약 인증을 받은 양평산 부사 사과 5kg(14~16과)입니다.',             '올해 첫 수확한 사과로, 수익금은 조합 청년농 교육에 쓰입니다.',                 '2026-08-28 09:30:00', NULL),
 ('우리밀 수제 쿠키 선물상자', 3,  1,  15000,  '우리밀과 유기농 설탕으로 구운 쿠키 20입 선물상자입니다.',             '자활 참여자들이 제과기능사 자격을 준비하며 구운 쿠키입니다.',                   '2026-08-30 14:00:00', '2026-09-02 10:00:00'),
@@ -77,17 +77,17 @@ INSERT INTO products (name, organization_id, category_id, start_price, descripti
 -- current_price: 가장 최근 입찰가, 입찰이 없는 대기 상태는 NULL (시작가는 products.start_price)
 -- start_time: 첫 입찰 시간 / end_time: start_time + 1일 / 대기 상태는 둘 다 NULL
 -- ------------------------------------------------------------
-INSERT INTO auction (product_id, current_price, start_time, end_time, auction_status) VALUES
-(1,  38000,  '2026-09-02 11:20:00', '2026-09-03 11:20:00', '완료'),
-(2,  30000,  '2026-09-05 08:30:00', '2026-09-06 08:30:00', '완료'),
-(3,  18000,  '2026-09-06 15:00:00', '2026-09-07 15:00:00', '완료'),
-(4,  25000,  '2026-09-10 12:00:00', '2026-09-11 12:00:00', '완료'),
-(5,  22000,  '2026-09-22 21:15:00', '2026-09-23 21:15:00', '진행'),
-(6,  180000, '2026-09-22 20:00:00', '2026-09-23 20:00:00', '진행'),
-(7,  NULL,   NULL,                  NULL,                  '대기'),
-(8,  NULL,   NULL,                  NULL,                  '대기'),
-(9,  NULL,   NULL,                  NULL,                  '대기'),
-(10, 15000,  '2026-02-10 10:30:00', '2026-02-11 10:30:00', '완료');
+INSERT INTO auction (product_id,  start_time, end_time, auction_status) VALUES
+(1,    '2026-09-02 11:20:00', '2026-09-03 11:20:00', '완료'),
+(2,   '2026-09-05 08:30:00', '2026-09-06 08:30:00', '완료'),
+(3,    '2026-09-06 15:00:00', '2026-09-07 15:00:00', '완료'),
+(4,    '2026-09-10 12:00:00', '2026-09-11 12:00:00', '완료'),
+(5,   '2026-09-22 21:15:00', '2026-09-23 21:15:00', '진행'),
+(6,   '2026-09-22 20:00:00', '2026-09-23 20:00:00', '진행'),
+(7,    NULL,                  NULL,                  '대기'),
+(8,    NULL,                  NULL,                  '대기'),
+(9,    NULL,                  NULL,                  '대기'),
+(10,   '2026-02-10 10:30:00', '2026-02-11 10:30:00', '완료');
 
 -- ------------------------------------------------------------
 -- 입찰 (정상 회원 2~7번만 입찰, 각 경매의 첫 입찰 = 경매 시작, 가격 오름차순)

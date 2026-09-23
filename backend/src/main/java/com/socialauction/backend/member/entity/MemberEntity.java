@@ -28,7 +28,7 @@ public class MemberEntity extends BaseTime{
     private String name;
     private String email;
     private String phone;
-    private boolean isActive;
+    private String role;
 
     private LocalDateTime lockedAt;
     

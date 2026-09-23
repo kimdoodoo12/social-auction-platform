@@ -1,5 +1,7 @@
 package com.socialauction.backend.organization.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,21 +34,24 @@ public class OrganizationEntity {
     private String manager;
 
     @Column
-    private String manager_phone;
+    private String managerPhone;
 
     @Column
-    private Boolean agreement_status;
+    private LocalDateTime agreementDate;
 
     @Column
-    private String agreement_file;
+    private Boolean agreementStatus;
 
     @Column
-    private String organization_image;
+    private String agreementFile;
+
+    @Column
+    private String organizationImage;
 
     @Column 
-    private String agreement_info;
+    private String agreementInfo;
 
     @Column
-    private String buisness_registration_number;
+    private String businessRegistration;
     
 }

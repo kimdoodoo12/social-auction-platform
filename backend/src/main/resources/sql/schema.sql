@@ -11,8 +11,8 @@ CREATE TABLE member (
   phone VARCHAR(255),
   CREATED_AT DATETIME NOT NULL,
   UPDATED_AT DATETIME,
-  status VARCHAR(20), -- 회원상태(정지, 정상, 잠금, 탈퇴)
-  is_active BOOLEAN ,-- 관리자 여부
+  role VARCHAR(20), -- 회원상태(정지, 정상, 잠금, 탈퇴)
+  status BOOLEAN ,-- 관리자 여부
   locked_At DateTime
   # 입찰내역, 낙찰내역은 입찰로그 JOIN하여 조회
 );
@@ -53,7 +53,7 @@ CREATE TABLE products (
   decription VARCHAR(255),
   background VARCHAR(255),
   CREATED_AT DATETIME,
-  UPDATE_AT DATETIME
+  UPDATED_AT DATETIME
 );
 
 CREATE TABLE auction(
@@ -64,7 +64,7 @@ CREATE TABLE auction(
     ON UPDATE CASCADE,
     # 상품삭제는 없다.
   # start_price INT, -- 상품테이블에서 시작가격은 JOIN 가능
-  current_price INT,
+  -- current_price INT,
   start_time DATETIME,
   end_time DATETIME,
   auction_status VARCHAR(30) -- 대기상태, 진행상태, 완료상태 -- BOOLEAN으로 처리하고 NULL이면 경매대기상태?
