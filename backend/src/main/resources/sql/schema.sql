@@ -1,13 +1,6 @@
 DROP DATABASE IF EXISTS ieum;
 CREATE DATABASE IF NOT EXISTS ieum;
 USE ieum;
-CREATE TABLE admin (
-    admin_id INT PRIMARY KEY AUTO_INCREMENT,
-    login_id VARCHAR(30) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    name VARCHAR(30) NOT NULL,
-    position VARCHAR(30)
-);
 
 CREATE TABLE member (
   member_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -17,13 +10,15 @@ CREATE TABLE member (
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(255),
   CREATED_AT DATETIME NOT NULL,
-  status BOOLEAN DEFAULT TRUE
+  UPDATED_AT DATETIME,
+  status VARCHAR(20), -- 회원상태(정지, 정상, 잠금, 탈퇴)
+  is_active BOOLEAN -- 관리자 여부
   # 입찰내역, 낙찰내역은 입찰로그 JOIN하여 조회
 );
   
 CREATE TABLE category (
   category_id INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(30)
+  name VARCHAR(30) NOT NULL
 );
 CREATE TABLE organization(
   organization_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -33,8 +28,12 @@ CREATE TABLE organization(
   manager VARCHAR(30) NOT NULL,
   manager_phone VARCHAR(30) NOT NULL,
   agreement_date DATETIME,
-  agreement_status BOOLEAN -- 계약종료, 계약기간
-  # 등록상품은 JOIN
+  agreement_status BOOLEAN, -- 계약종료, 계약기간
+  agreement_file VARCHAR(255), -- 파일 경로, 위치
+  organization_image VARCHAR(255), -- 기관 이미지
+  agreement_info VARCHAR(255), -- 협약정보
+  business_registration VARCHAR(20) NOT NULL -- 사업자 등록번호
+  -- 등록상품은 JOIN
 );
 CREATE TABLE products (
   product_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -84,7 +83,7 @@ CREATE TABLE bid(
     ON UPDATE CASCADE,
   bid_price INT NOT NULL,
   # bid_status VARCHAR(30), -- 낙찰대기, 낙찰이전, 최종낙찰, 이건 없어도 가능
-  bid_time DATETIME
+  bid_time DATETIME -- 입찰한 시간 (추적 필요)
 );
 
 CREATE TABLE payment(
@@ -92,11 +91,11 @@ CREATE TABLE payment(
   auction_id INT NOT NULL,
   CONSTRAINT fk_payment_auction FOREIGN KEY(auction_id)
     REFERENCES auction(auction_id)
-    ON update CASCADE,
+    ON UPDATE CASCADE,
   member_id INT NOT NULL,
   CONSTRAINT fk_payment_member FOREIGN KEY(member_id)
     REFERENCES member(member_id)
     ON UPDATE CASCADE,
   payment_price INT NOT NULL,
   payment_status BOOLEAN  -- 결제, 미결제
-)
+);
