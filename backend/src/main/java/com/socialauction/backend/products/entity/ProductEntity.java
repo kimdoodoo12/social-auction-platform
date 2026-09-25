@@ -12,16 +12,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity 
+@Entity
 @Table (name = "products")
+@AllArgsConstructor @NoArgsConstructor @Data @Builder
 public class ProductEntity extends BaseTime{
-    
-    @Id 
+
+    @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer productId;
     private String name;
-    
+
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organizationEntity;
@@ -29,10 +34,9 @@ public class ProductEntity extends BaseTime{
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "category_id")
     private CategoryEntity categoryEntity;
-    
+
     private Integer startPrice;
     private String description;
     private String background;
-    
 
 }

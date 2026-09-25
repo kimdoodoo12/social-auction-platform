@@ -7,17 +7,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
-@Entity 
+@Getter
+@Entity
 @Table (name = "image")
 public class ImageEntity {
-    @Id 
+    @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer image_id;
 
-    @ManyToOne 
+    @ManyToOne
     @JoinColumn (name = "product_id")
-    private ProductEntity product_id;
+    private ProductEntity productEntity;
 
     private String image;
 }
