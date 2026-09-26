@@ -1,6 +1,7 @@
 package com.socialauction.backend.products.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.socialauction.backend.products.entity.ProductEntity;
 
@@ -20,6 +21,8 @@ public class ProductDto {
     private String background;      // 배경
     private LocalDateTime createdAt;// 생성 시간
     private LocalDateTime updatedAt;// 수정 시간
+
+    private List<ProductDto> images;// 상품 이미지들
 
     public ProductEntity toEntity(){
         return ProductEntity.builder()
