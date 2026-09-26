@@ -17,10 +17,11 @@ import com.socialauction.backend.products.entity.ProductEntity;
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
 
     @Override
+    // organizationEntity가 lazy설정이므로 먼저 정보를 받아올 수 있게 EntityGraph 어노테이션이 필요
     @EntityGraph(attributePaths = "organizationEntity")
     Page<ProductEntity> findAll(Pageable pageable);
 
-    // 기존 경매/입찰 엔티티를 조회만 하고, 입찰이 없는 경매도 포함한다.
+    // productId, 상태,현재가 가져오기
     @Query("""
             select a.productEntity.productId as productId,
                    a.auctionStatus as status,
