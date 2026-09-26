@@ -17,8 +17,8 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
             select i from ImageEntity i
             join fetch i.productEntity
             where i.productEntity.productId in :productIds
-              and i.image_id = (
-                  select min(other.image_id) from ImageEntity other
+              and i.imageId = (
+                  select min(other.imageId) from ImageEntity other
                   where other.productEntity = i.productEntity
               )
             """)
