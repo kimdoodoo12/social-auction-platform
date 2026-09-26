@@ -24,4 +24,8 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
             """)
     List<ImageEntity> findRepresentImg(
             @Param("productIds") List<Integer> productIds);
+
+    
+    // 이미지 여러개 찾기
+    List<ImageEntity> findByProductId(Integer productId);
 }
