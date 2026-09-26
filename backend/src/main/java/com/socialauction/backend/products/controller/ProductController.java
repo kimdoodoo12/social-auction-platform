@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
     private final ProductService productService;
 
-    // 상품 첫 화면 조회
+    // 상품 첫 화면(상품관리) 조회
     @GetMapping("")
     public Page<ProductListResponse> findAll(
             @PageableDefault(size = 8, sort = {"createdAt", "productId"},

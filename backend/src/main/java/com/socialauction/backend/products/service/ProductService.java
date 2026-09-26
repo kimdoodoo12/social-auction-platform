@@ -25,7 +25,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
 
-    // 상품 첫 화면 조회
+    // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
     public Page<ProductListResponse> findAll(Pageable pageable) {
         // 전체 가져오기
