@@ -11,8 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.socialauction.backend.products.dto.ImageDto;
 import com.socialauction.backend.products.dto.ProductAuctionSummary;
+import com.socialauction.backend.products.dto.ProductDto;
 import com.socialauction.backend.products.dto.ProductListResponse;
+import com.socialauction.backend.products.entity.ImageEntity;
 import com.socialauction.backend.products.entity.ProductEntity;
 import com.socialauction.backend.products.repository.ImageRepository;
 import com.socialauction.backend.products.repository.ProductRepository;
@@ -75,4 +78,18 @@ public class ProductService {
         // 추가한 배열들 반환
         return new PageImpl<>(responses, pageable, products.getTotalElements());
     }
-}
+
+    // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
+    public ProductDto findDetail(Integer productId) {
+        // 상품아이디로 상품 정보 가져오기
+        ProductEntity productEntity = productRepository.findById(productId).orElse(null);
+        // 상품아이디로 이미지들의 정보 가져오기
+        List<ImageEntity> imageEntities = imageRepository.findByProductId(productId);
+        
+        // productEntity를 dto로 변환, 이미지 정보도 담기
+        ProductDto productDto = ProductDto.from(productEntity, imageEntities);
+        
+        return productDto;
+        
+    }
+} // service end
