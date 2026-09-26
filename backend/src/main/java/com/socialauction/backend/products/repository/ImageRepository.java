@@ -27,5 +27,9 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
 
     
     // 이미지 여러개 찾기
-    List<ImageEntity> findByProductId(Integer productId);
+    @Query("""
+    select i from ImageEntity i
+    where i.productEntity.productId = :productId
+    """)
+    List<ImageEntity> findByProductId(@Param("productId") Integer productId);
 }
