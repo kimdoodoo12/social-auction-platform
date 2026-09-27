@@ -87,6 +87,7 @@ public class ProductService {
     }
 
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
+    @Transactional(readOnly = true)
     public ProductDto findDetail(Integer productId) {
         // 상품아이디로 상품 정보 가져오기
         ProductEntity productEntity = productRepository.findById(productId)
