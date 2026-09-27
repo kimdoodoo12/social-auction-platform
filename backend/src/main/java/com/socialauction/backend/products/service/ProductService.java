@@ -143,7 +143,9 @@ public class ProductService {
 
         // 이미지 설정
         if (productDto.getImages() != null) { // 비어있는지 확인
-            for (String imagePath : productDto.getImages()) { // Dto의 images는 경로만 포함되어있음
+            for (ImageDto imageDto : productDto.getImages()) {
+                Checks.check(imageDto == null, "이미지 정보를 입력해주세요.");
+                String imagePath = imageDto.getImage();
                 // 이미지 경로 확인
                 Checks.check(imagePath == null || imagePath.isBlank(),
                         "유효한 이미지 경로가 아닙니다.");

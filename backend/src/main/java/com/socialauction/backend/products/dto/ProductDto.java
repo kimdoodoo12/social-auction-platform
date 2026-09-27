@@ -25,7 +25,7 @@ public class ProductDto {
     private LocalDateTime updatedAt;// 수정 시간
 
     @Builder.Default
-    private List<String> images = new ArrayList<>();   // 상품 이미지경로들
+    private List<ImageDto> images = new ArrayList<>();   // 상품 이미지 정보들
 
 
 
@@ -51,7 +51,7 @@ public class ProductDto {
         .updatedAt(productEntity.getUpdatedAt() )
         .description(productEntity.getDescription() )
         .background(productEntity.getBackground() )
-        .images(imageEntities.stream().map( entity -> entity.getImage() ).toList())
+        .images(imageEntities.stream().map(ImageDto::from).toList())
         .build();
     }
 }
