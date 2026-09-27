@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +25,7 @@ public class ImageEntity {
 
     @ManyToOne
     @JoinColumn (name = "product_id")
+    @EqualsAndHashCode.Exclude // 무한재귀방지
     private ProductEntity productEntity;
 
     private String image;

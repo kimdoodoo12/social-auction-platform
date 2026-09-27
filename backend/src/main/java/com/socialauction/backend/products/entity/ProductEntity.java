@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -45,6 +46,7 @@ public class ProductEntity extends BaseTime{
 
     @OneToMany (mappedBy = "productEntity", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude // 무한재귀방지
     @Builder.Default 
     private List<ImageEntity> imageEntity = new ArrayList<>();
 
