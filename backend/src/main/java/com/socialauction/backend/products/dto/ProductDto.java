@@ -1,6 +1,7 @@
 package com.socialauction.backend.products.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.socialauction.backend.products.entity.ImageEntity;
@@ -23,7 +24,8 @@ public class ProductDto {
     private LocalDateTime createdAt;// 생성 시간
     private LocalDateTime updatedAt;// 수정 시간
 
-    private List<String> images;    // 상품 이미지경로들
+    @Builder.Default
+    private List<String> images = new ArrayList<>();   // 상품 이미지경로들
 
 
 
