@@ -8,9 +8,14 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.socialauction.backend.category.repository.CategoryRepository;
+import com.socialauction.backend.global.Checks;
+import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.dto.ImageDto;
 import com.socialauction.backend.products.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.dto.ProductDto;
@@ -27,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
+    private final CategoryRepository categoryRepository;
+    private final OrganizationRepository organizationRepository;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
@@ -91,5 +98,63 @@ public class ProductService {
         
         return productDto;
         
+    }
+
+    // 상품 등록
+    @Transactional
+    public boolean saveProduct(ProductDto productDto) {
+        // 상품명과 시작가 검증
+        Checks.check(productDto.getName() == null || productDto.getName().isBlank(),
+                "상품명을 입력해주세요.");
+        Checks.check(productDto.getName().length() > 30,
+                "상품명은 30자 이하로 입력해주세요.");
+        Checks.check(productDto.getStartPrice() == null || productDto.getStartPrice() < 0,
+                "시작가는 0 이상의 금액을 입력해주세요.");
+
+        // 상품 설명과 배경 길이 확인
+        Checks.check(productDto.getDescription() != null
+                && productDto.getDescription().length() > 255,
+                "상품 설명은 255자 이하로 입력해주세요.");
+        Checks.check(productDto.getBackground() != null
+                && productDto.getBackground().length() > 255,
+                "상품 배경은 255자 이하로 입력해주세요.");
+
+        ProductEntity productEntity = productDto.toEntity();
+
+        // 기관, 카테고리를 선택했는지 확인
+        Checks.check(productDto.getOrganizationId() == null
+                || productDto.getCategoryId() == null,
+                "기관과 카테고리를 설정해주세요.");
+
+        // 기관 설정
+        productEntity.setOrganizationEntity(
+                organizationRepository.findById(productDto.getOrganizationId())
+                        .orElseThrow(() -> new ResponseStatusException( // 예외 처리
+                                HttpStatus.BAD_REQUEST, "존재하지 않는 기관입니다.")));
+                            
+        // 카테고리 설정
+        productEntity.setCategoryEntity(
+                categoryRepository.findById(productDto.getCategoryId())
+                        .orElseThrow(() -> new ResponseStatusException( // 예외 처리
+                                HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다.")));
+
+        // 이미지 설정
+        if (productDto.getImages() != null) { // 비어있는지 확인
+            for (String imagePath : productDto.getImages()) { // Dto의 images는 경로만 포함되어있음
+                // 이미지 경로 확인
+                Checks.check(imagePath == null || imagePath.isBlank(),
+                        "유효한 이미지 경로가 아닙니다.");
+                ImageEntity imageEntity = ImageEntity.builder()
+                        .image(imagePath) // 받아온 경로를 설정
+                        .productEntity(productEntity) // 상품 번호 설정
+                        .build();
+
+                productEntity.getImageEntity().add(imageEntity); // 상품에 연결
+            }
+        }
+
+        // 저장
+        ProductEntity savedEntity = productRepository.save(productEntity);
+        return savedEntity.getProductId() >= 1;
     }
 } // service end

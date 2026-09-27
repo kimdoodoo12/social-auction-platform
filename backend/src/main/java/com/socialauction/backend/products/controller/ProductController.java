@@ -14,6 +14,9 @@ import com.socialauction.backend.products.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -36,4 +39,10 @@ public class ProductController {
         return productService.findDetail(productId);
     }
     
-}
+    // 상품 등록
+    @PostMapping("cc")
+    public boolean saveProduct(@RequestBody ProductDto productDto) {
+        return productService.saveProduct(productDto);
+    }
+    
+} // controller end
