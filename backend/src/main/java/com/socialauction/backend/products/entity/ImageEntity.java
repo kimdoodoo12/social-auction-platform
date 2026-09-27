@@ -7,11 +7,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @Table (name = "image")
+@NoArgsConstructor @AllArgsConstructor @Builder @Data 
 public class ImageEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
