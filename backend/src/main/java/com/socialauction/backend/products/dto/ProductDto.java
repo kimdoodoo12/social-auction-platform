@@ -25,6 +25,18 @@ public class ProductDto {
 
     private List<String> images;    // 상품 이미지경로들
 
+
+
+    public ProductEntity toEntity() {
+        return ProductEntity.builder()
+        .name(this.name)
+        .startPrice(this.startPrice)
+        .description(this.description)
+        .background(this.background)
+        .build();
+        
+    }
+
     // 시작가는 제외했음
     public static ProductDto from(ProductEntity productEntity, List<ImageEntity> imageEntities) {
         return ProductDto.builder()
