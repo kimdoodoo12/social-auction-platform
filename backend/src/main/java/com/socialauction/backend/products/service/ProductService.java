@@ -89,7 +89,9 @@ public class ProductService {
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
     public ProductDto findDetail(Integer productId) {
         // 상품아이디로 상품 정보 가져오기
-        ProductEntity productEntity = productRepository.findById(productId).orElse(null);
+        ProductEntity productEntity = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."));
         // 상품아이디로 이미지들의 정보 가져오기
         List<ImageEntity> imageEntities = imageRepository.findByProductId(productId);
         
