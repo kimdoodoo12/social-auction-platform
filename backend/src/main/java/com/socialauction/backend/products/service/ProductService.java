@@ -196,6 +196,22 @@ public class ProductService {
                         HttpStatus.BAD_REQUEST, "존재하지 않는 상품번호입니다."
                 ));
 
+        // 기존 이미지와 새 이미지의 개수 확인
+        if (productDto.getImages() != null) { // 이미지가 있는지 확인
+            int newImageCount = 0;
+            for (ImageDto imageDto : productDto.getImages()) {
+                // 이미지 정보 확인
+                Checks.check(imageDto == null, "이미지 정보를 입력해주세요.");
+                // 이미지 id가 없으면 새 이미지로 계산
+                if (imageDto.getImageId() == null) {
+                    newImageCount++;
+                }
+            }
+            // 기존 이미지를 교체하는 경우는 개수가 늘어나지 않음
+            Checks.check(savedEntity.getImageEntity().size() + newImageCount > 5,
+                    "상품 이미지는 최대 5개까지 등록할 수 있습니다.");
+        }
+
         // 받아온 Dto를 Entity로 변환
         ProductEntity productEntity = productDto.toEntity();
         
