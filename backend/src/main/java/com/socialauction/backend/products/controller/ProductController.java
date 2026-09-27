@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 
@@ -45,4 +48,9 @@ public class ProductController {
         return productService.saveProduct(productDto);
     }
     
+    // 상품 수정
+    @PutMapping("dd")
+    public boolean updateProduct(@RequestBody ProductDto productDto) {
+        return productService.updateProduct(productDto);
+    }
 } // controller end

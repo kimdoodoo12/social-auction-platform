@@ -162,4 +162,42 @@ public class ProductService {
         ProductEntity savedEntity = productRepository.save(productEntity);
         return savedEntity.getProductId() >= 1;
     }
+
+    // 상품 수정
+    @Transactional
+    public boolean updateProduct(ProductDto productDto) {
+        // 받아온 상품번호로 엔티티 조회
+        ProductEntity savedEntity = productRepository.findById(productDto.getProductId())
+                .orElseThrow( () -> new ResponseStatusException( // 예외 처리
+                        HttpStatus.BAD_REQUEST, "존재하지 않는 상품번호입니다."
+                ));
+
+        // 받아온 Dto를 Entity로 변환
+        ProductEntity productEntity = productDto.toEntity();
+        
+        // setter 이용해서 수정
+        savedEntity.setName(productEntity.getName() );
+        savedEntity.setStartPrice(productEntity.getStartPrice() );
+        savedEntity.setDescription(productEntity.getDescription() );
+        savedEntity.setBackground(productEntity.getBackground() );
+
+        // 기관 정보 변경
+        savedEntity.setOrganizationEntity(
+                // 받아온 기관 id로 기관 정보를 받아옴
+                organizationRepository.findById(productDto.getOrganizationId() )
+                .orElseThrow( () -> new ResponseStatusException( // 예외 처리
+                        HttpStatus.BAD_REQUEST, "존재하지 않는 기관 id입니다."
+                ))
+        );
+
+        // 카테고리 변경
+        savedEntity.setCategoryEntity( // 위랑 동일한 방식
+                categoryRepository.findById(productDto.getCategoryId() )
+                .orElseThrow( () -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리 id입니다."
+                ))
+        );
+
+        return true;
+    }
 } // service end
