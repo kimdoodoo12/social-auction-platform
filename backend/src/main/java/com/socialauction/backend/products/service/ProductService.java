@@ -166,6 +166,30 @@ public class ProductService {
     // 상품 수정
     @Transactional
     public boolean updateProduct(ProductDto productDto) {
+        // 상품번호가 있는지 확인
+        Checks.check(productDto.getProductId() == null,
+                "상품번호를 입력해주세요.");
+        // 기관, 카테고리를 선택했는지 확인
+        Checks.check(productDto.getOrganizationId() == null
+                || productDto.getCategoryId() == null,
+                "기관과 카테고리를 설정해주세요.");
+
+        // 상품명과 시작가 확인
+        Checks.check(productDto.getName() == null || productDto.getName().isBlank(),
+                "상품명을 입력해주세요.");
+        Checks.check(productDto.getName().length() > 30,
+                "상품명은 30자 이하로 입력해주세요.");
+        Checks.check(productDto.getStartPrice() == null || productDto.getStartPrice() < 0,
+                "시작가는 0 이상의 금액을 입력해주세요.");
+
+        // 상품 설명과 배경 길이 확인
+        Checks.check(productDto.getDescription() != null
+                && productDto.getDescription().length() > 255,
+                "상품 설명은 255자 이하로 입력해주세요.");
+        Checks.check(productDto.getBackground() != null
+                && productDto.getBackground().length() > 255,
+                "상품 배경은 255자 이하로 입력해주세요.");
+
         // 받아온 상품번호로 엔티티 조회
         ProductEntity savedEntity = productRepository.findById(productDto.getProductId())
                 .orElseThrow( () -> new ResponseStatusException( // 예외 처리
