@@ -198,6 +198,36 @@ public class ProductService {
                 ))
         );
 
+        // 이미지 변경
+        if (productDto.getImages() != null) { // 이미지가 있는지 확인
+            for (ImageDto imageDto : productDto.getImages()) {
+                // 이미지 정보 확인
+                Checks.check(imageDto == null, "이미지 정보를 입력해주세요.");
+                String imagePath = imageDto.getImage();
+                // 이미지 경로 확인
+                Checks.check(imagePath == null || imagePath.isBlank(),
+                        "유효한 이미지 경로가 아닙니다.");
+                // 빈 이미지 변경
+                if (imageDto.getImageId() == null) {
+                    ImageEntity imageEntity = ImageEntity.builder()
+                            .image(imagePath)
+                            .productEntity(savedEntity)
+                            .build();
+                    savedEntity.getImageEntity().add(imageEntity);
+                } else { // 기존 이미지 변경
+                    ImageEntity imageEntity = imageRepository.findById(imageDto.getImageId())
+                            .orElseThrow(() -> new ResponseStatusException( // 예외 처리
+                                    HttpStatus.BAD_REQUEST, "존재하지 않는 이미지입니다."));
+                    // imageId가 잘못 왔을 경우를 대비해서 확인            
+                    Checks.check(!savedEntity.getProductId().equals(
+                            imageEntity.getProductEntity().getProductId()),
+                            "해당 상품의 이미지가 아닙니다.");
+                    // 적용    
+                    imageEntity.setImage(imagePath);
+                }
+            }
+        }
+
         return true;
     }
 } // service end
