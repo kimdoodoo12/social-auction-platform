@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import com.socialauction.backend.products.dto.ImageDto;
 import com.socialauction.backend.products.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.dto.ProductDto;
 import com.socialauction.backend.products.dto.ProductListResponse;
+import com.socialauction.backend.products.dto.ProductManageDto;
 import com.socialauction.backend.products.entity.ImageEntity;
 import com.socialauction.backend.products.entity.ProductEntity;
 import com.socialauction.backend.products.repository.ImageRepository;
@@ -283,5 +285,12 @@ public class ProductService {
         }
 
         return true;
+    }
+
+    // 검색기능
+    public Page<ProductManageDto> findProductManage(
+        String productName, String organizationName, String auctionStatus, String categoryName, int page) {
+        Pageable pageable = PageRequest.of(page, 8); // 페이징 조건을 객체로 만듦 (page: 조회할 페이지 번호, pagesize: 출력할 개수)
+        return productRepository.findProductManage(productName, organizationName, auctionStatus, categoryName, pageable);
     }
 } // service end
