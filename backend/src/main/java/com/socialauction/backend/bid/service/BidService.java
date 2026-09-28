@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional 
 @RequiredArgsConstructor 
 public class BidService {
-     private final BidRepository bidRepository;
+    private final BidRepository bidRepository;
 
     public Page<BidDto> bidFindAll(Integer auctionId, int page, int size){
         Pageable pageable = PageRequest.of(

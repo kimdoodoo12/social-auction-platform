@@ -18,11 +18,12 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor 
-@RequestMapping ("/auction")
+@RequestMapping ("/bid")
 public class BidController {
     
     private final BidService bidService;
 
+    //입찰 전체 조회 7개씩 페이징 하여 조회 쿼리스트링: ?auctionId=1&page=0&size=7
     @GetMapping("/detail")
     public Page<BidDto> bidFindAll( @RequestParam Integer auctionId,
         @RequestParam(defaultValue = "0") int page,
@@ -32,7 +33,8 @@ public class BidController {
             
         }
 
-        
+
+    // 입찰 결과 조회 
     @GetMapping("/bidDetail")
     public BidResultDto bidResultfind(@RequestParam Integer auctionId) {
         return bidService.bidResultFind(auctionId);
