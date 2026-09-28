@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,14 +33,30 @@ public class MemberService {
 
 
 
+    // // 회원관리 관리자 페이지 (전체 조회)
+    // public List<MemberDto> memberfindAll(){
+    //     List<MemberEntity> memberEntities = memberRepository.findAll();
+
+    //     memberEntities.stream().map(MemberDto::from).toList();
+
+    //     return memberEntities.stream().map(MemberDto::from).toList();
+    // } // memberfindall end
+
     // 회원관리 관리자 페이지 (전체 조회)
-    public List<MemberDto> memberfindAll(){
-        List<MemberEntity> memberEntities = memberRepository.findAll();
+    @Transactional 
+    public Page<MemberDto> memberfindAll(int page, int size){
 
-        memberEntities.stream().map(MemberDto::from).toList();
+            Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("memberId").descending()
+            );
 
-        return memberEntities.stream().map(MemberDto::from).toList();
-    } // memberfindall end
+            Page<MemberEntity> members =
+                memberRepository.findAll(pageable);
+
+            return members.map(MemberDto::from);
+        } // memberfindall end
 
 
     // 회원관리 관리자 페이지 (개별 조회 : 이름)

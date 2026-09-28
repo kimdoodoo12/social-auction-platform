@@ -2,6 +2,7 @@ package com.socialauction.backend.member.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -26,10 +27,19 @@ public class MemberController {
     private final MemberService memberService;
 
     // 회원관리 관리자 페이지 (전체 조회)
-    @GetMapping ("/admin/user/manage")
-    public List<MemberDto> memberfindAll(){
-        return memberService.memberfindAll();
+    @GetMapping("/admin/user/manage")
+    public Page<MemberDto> memberfindAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "4") int size
+    ) {
+        return memberService.memberfindAll(page, size);
     } // memberfindAll() end
+
+    // // 회원관리 관리자 페이지 (전체 조회)
+    // @GetMapping ("/admin/user/manage")
+    // public List<MemberDto> memberfindAll(){
+    //     return memberService.memberfindAll();
+    // } // memberfindAll() end
 
     // 회원관리 관리자 페이지 (개별 조회 : 이름)
     @GetMapping("/admin/user/name")
