@@ -16,11 +16,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.entity.BidEntity;
+import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.entity.MemberEntity;
 import com.socialauction.backend.member.repository.MemberRepository;
+import com.socialauction.backend.payment.dto.PaymentDto;
 import com.socialauction.backend.payment.entity.PaymentEntity;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -131,6 +134,21 @@ public class MemberService {
         }
         return false;
     } // userStop() end
+
+    // 회원별 상세 페이지
+    public MemberBidHistoryDto userDetailInfo(int userid){
+        MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
+        MemberBidHistoryDto mDto = MemberBidHistoryDto.from(memberEntity);
+        memberEntity.getBidEntities().forEach((aaa)->{
+            BidDto bidDto = BidDto.from(aaa);
+            mDto.getBidDtos().add(bidDto);
+        });
+        memberEntity.getPaymentEntities().forEach((aaa)->{
+            PaymentDto paymentDto = PaymentDto.from(aaa);
+            mDto.getPayDtos().add(paymentDto);
+        });
+        return mDto;
+    }
 
 
 }

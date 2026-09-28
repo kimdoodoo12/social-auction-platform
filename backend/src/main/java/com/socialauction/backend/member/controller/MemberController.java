@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.service.MemberService;
@@ -77,6 +78,13 @@ public class MemberController {
     public boolean userStop(@PathVariable (name = "userid")int userid) {
         return memberService.userStop(userid);
     }
+
+    // 회원 상세 페이지 
+    @GetMapping("/user/detail/info")
+    public MemberBidHistoryDto userDetailInfo(@RequestParam (name = "userid")int userid){
+        return memberService.userDetailInfo(userid);
+    }
+    
     
     
     
