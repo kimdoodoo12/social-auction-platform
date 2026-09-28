@@ -50,7 +50,7 @@ CREATE TABLE products (
     ON UPDATE CASCADE,
   # 카테고리삭제는 보통하지 않는 것으로
   start_price INT NOT NULL,
-  decription VARCHAR(255),
+  description VARCHAR(255),
   background VARCHAR(255),
   CREATED_AT DATETIME,
   UPDATED_AT DATETIME
