@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.socialauction.backend.auction.entity.AuctionEntity;
+import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
@@ -34,6 +36,7 @@ public class ProductService {
     private final ImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final OrganizationRepository organizationRepository;
+    private final AuctionRepository auctionRepository;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
@@ -101,6 +104,17 @@ public class ProductService {
         
         return productDto;
         
+        
+    }
+
+    // 상태 이력
+
+    // 판매 중지
+    @Transactional
+    public boolean stopSelling(Integer productId) {
+        AuctionEntity auctionEntity = auctionRepository.findByProductEntity_ProductId(productId);
+        auctionEntity.setAuctionStatus("판매 중지");
+        return true;
     }
 
     // 상품 등록

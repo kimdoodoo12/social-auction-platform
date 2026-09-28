@@ -33,4 +33,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             """)
     List<ProductAuctionSummary> findAuctionSummaries(
             @Param("productIds") List<Integer> productIds);
+
+	
+	
+        
 }

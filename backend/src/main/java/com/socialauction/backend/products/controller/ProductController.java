@@ -12,6 +12,7 @@ import com.socialauction.backend.products.dto.ProductDto;
 import com.socialauction.backend.products.dto.ProductListResponse;
 import com.socialauction.backend.products.service.ProductService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,16 @@ public class ProductController {
         return productService.findDetail(productId);
     }
     
+    // 상태 이력
+
+    // 판매 중지 
+    @PostMapping("tt")
+    public boolean stopSelling( @RequestParam (name = "productId" ) Integer productId ) {
+        return productService.stopSelling(productId);
+    }
+    
+
+
     // 상품 등록
     @PostMapping("cc")
     public boolean saveProduct(@RequestBody ProductDto productDto) {
@@ -53,4 +64,5 @@ public class ProductController {
     public boolean updateProduct(@RequestBody ProductDto productDto) {
         return productService.updateProduct(productDto);
     }
+
 } // controller end
