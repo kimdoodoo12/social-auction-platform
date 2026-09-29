@@ -32,7 +32,7 @@ public class OrganizationInfoRequest {
             .name(this.name)
             .description(this.description)
             .address(this.address)
-            .manager(this.address)
+            .manager(this.manager)
             .managerPhone(this.managerPhone)
             .agreementDate(this.agreementDate)
             .agreementStatus(this.agreementStatus)
