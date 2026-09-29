@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping ("/product")
+@RequestMapping ("/admin/product")
 public class ProductController {
     private final ProductService productService;
 
@@ -39,8 +39,8 @@ public class ProductController {
     }
 
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
-    @GetMapping("bb") // 주소 추후에 설정
-    public ProductDto findDetail(@RequestParam (name = "productId") Integer productId) {
+    @GetMapping("/bb/{productId}") // 주소 추후에 설정
+    public ProductDto findDetail(@PathVariable ("productId") Integer productId) {
         return productService.findDetail(productId);
     }
 
