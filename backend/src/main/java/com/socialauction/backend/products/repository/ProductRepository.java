@@ -70,7 +70,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             )
             and (
                 :categoryName is null or
-                :categoryName = c.category_name
+                :categoryName = c.name
             )
             
             group by p.product_id, i.image, p.name, o.name, p.start_price,
@@ -99,7 +99,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
                 )
                 and (
                     :categoryName is null or
-                    :categoryName = c.category_name
+                    :categoryName = c.name
                 )
                 """,
             nativeQuery = true) // sql문을 사용하기 위해서 적용

@@ -1,0 +1,22 @@
+/* 카테고리 관리 */
+.category-add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.category-add > .admin-input {
+  flex: 1;
+}
+
+.category-edit-input {
+  height: 34px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.category-error {
+  margin: 10px 0 0;
+  color: var(--color-danger);
+  font-size: 12px;
+}

@@ -1,0 +1,86 @@
+/* 로그인 */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  padding: 16px;
+}
+
+.login-card {
+  width: 420px;
+  max-width: 100%;
+  padding: 36px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-card__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.login-card__desc,
+.login-card__foot {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* 대시보드 */
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dash-stat {
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dash-stat__label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.dash-stat__value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.dash-stat__value.highlight {
+  color: var(--color-primary);
+}
+
+.dash-stat__value small {
+  margin-left: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.dash-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.dash-more {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}

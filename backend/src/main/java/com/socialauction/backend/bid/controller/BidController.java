@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.dto.BidResultDto;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor 
 @RequestMapping ("/bid")
 public class BidController {
@@ -25,9 +27,9 @@ public class BidController {
 
     //입찰 전체 조회 7개씩 페이징 하여 조회 쿼리스트링: ?auctionId=1&page=0&size=7
     @GetMapping("/detail")
-    public Page<BidDto> bidFindAll( @RequestParam Integer auctionId,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "7") int size
+    public Page<BidDto> bidFindAll( @RequestParam(name="auctionId") Integer auctionId,
+        @RequestParam(name="page", defaultValue = "0") int page,
+        @RequestParam(name="size", defaultValue = "7") int size
         ) {
             return bidService.bidFindAll(auctionId, page, size);
             
