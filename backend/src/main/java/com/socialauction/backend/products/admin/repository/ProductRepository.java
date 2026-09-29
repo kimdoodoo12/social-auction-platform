@@ -114,7 +114,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 
     // 가격 경매 정보
     @Query (value = """
-            
+                select
+                    p.start
             """, nativeQuery = true)
 
 	
