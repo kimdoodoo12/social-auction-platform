@@ -31,7 +31,7 @@ import com.socialauction.backend.products.entity.ProductEntity;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Service("adminProductService")
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;

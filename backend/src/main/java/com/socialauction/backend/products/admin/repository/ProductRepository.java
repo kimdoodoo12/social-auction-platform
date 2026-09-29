@@ -18,7 +18,7 @@ import com.socialauction.backend.products.admin.dto.ProductManageDto;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.entity.ProductEntity;
 
-@Repository
+@Repository("adminProductRepository")
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
 
     @Override

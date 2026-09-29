@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 
-@RestController 
+@RestController("userProductController") 
 @RequiredArgsConstructor 
 @RequestMapping ("/user/product")
 public class ProductController {
     private final ProductService productService;
 
     // 추천 상품 조회
-    @GetMapping("aa")
-    public List<ProductDto> findRecommendProduct(Integer memberId ) {
-        return productService.findRecommendProduct(memberId);
-    }
+    // @GetMapping("aa")
+    // public List<ProductDto> findRecommendProduct(Integer memberId ) {
+    //     return productService.findRecommendProduct(memberId);
+    // }
     
     
     

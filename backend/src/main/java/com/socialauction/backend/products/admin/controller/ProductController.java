@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 
-@RestController
+@RestController("adminProductController")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 @RequestMapping ("/admin/product")
