@@ -35,8 +35,8 @@ public class BidController {
 
 
     // 입찰 결과 조회 
-    @GetMapping("/bidDetail")
-    public BidResultDto bidResultfind(@RequestParam Integer auctionId) {
+    @GetMapping("/bidDetail/{id}")
+    public BidResultDto bidResultfind( @PathVariable("id") Integer auctionId) {
         return bidService.bidResultFind(auctionId);
     }
     

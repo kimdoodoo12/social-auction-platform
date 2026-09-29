@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.socialauction.backend.auction.dto.AuctionDto;
+import com.socialauction.backend.auction.dto.AuctionFindAllDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.bid.dto.BidResultDto;
 
@@ -24,6 +24,23 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity,Integer> 
     nativeQuery = true
     )
     Integer findTopPriceByAuctionId(@Param("auctionId") Integer auctionId);
+
+    //경매 조회 - 현재 최고가 입찰한 사람이름
+    @Query(
+        value = """
+            SELECT m.name
+            FROM bid b
+            JOIN member m ON b.member_id = m.member_id
+            WHERE b.auction_id = :auctionId
+            ORDER BY b.bid_price DESC, b.bid_time DESC, b.bid_id DESC
+            LIMIT 1
+            """,
+        nativeQuery = true
+    )
+    Optional<String> findTopBidNameByAuctionId(
+        @Param("auctionId") Integer auctionId
+    );
+
     
 
 

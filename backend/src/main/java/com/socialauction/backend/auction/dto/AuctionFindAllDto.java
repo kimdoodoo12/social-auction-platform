@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor @AllArgsConstructor @Data @Builder 
-public class AuctionDto {
+public class AuctionFindAllDto {
     
     private Integer auctionId;
 
@@ -30,8 +30,8 @@ public class AuctionDto {
 
     private LocalDateTime endTime;
 
-    public static AuctionDto from(AuctionEntity auctionEntity){
-        return AuctionDto.builder()
+    public static AuctionFindAllDto from(AuctionEntity auctionEntity){
+        return AuctionFindAllDto.builder()
             .auctionId(auctionEntity.getAuctionId())
             .productName(auctionEntity.getProductEntity().getName())
             .organizationName(auctionEntity.getProductEntity().getOrganizationEntity().getName())
