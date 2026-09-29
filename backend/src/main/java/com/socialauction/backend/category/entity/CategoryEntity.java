@@ -23,4 +23,8 @@ public class CategoryEntity {
 
     @Column
     private String name;
+
+    public CategoryEntity(String name){
+        this.name = name;
+    }
 }

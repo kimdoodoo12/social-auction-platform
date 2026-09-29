@@ -12,7 +12,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Intege
     
     @Query(value = "SELECT " 
     + "category.category_id, category.name, COUNT(product_id) "
-    + "FROM products LEFT JOIN category "
+    + "FROM products RIGHT JOIN category "
     + "on products.category_id = category.category_id "
     + "GROUP BY category_id", nativeQuery = true)
     List<CategoryResponse> findAllCategoryWithCounts();
