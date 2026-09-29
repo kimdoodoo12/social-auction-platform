@@ -176,6 +176,11 @@ public class ProductService {
 
         // 저장
         ProductEntity savedEntity = productRepository.save(productEntity);
+        AuctionEntity auctionEntity = new AuctionEntity();
+        auctionEntity.setProductEntity(productEntity);
+        auctionEntity.setAuctionStatus("대기");
+        auctionRepository.save(auctionEntity);
+        
         return savedEntity.getProductId() >= 1;
     }
 
