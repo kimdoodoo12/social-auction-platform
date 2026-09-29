@@ -7,12 +7,15 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.socialauction.backend.auction.entity.AuctionEntity;
+import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
@@ -20,6 +23,7 @@ import com.socialauction.backend.products.dto.ImageDto;
 import com.socialauction.backend.products.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.dto.ProductDto;
 import com.socialauction.backend.products.dto.ProductListResponse;
+import com.socialauction.backend.products.dto.ProductManageDto;
 import com.socialauction.backend.products.entity.ImageEntity;
 import com.socialauction.backend.products.entity.ProductEntity;
 import com.socialauction.backend.products.repository.ImageRepository;
@@ -34,6 +38,7 @@ public class ProductService {
     private final ImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final OrganizationRepository organizationRepository;
+    private final AuctionRepository auctionRepository;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
@@ -101,6 +106,17 @@ public class ProductService {
         
         return productDto;
         
+        
+    }
+
+    // 상태 이력
+
+    // 판매 중지
+    @Transactional
+    public boolean stopSelling(Integer productId) {
+        AuctionEntity auctionEntity = auctionRepository.findByProductEntity_ProductId(productId);
+        auctionEntity.setAuctionStatus("판매 중지");
+        return true;
     }
 
     // 상품 등록
@@ -269,5 +285,12 @@ public class ProductService {
         }
 
         return true;
+    }
+
+    // 검색기능
+    public Page<ProductManageDto> findProductManage(
+        String productName, String organizationName, String auctionStatus, String categoryName, int page) {
+        Pageable pageable = PageRequest.of(page, 8); // 페이징 조건을 객체로 만듦 (page: 조회할 페이지 번호, pagesize: 출력할 개수)
+        return productRepository.findProductManage(productName, organizationName, auctionStatus, categoryName, pageable);
     }
 } // service end

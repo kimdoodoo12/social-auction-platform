@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.socialauction.backend.products.dto.ProductDto;
 import com.socialauction.backend.products.dto.ProductListResponse;
+import com.socialauction.backend.products.dto.ProductManageDto;
 import com.socialauction.backend.products.service.ProductService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +43,15 @@ public class ProductController {
     public ProductDto findDetail(@RequestParam (name = "productId") Integer productId) {
         return productService.findDetail(productId);
     }
+
+    // 판매 중지 
+    @PostMapping("tt")
+    public boolean stopSelling( @RequestParam (name = "productId" ) Integer productId ) {
+        return productService.stopSelling(productId);
+    }
     
+
+
     // 상품 등록
     @PostMapping("cc")
     public boolean saveProduct(@RequestBody ProductDto productDto) {
@@ -53,4 +63,18 @@ public class ProductController {
     public boolean updateProduct(@RequestBody ProductDto productDto) {
         return productService.updateProduct(productDto);
     }
+
+    // 검색 기능
+    @GetMapping("ee")
+    public Page<ProductManageDto> findProductManage(
+        @RequestParam(name = "productName", defaultValue = "") String productName,          // 상품 이름 (기본값을 공백으로 설정)
+        // required = false : 요청을 받지 않아도 되게 설정( 받지 않을 경우 null )
+        @RequestParam(name = "organizationName", required = false) String organizationName, // 기관 이름 
+        @RequestParam(name = "auctionStatus", required = false) String auctionStatus,       // 경매 상태
+        @RequestParam(name = "categoryName", required = false) String categoryName,         // 카테고리 이름
+        @RequestParam(name = "page", defaultValue = "0") int page                           // 페이지 기본값을 0으로 설정
+        ) {
+            return productService.findProductManage(productName, organizationName, auctionStatus, categoryName, page);
+        }
+    
 } // controller end
