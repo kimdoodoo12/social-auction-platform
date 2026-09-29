@@ -52,6 +52,7 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity,Integer> 
     Integer countBidsByAuctionId(@Param("auctionId") Integer auctionId);
     
 
+    AuctionEntity findByProductEntity_ProductId(Integer productId);
 
 }
 

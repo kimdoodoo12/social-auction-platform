@@ -1,15 +1,59 @@
 package com.socialauction.backend.products.user.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.socialauction.backend.products.entity.ProductEntity;
+import com.socialauction.backend.products.user.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
 
 @Repository 
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer>{
 
+    // 추천 상품을 출력하기 위한거
+    @Query(value = """
+        SELECT
+            p.product_id AS productId,
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            COALESCE(bs.bid_count, 0) AS bidCount
+        FROM products p
+        LEFT JOIN organization o
+            ON o.organization_id = p.organization_id
+        LEFT JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        LEFT JOIN image i
+            ON i.product_id = p.product_id
+            AND i.image_id = (
+                SELECT min(img.image_id)
+                FROM image img
+                WHERE img.product_id = p.product_id
+            )
+        where c.name = :categoryName
+        """, nativeQuery = true)
+    List<ProductDto> findRecommend(
+        @Param ("categoryName") String categoryName
+    );
+
+    
     
 }

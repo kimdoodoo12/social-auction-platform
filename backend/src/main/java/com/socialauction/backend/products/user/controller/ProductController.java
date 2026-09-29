@@ -1,13 +1,20 @@
 package com.socialauction.backend.products.user.controller;
 
-import org.hibernate.query.Page;
-import org.springframework.stereotype.Controller;
+import java.util.List;
+
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.socialauction.backend.products.user.dto.ProductDto;
 import com.socialauction.backend.products.user.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
+
+
+import org.springframework.web.bind.annotation.GetMapping;
+
+
 
 @RestController 
 @RequiredArgsConstructor 
@@ -15,6 +22,12 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
     private final ProductService productService;
 
-    // 추천 상품 출력
+    // 추천 상품 조회
+    @GetMapping("aa")
+    public List<ProductDto> findRecommend(Integer memberId ) {
+        return productService.findRecommend( memberId );
+    }
+    
+    
     
 }
