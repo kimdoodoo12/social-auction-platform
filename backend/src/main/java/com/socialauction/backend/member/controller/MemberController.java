@@ -2,11 +2,14 @@ package com.socialauction.backend.member.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
+import com.socialauction.backend.member.dto.MemberSearchDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.service.MemberService;
 
@@ -26,10 +29,19 @@ public class MemberController {
     private final MemberService memberService;
 
     // 회원관리 관리자 페이지 (전체 조회)
-    @GetMapping ("/admin/user/manage")
-    public List<MemberDto> memberfindAll(){
-        return memberService.memberfindAll();
+    @GetMapping("/admin/user/manage")
+    public Page<MemberDto> memberfindAll(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "4") int size
+    ) {
+        return memberService.memberfindAll(page, size);
     } // memberfindAll() end
+
+    // // 회원관리 관리자 페이지 (전체 조회)
+    // @GetMapping ("/admin/user/manage")
+    // public List<MemberDto> memberfindAll(){
+    //     return memberService.memberfindAll();
+    // } // memberfindAll() end
 
     // 회원관리 관리자 페이지 (개별 조회 : 이름)
     @GetMapping("/admin/user/name")
@@ -66,6 +78,22 @@ public class MemberController {
     @PutMapping("/user/stop/{userid}")
     public boolean userStop(@PathVariable (name = "userid")int userid) {
         return memberService.userStop(userid);
+    }
+
+    // 회원 상세 페이지 
+    @GetMapping("/user/detail/info/{userid}")
+    public MemberBidHistoryDto userDetailInfo(@PathVariable (name = "userid")int userid){
+        return memberService.userDetailInfo(userid);
+    }
+    
+    // 이름 + 아이디 + 가입일 + 전체 상태 
+    @GetMapping("/admin/user/search")
+    public Page<MemberDto> userSearch(
+        @ModelAttribute MemberSearchDto dto,
+        @RequestParam(name = "page") int page,
+        @RequestParam(name = "size") int size
+    ) {
+        return memberService.userSearch(dto, page, size);
     }
     
     

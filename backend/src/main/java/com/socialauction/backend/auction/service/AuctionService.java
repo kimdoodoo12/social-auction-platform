@@ -1,0 +1,85 @@
+package com.socialauction.backend.auction.service;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.socialauction.backend.auction.dto.AuctionDetailDto;
+import com.socialauction.backend.auction.dto.AuctionFindAllDto;
+import com.socialauction.backend.auction.entity.AuctionEntity;
+import com.socialauction.backend.auction.repository.AuctionRepository;
+import com.socialauction.backend.products.dto.ImageDto;
+
+import lombok.RequiredArgsConstructor;
+
+@Service 
+@RequiredArgsConstructor 
+
+public class AuctionService {
+    
+    private final AuctionRepository auctionRepository;
+
+    // 경매 전체 조회 기능 , 페이징
+    @Transactional (readOnly = true)
+    public Page<AuctionFindAllDto> auctionFindAll(int page, int size){
+        Pageable pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by("auctionId").ascending()
+        );
+
+        Page<AuctionEntity> auctionEntities = auctionRepository.findAll(pageable);
+
+
+        Page<AuctionFindAllDto> auctiomDto = auctionEntities.map((entity) -> { 
+            AuctionFindAllDto dto;
+            dto = AuctionFindAllDto.from(entity);
+
+            Integer topPrice = auctionRepository.findTopPriceByAuctionId(entity.getAuctionId()); 
+            dto.setTopPrice(topPrice != null ? topPrice : 0);
+
+            Integer bidCount = auctionRepository.countBidsByAuctionId(entity.getAuctionId());
+            
+            dto.setBidCount(bidCount);
+            
+            
+            return dto;
+        
+        } );
+
+        return auctiomDto;
+        
+    }
+
+    //경매 상세 조회
+    @Transactional (readOnly = true)
+    public AuctionDetailDto auctionDetailFind(Integer auctionId){
+        AuctionEntity auctioneEntity = auctionRepository.findById(auctionId).orElse(null);
+        
+        AuctionDetailDto auctionDetailDto = AuctionDetailDto.from(auctioneEntity);
+        
+        Integer topPrice = auctionRepository.findTopPriceByAuctionId(auctioneEntity.getAuctionId()); 
+        auctionDetailDto.getAuctionFindAllDto().setTopPrice(topPrice != null ? topPrice : 0);
+
+        Integer bidCount = auctionRepository.countBidsByAuctionId(auctioneEntity.getAuctionId());
+            
+        auctionDetailDto.getAuctionFindAllDto().setBidCount(bidCount);
+
+
+        //이미지 꺼내기
+        List<ImageDto> imageDtos = auctioneEntity.getProductEntity().getImageEntity().stream().map(ImageDto::from).toList();
+        //이미지 저장
+        auctionDetailDto.setImageList(imageDtos);
+
+        // 최고가 입찰 쿼리문으로 가져오기
+        String userName = auctionRepository.findTopBidNameByAuctionId(auctionId).orElse(null);
+        auctionDetailDto.setUserName(userName);
+
+        return auctionDetailDto;
+    }
+}

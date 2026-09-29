@@ -26,7 +26,10 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
 
 
 
-    //현재 입찰기록 최근 기록 기준으로 출력
+    //현재 입찰기록 최근 기록 기준으로 출력 
+    // 회원: 해당 입찰을 한 회원을 찾기
+    // 경매: 해당 입찰이 속한 경매를 찾기
+    // 결제: 같은 경매에 참여한 같은 회원의 결제찾기 결제가 없어도 입찰이 나오도록 LEFT JOIN을 사용
     @Query( 
 
         value = """ 

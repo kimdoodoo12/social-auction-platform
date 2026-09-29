@@ -36,7 +36,7 @@ public class OrganizationEntity {
     @Column
     private String address;
 
-    @Column 
+    @Column
     private String manager;
 
     @Column

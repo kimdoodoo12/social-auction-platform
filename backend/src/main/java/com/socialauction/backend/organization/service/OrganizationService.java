@@ -12,6 +12,7 @@ import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationListResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationProductResponse;
+import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 
@@ -22,10 +23,17 @@ import lombok.RequiredArgsConstructor;
 public class OrganizationService {
     private final OrganizationRepository oRepository;
 
+    @Transactional(readOnly = true)
     public Page<OrganizationListResponse> findAll(Pageable pageable){
         return oRepository.findAllOrganizationWithCounts(pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<OrganizationListResponse> findAll(String name, Boolean agreementStatus, Pageable pageable){
+        return oRepository.findAllOrganizationWithCounts(name, agreementStatus, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public OrganizationDetailResponse getOrganizationDetailResponse(int id){
         OrganizationInfoResponse oInfoResponse = OrganizationInfoResponse.from(oRepository.findById(id).get());
         List<OrganizationProductResponse> oProductResponse = oRepository.findOrganizationProduct(id);
