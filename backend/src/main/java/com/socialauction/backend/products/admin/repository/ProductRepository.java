@@ -1,6 +1,7 @@
 package com.socialauction.backend.products.admin.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
 import com.socialauction.backend.products.admin.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.admin.dto.ProductDto;
 import com.socialauction.backend.products.admin.dto.ProductManageDto;
@@ -113,12 +115,31 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         Pageable pageable);
 
     // 가격 경매 정보
-    @Query (value = """
-                select
-                    p.start
-            """, nativeQuery = true)
+    @Query(value = """
+        SELECT
+            a.auction_id AS auctionId,
+            p.start_price AS startPrice,
+            COALESCE(MAX(b.bid_price), p.start_price) AS currentPrice,
+            COUNT(b.bid_id) AS bidCount,
+            COUNT(DISTINCT b.member_id) AS bidderCount,
+            a.start_time AS startTime,
+            a.end_time AS endTime
+        FROM products p
+        JOIN auction a
+            ON a.product_id = p.product_id
+        LEFT JOIN bid b
+            ON b.auction_id = a.auction_id
+        WHERE p.product_id = :productId
+        GROUP BY
+            a.auction_id,
+            p.start_price,
+            a.start_time,
+            a.end_time
+        """, nativeQuery = true)
+    Optional<ProductAuctionInfo> findAuctionInfo(
+        @Param("productId") Integer productId
+    );
+	
 
-	
-	
         
 }
