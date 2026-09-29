@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+// 회원 정보 등록시 필요한 정보 
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
 public class UserDto {
     private String loginId;
