@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.socialauction.backend.auction.entity.AuctionEntity;
-import com.socialauction.backend.products.dto.ImageDto;
+import com.socialauction.backend.products.admin.dto.ImageDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

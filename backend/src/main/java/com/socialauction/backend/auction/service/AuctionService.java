@@ -13,7 +13,7 @@ import com.socialauction.backend.auction.dto.AuctionDetailDto;
 import com.socialauction.backend.auction.dto.AuctionFindAllDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
-import com.socialauction.backend.products.dto.ImageDto;
+import com.socialauction.backend.products.admin.dto.ImageDto;
 
 import lombok.RequiredArgsConstructor;
 
