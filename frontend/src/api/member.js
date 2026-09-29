@@ -34,3 +34,8 @@ export function fetchMemberDetail(userId) {
 export function suspendMember(userId) {
   return api.put(`/user/stop/${userId}`)
 }
+
+// 회원 정상 복구
+export function normalizeMember(userId) {
+  return api.put(`/user/normal/${userId}`)
+}

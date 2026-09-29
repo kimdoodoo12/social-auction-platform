@@ -4,7 +4,7 @@ import AdminPage from '../../../components/admin/AdminPage'
 import DataTable from '../../../components/admin/DataTable'
 import Pagination from '../../../components/admin/Pagination'
 import { Badge, Button, Card, ConfirmModal, FilterBar, LinkButton, Summary } from '../../../components/admin/ui'
-import { fetchMembers, searchMembers, suspendMember } from '../../../api/member'
+import { fetchMembers, searchMembers, suspendMember , normalizeMember } from '../../../api/member'
 import { useAsync } from '../../../hooks/useAsync'
 import { formatDate, formatNumber } from '../../../utils/format'
 import { MEMBER_ROLES, SUSPENDED_ROLE, memberRoleTone } from './memberStatus'
@@ -60,20 +60,45 @@ export default function MemberListPage() {
     setDraft(empty)
     applyFilters(empty)
   }
+//*****************************8 */
+  const handleStatusChange = async () => {
+  const member = target
+  const restoring = member.role === SUSPENDED_ROLE
 
-  const handleSuspend = async () => {
-    const member = target
-    setTarget(null)
-    setActionError(null)
-    try {
-      const ok = await suspendMember(member.memberId)
-      if (!ok) setActionError(`${member.name} 회원을 정지하지 못했습니다.`)
-    } catch (error) {
-      setActionError(error.message)
+  setTarget(null)
+  setActionError(null)
+
+  try {
+    const ok = restoring
+      ? await normalizeMember(member.memberId)
+      : await suspendMember(member.memberId)
+
+    if (!ok) {
+      setActionError(
+        `${member.name} 회원을 ${restoring ? '정상 처리' : '정지'}하지 못했습니다.`,
+      )
     }
-    list.reload()
-    counts.reload()
+  } catch (error) {
+    setActionError(error.message)
   }
+
+  list.reload()
+  counts.reload()
+}
+
+  // const handleSuspend = async () => {
+  //   const member = target
+  //   setTarget(null)
+  //   setActionError(null)
+  //   try {
+  //     const ok = await suspendMember(member.memberId)
+  //     if (!ok) setActionError(`${member.name} 회원을 정지하지 못했습니다.`)
+  //   } catch (error) {
+  //     setActionError(error.message)
+  //   }
+  //   list.reload()
+  //   counts.reload()
+  // }
 
   const pageData = list.data
   const columns = [
@@ -94,11 +119,10 @@ export default function MemberListPage() {
           <LinkButton onClick={() => navigate(`/admin/members/${r.memberId}`)}>상세</LinkButton>
           <span className="admin-actions__sep">·</span>
           <LinkButton
-            tone={r.role === SUSPENDED_ROLE ? 'muted' : 'primary'}
-            disabled={r.role === SUSPENDED_ROLE}
+            tone={r.role === SUSPENDED_ROLE ? 'primary' : 'danger'}
             onClick={() => setTarget(r)}
           >
-            정지
+            {r.role === SUSPENDED_ROLE ? '정상' : '정지'}
           </LinkButton>
         </div>
       ),
@@ -172,11 +196,17 @@ export default function MemberListPage() {
 
       <ConfirmModal
         open={Boolean(target)}
-        title="회원 정지"
-        message={target ? `${target.name}(${target.loginId}) 회원을 정지하시겠습니까?` : ''}
-        confirmText="정지"
-        danger
-        onConfirm={handleSuspend}
+        title={target?.role === SUSPENDED_ROLE ? '회원 정상 처리' : '회원 정지'}
+        message={
+          target
+            ? `${target.name}(${target.loginId}) 회원을 ${
+                target.role === SUSPENDED_ROLE ? '정상 처리' : '정지'
+              }하시겠습니까?`
+            : ''
+        }
+        confirmText={target?.role === SUSPENDED_ROLE ? '정상' : '정지'}
+        danger={target?.role !== SUSPENDED_ROLE}
+        onConfirm={handleStatusChange}
         onCancel={() => setTarget(null)}
       />
     </AdminPage>

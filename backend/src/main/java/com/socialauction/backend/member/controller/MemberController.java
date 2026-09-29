@@ -81,6 +81,11 @@ public class MemberController {
     public boolean userStop(@PathVariable ("userid")int userid) {
         return memberService.userStop(userid);
     }
+    // 회원 정지 풀기 
+    @PutMapping("/user/normal/{userid}")
+    public boolean userNoStop(@PathVariable ("userid")int userid) {
+        return memberService.userStop(userid);
+    }
 
     // 회원 상세 페이지 
     @GetMapping("/user/detail/info/{userid}")
