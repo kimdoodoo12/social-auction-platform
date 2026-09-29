@@ -1,4 +1,4 @@
-package com.socialauction.backend.products.repository;
+package com.socialauction.backend.products.admin.repository;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.socialauction.backend.products.dto.ProductAuctionSummary;
-import com.socialauction.backend.products.dto.ProductDto;
-import com.socialauction.backend.products.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.dto.ProductAuctionSummary;
+import com.socialauction.backend.products.admin.dto.ProductDto;
+import com.socialauction.backend.products.admin.dto.ProductManageDto;
 import com.socialauction.backend.products.entity.ProductEntity;
 
 @Repository

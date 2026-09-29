@@ -1,4 +1,4 @@
-package com.socialauction.backend.products.dto;
+package com.socialauction.backend.products.admin.dto;
 
 import com.socialauction.backend.products.entity.ImageEntity;
 

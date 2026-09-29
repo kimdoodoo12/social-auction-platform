@@ -1,4 +1,4 @@
-package com.socialauction.backend.products.service;
+package com.socialauction.backend.products.admin.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,15 +19,15 @@ import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
-import com.socialauction.backend.products.dto.ImageDto;
-import com.socialauction.backend.products.dto.ProductAuctionSummary;
-import com.socialauction.backend.products.dto.ProductDto;
-import com.socialauction.backend.products.dto.ProductListResponse;
-import com.socialauction.backend.products.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.dto.ImageDto;
+import com.socialauction.backend.products.admin.dto.ProductAuctionSummary;
+import com.socialauction.backend.products.admin.dto.ProductDto;
+import com.socialauction.backend.products.admin.dto.ProductListResponse;
+import com.socialauction.backend.products.admin.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.repository.ImageRepository;
+import com.socialauction.backend.products.admin.repository.ProductRepository;
 import com.socialauction.backend.products.entity.ImageEntity;
 import com.socialauction.backend.products.entity.ProductEntity;
-import com.socialauction.backend.products.repository.ImageRepository;
-import com.socialauction.backend.products.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 

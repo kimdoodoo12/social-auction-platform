@@ -1,4 +1,4 @@
-package com.socialauction.backend.products.dto;
+package com.socialauction.backend.products.admin.dto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

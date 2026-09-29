@@ -1,4 +1,4 @@
-package com.socialauction.backend.products.controller;
+package com.socialauction.backend.products.admin.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.socialauction.backend.products.dto.ProductDto;
-import com.socialauction.backend.products.dto.ProductListResponse;
-import com.socialauction.backend.products.dto.ProductManageDto;
-import com.socialauction.backend.products.service.ProductService;
+import com.socialauction.backend.products.admin.dto.ProductDto;
+import com.socialauction.backend.products.admin.dto.ProductListResponse;
+import com.socialauction.backend.products.admin.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.service.ProductService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

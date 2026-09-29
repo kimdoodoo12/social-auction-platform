@@ -1,4 +1,4 @@
-package com.socialauction.backend.products.repository;
+package com.socialauction.backend.products.admin.repository;
 
 import java.util.List;
 
