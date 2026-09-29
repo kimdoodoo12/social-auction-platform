@@ -53,7 +53,7 @@ public class MemberService {
             Pageable pageable = PageRequest.of(
                 page,
                 size,
-                Sort.by("memberId").descending()
+                Sort.by("memberId").ascending()
             );
 
             Page<MemberEntity> members =
@@ -135,6 +135,17 @@ public class MemberService {
         }
         return false;
     } // userStop() end
+    // 회원정지 복구
+    @Transactional 
+    public boolean userNoStop(int userid){
+        MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
+        if(memberEntity != null){
+            memberEntity.setRole("정상");
+            return true;
+        }
+        return false;
+    } // userStop() end
+
 
     // 회원별 상세 페이지
     public MemberBidHistoryDto userDetailInfo(int userid){

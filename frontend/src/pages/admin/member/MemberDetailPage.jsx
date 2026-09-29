@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import AdminPage from '../../../components/admin/AdminPage'
 import DataTable from '../../../components/admin/DataTable'
 import { AsyncBoundary, Badge, Button, Card, ConfirmModal, DetailList } from '../../../components/admin/ui'
-import { fetchMemberDetail, suspendMember } from '../../../api/member'
+import { fetchMemberDetail, suspendMember, normalizeMember } from '../../../api/member'
 import { useAsync } from '../../../hooks/useAsync'
 import { formatDate, formatDateTime, formatNumber, formatPrice } from '../../../utils/format'
 import { SUSPENDED_ROLE, memberRoleTone } from './memberStatus'
@@ -22,25 +22,40 @@ export default function MemberDetailPage() {
   const member = detail.data
   const suspended = member?.role === SUSPENDED_ROLE
 
-  const handleSuspend = async () => {
-    setConfirmOpen(false)
-    setActionError(null)
-    try {
-      const ok = await suspendMember(member.memberId)
-      if (!ok) setActionError('회원을 정지하지 못했습니다.')
-    } catch (error) {
-      setActionError(error.message)
+  const handleStatusChange = async () => {
+  setConfirmOpen(false)
+  setActionError(null)
+
+  try {
+    const ok = suspended
+      ? await normalizeMember(member.memberId)
+      : await suspendMember(member.memberId)
+
+    if (!ok) {
+      setActionError(
+        suspended
+          ? '회원을 정상 처리하지 못했습니다.'
+          : '회원을 정지하지 못했습니다.',
+      )
     }
-    detail.reload()
+  } catch (error) {
+    setActionError(error.message)
   }
+
+  detail.reload()
+}
 
   const bids = [...(member?.bidDtos ?? [])].sort(byTimeDesc('bidTime'))
   const payments = [...(member?.payDtos ?? [])].sort(byTimeDesc('createdAt'))
 
   const actions = member && (
-    <Button variant="danger" size="sm" disabled={suspended} onClick={() => setConfirmOpen(true)}>
-      {suspended ? '정지된 회원' : '회원 정지'}
-    </Button>
+  <Button
+    variant={suspended ? 'dark' : 'danger'}
+    size="sm"
+    onClick={() => setConfirmOpen(true)}
+  >
+    {suspended ? '회원 정상' : '회원 정지'}
+  </Button>
   )
 
   return (
@@ -127,11 +142,17 @@ export default function MemberDetailPage() {
 
       <ConfirmModal
         open={confirmOpen}
-        title="회원 정지"
-        message={member ? `${member.name}(${member.loginId}) 회원을 정지하시겠습니까?` : ''}
-        confirmText="정지"
-        danger
-        onConfirm={handleSuspend}
+        title={suspended ? '회원 정상 처리' : '회원 정지'}
+        message={
+          member
+            ? `${member.name}(${member.loginId}) 회원을 ${
+                suspended ? '정상 처리' : '정지'
+              }하시겠습니까?`
+            : ''
+        }
+        confirmText={suspended ? '정상' : '정지'}
+        danger={!suspended}
+        onConfirm={handleStatusChange}
         onCancel={() => setConfirmOpen(false)}
       />
     </AdminPage>
