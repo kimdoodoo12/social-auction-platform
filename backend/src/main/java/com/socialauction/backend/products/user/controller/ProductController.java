@@ -24,8 +24,8 @@ public class ProductController {
 
     // 추천 상품 조회
     @GetMapping("aa")
-    public List<ProductDto> findRecommend(Integer memberId ) {
-        return productService.findRecommend( memberId );
+    public List<ProductDto> findRecommendProduct(Integer memberId ) {
+        return productService.findRecommendProduct(memberId);
     }
     
     

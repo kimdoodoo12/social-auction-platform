@@ -10,11 +10,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.socialauction.backend.products.entity.ProductEntity;
 import com.socialauction.backend.products.user.dto.ProductDto;
+import com.socialauction.backend.products.user.dto.ProductRecommendDto;
 
 import lombok.RequiredArgsConstructor;
 
 @Repository 
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer>{
+
+    // 현재 로그인한 사용자의 카테고리별 입찰 횟수 확인
+    @Query(value = """
+        SELECT
+            p.category_id AS categoryId,
+            COUNT(b.bid_id) AS bidCount
+        FROM bid b
+        JOIN auction a
+            ON a.auction_id = b.auction_id
+        JOIN products p
+            ON p.product_id = a.product_id
+        WHERE b.member_id = :memberId
+        AND p.category_id IS NOT NULL
+        GROUP BY p.category_id
+        """, nativeQuery = true)
+    List<ProductRecommendDto> findcount(
+        @Param("memberId") Integer memberId
+    );
+
+
+
 
     // 추천 상품을 출력하기 위한거
     @Query(value = """
@@ -53,7 +75,5 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
     List<ProductDto> findRecommend(
         @Param ("categoryName") String categoryName
     );
-
-    
     
 }

@@ -112,6 +112,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         @Param ("categoryName") String categoryName,
         Pageable pageable);
 
+    // 가격 경매 정보
+    @Query (value = """
+            
+            """, nativeQuery = true)
+
 	
 	
         
