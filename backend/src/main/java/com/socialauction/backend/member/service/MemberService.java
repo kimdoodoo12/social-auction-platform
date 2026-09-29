@@ -20,6 +20,7 @@ import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
+import com.socialauction.backend.member.dto.MemberSearchDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.entity.MemberEntity;
 import com.socialauction.backend.member.repository.MemberRepository;
@@ -148,6 +149,29 @@ public class MemberService {
             mDto.getPayDtos().add(paymentDto);
         });
         return mDto;
+    }
+
+    // 회원조회 이름 + 아이디 + 상태 + 가입일 
+    @Transactional(readOnly = true)
+    public Page<MemberDto> userSearch(
+            MemberSearchDto dto,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<MemberEntity> result =
+            memberRepository.userSearch(
+                    dto.getName(),
+                    dto.getEmail(),
+                    dto.getRole(),
+                    dto.getStartDate(),
+                    dto.getEndDate(),
+                    pageable
+            );
+
+        return result.map(MemberDto::from);
     }
 
 
