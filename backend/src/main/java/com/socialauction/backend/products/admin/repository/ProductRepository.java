@@ -15,6 +15,7 @@ import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
 import com.socialauction.backend.products.admin.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.admin.dto.ProductDto;
 import com.socialauction.backend.products.admin.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.entity.ProductEntity;
 
 @Repository
@@ -140,6 +141,26 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         @Param("productId") Integer productId
     );
 	
-
+    // 최근 입찰 내역
+    @Query(value = """
+        SELECT
+            ROW_NUMBER() OVER (
+                ORDER BY b.bid_time ASC, b.bid_id ASC
+            ) AS bidNumber,
+            COUNT(*) OVER () AS totalCount,
+            b.member_id AS memberId,
+            m.name AS memberName,
+            b.bid_price AS bidPrice,
+            b.bid_time AS bidTime
+        FROM bid b
+        LEFT JOIN member m
+            ON m.member_id = b.member_id
+        WHERE b.auction_id = :auctionId
+        ORDER BY b.bid_time DESC, b.bid_id DESC
+        LIMIT 5
+        """, nativeQuery = true)
+    List<RecentBid> findRecentBids(
+        @Param("auctionId") Integer auctionId
+    );
         
 }
