@@ -58,7 +58,7 @@ select * from bid where auction_id = 1;
 
 
 
-SELECT category.category_id, category.name, COUNT(product_id) as product_count FROM products LEFT JOIN category on products.category_id = category.category_id GROUP BY category_id;
+SELECT category.category_id, category.name, COUNT(product_id) as product_count FROM products RIGHT JOIN category on products.category_id = category.category_id GROUP BY category_id;
 select * from category;
 
 select * from products;

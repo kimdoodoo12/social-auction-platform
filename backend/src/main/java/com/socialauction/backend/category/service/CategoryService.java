@@ -24,7 +24,7 @@ public class CategoryService {
     }
 
     public boolean save(String name){
-        CategoryEntity cEntity = new CategoryEntity(null, name);
+        CategoryEntity cEntity = new CategoryEntity(name);
         cRepository.save(cEntity);
 
         if(cEntity.getCategoryId() >= 1){

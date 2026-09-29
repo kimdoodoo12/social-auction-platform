@@ -30,7 +30,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     + "o.organization_id, o.name, o.manager, o.manager_phone, "
     + "o.agreement_date, o.agreement_status, COUNT(products.product_id) "
     + "FROM organization as o LEFT JOIN products on o.organization_id = products.organization_id "
-    + "WHERE o.name = :name AND (o.agreement_status = :agreementStatus is null or o.agreement_status = :agreementStatus)"
+    + "WHERE (o.name = :name is null or o.name LIKE CONCAT('%', :name, '%')) AND (o.agreement_status = :agreementStatus is null or o.agreement_status = :agreementStatus)"
     + "GROUP BY o.organization_id "
     , nativeQuery = true)
     Page<OrganizationListResponse> findAllOrganizationWithCounts(@Param("name")String name, @Param("agreementStatus") Boolean agreementStatus, Pageable pageable);
