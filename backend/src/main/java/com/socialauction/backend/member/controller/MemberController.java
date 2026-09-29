@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController 
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor 
 public class MemberController {
     private final MemberService memberService;
@@ -31,8 +33,8 @@ public class MemberController {
     // 회원관리 관리자 페이지 (전체 조회)
     @GetMapping("/admin/user/manage")
     public Page<MemberDto> memberfindAll(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "4") int size
+        @RequestParam(name="page", defaultValue = "0") int page,
+        @RequestParam(name="size", defaultValue = "4") int size
     ) {
         return memberService.memberfindAll(page, size);
     } // memberfindAll() end
@@ -70,19 +72,19 @@ public class MemberController {
 
     // 회원정보수정( 등록때 한것만 수정할 수 있도록 )
     @PutMapping("/user/update/{userid}")
-    public boolean userUpdate(@PathVariable (name = "userid") int userid , @RequestBody UserDto userDto) {
+    public boolean userUpdate(@PathVariable ("userid") int userid , @RequestBody UserDto userDto) {
         return memberService.userUpdate(userid,userDto);
     }
 
     // 회원 정지 기능 
     @PutMapping("/user/stop/{userid}")
-    public boolean userStop(@PathVariable (name = "userid")int userid) {
+    public boolean userStop(@PathVariable ("userid")int userid) {
         return memberService.userStop(userid);
     }
 
     // 회원 상세 페이지 
     @GetMapping("/user/detail/info/{userid}")
-    public MemberBidHistoryDto userDetailInfo(@PathVariable (name = "userid")int userid){
+    public MemberBidHistoryDto userDetailInfo(@PathVariable ("userid")int userid){
         return memberService.userDetailInfo(userid);
     }
     

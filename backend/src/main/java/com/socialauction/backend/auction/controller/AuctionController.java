@@ -2,6 +2,7 @@ package com.socialauction.backend.auction.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.socialauction.backend.auction.dto.AuctionDetailDto;
 import com.socialauction.backend.auction.dto.AuctionFindAllDto;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController 
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor 
 @RequestMapping ("/auction")
 public class AuctionController {
@@ -24,8 +26,8 @@ public class AuctionController {
     private final AuctionService auctionService;
 
    @GetMapping("")
-    public Page<AuctionFindAllDto> auctionFindAll(@RequestParam(defaultValue = "0") int page, 
-                                    @RequestParam(defaultValue = "8") int size) {
+    public Page<AuctionFindAllDto> auctionFindAll(@RequestParam(name="page", defaultValue = "0") int page, 
+                                    @RequestParam(name="size", defaultValue = "8") int size) {
             return auctionService.auctionFindAll(page, size);
             
         }

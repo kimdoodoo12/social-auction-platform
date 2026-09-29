@@ -1,0 +1,34 @@
+/* 기관 상세 */
+.org-detail__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.org-detail__desc {
+  margin: 0;
+  color: var(--color-text-body);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.org-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+/* 기관 등록/수정 폼 */
+.org-form__error {
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.org-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
