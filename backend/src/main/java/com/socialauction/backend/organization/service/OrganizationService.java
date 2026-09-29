@@ -23,16 +23,17 @@ import lombok.RequiredArgsConstructor;
 public class OrganizationService {
     private final OrganizationRepository oRepository;
 
+    @Transactional(readOnly = true)
     public Page<OrganizationListResponse> findAll(Pageable pageable){
         return oRepository.findAllOrganizationWithCounts(pageable);
     }
 
-    public Page<OrganizationListResponse> findAll(OrganizationSearchRequest request, Pageable pageable){
-        String name = request.getName();
-        boolean agreementStatus = request.getAgreementStatus();
+    @Transactional(readOnly = true)
+    public Page<OrganizationListResponse> findAll(String name, Boolean agreementStatus, Pageable pageable){
         return oRepository.findAllOrganizationWithCounts(name, agreementStatus, pageable);
     }
 
+    @Transactional(readOnly = true)
     public OrganizationDetailResponse getOrganizationDetailResponse(int id){
         OrganizationInfoResponse oInfoResponse = OrganizationInfoResponse.from(oRepository.findById(id).get());
         List<OrganizationProductResponse> oProductResponse = oRepository.findOrganizationProduct(id);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 import com.socialauction.backend.organization.dto.admin.OrganizationDetailResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
@@ -36,9 +37,9 @@ public class OrganizationController {
         Page<OrganizationListResponse> organizations = oService.findAll(pageable);
         return organizations;
     }
-    @PostMapping("/search")
-    public Page<OrganizationListResponse> findAll(@RequestBody OrganizationSearchRequest request, @PageableDefault(page=0, size=10, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
-        Page<OrganizationListResponse> organizations = oService.findAll(request, pageable);
+    @GetMapping("/search")
+    public Page<OrganizationListResponse> findAll(@RequestParam(name = "name", required = false)String name, @RequestParam(name = "agreementStatus", required = false) Boolean agreementStatus, @PageableDefault(page=0, size=10, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
+        Page<OrganizationListResponse> organizations = oService.findAll(name, agreementStatus, pageable);
         return organizations;
     }
 
