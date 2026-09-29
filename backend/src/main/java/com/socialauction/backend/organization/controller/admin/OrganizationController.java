@@ -19,6 +19,7 @@ import com.socialauction.backend.organization.dto.admin.OrganizationDetailRespon
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationListResponse;
+import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.service.OrganizationService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,11 @@ public class OrganizationController {
     @GetMapping("")
     public Page<OrganizationListResponse> findAll(@PageableDefault(page=0,  size=4, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
         Page<OrganizationListResponse> organizations = oService.findAll(pageable);
+        return organizations;
+    }
+    @PostMapping("/search")
+    public Page<OrganizationListResponse> findAll(@RequestBody OrganizationSearchRequest request, @PageableDefault(page=0, size=10, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
+        Page<OrganizationListResponse> organizations = oService.findAll(request, pageable);
         return organizations;
     }
 

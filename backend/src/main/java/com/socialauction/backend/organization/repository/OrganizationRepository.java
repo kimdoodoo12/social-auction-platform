@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationListResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationProductResponse;
+import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 
 @Repository 
@@ -24,6 +25,15 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     + "FROM organization as o LEFT JOIN products on o.organization_id = products.organization_id "
     + "GROUP BY o.organization_id", nativeQuery = true)
     Page<OrganizationListResponse> findAllOrganizationWithCounts(Pageable pageable);
+
+    @Query(value = "SELECT "
+    + "o.organization_id, o.name, o.manager, o.manager_phone, "
+    + "o.agreement_date, o.agreement_status, COUNT(products.product_id) "
+    + "FROM organization as o LEFT JOIN products on o.organization_id = products.organization_id "
+    + "WHERE o.name = :name AND o.agreement_status = :agreementStatus "
+    + "GROUP BY o.organization_id "
+    , nativeQuery = true)
+    Page<OrganizationListResponse> findAllOrganizationWithCounts(@Param("name")String name, @Param("agreementStatus") Boolean agreementStatus, Pageable pageable);
 
 
     @Query(value = "SELECT "

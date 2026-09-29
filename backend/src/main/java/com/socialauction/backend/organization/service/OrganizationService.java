@@ -12,6 +12,7 @@ import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationListResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationProductResponse;
+import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 
@@ -24,6 +25,12 @@ public class OrganizationService {
 
     public Page<OrganizationListResponse> findAll(Pageable pageable){
         return oRepository.findAllOrganizationWithCounts(pageable);
+    }
+
+    public Page<OrganizationListResponse> findAll(OrganizationSearchRequest request, Pageable pageable){
+        String name = request.getName();
+        boolean agreementStatus = request.getAgreementStatus();
+        return oRepository.findAllOrganizationWithCounts(name, agreementStatus, pageable);
     }
 
     public OrganizationDetailResponse getOrganizationDetailResponse(int id){

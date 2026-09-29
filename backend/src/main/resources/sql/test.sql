@@ -62,3 +62,9 @@ SELECT category.category_id, category.name, COUNT(product_id) as product_count F
 select * from category;
 
 select * from products;
+
+
+SELECT o.organization_id, o.name, o.manager, o.manager_phone, o.agreement_date, o.agreement_status, COUNT(products.product_id)
+    FROM organization as o LEFT JOIN products on o.organization_id = products.organization_id
+    WHERE o.name = '햇살공방' AND o.agreement_status = TRUE
+    GROUP BY o.organization_id
