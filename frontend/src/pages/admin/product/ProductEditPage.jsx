@@ -6,8 +6,8 @@ import { useAsync } from '../../../hooks/useAsync'
 import ProductForm from './ProductForm'
 import './product.css'
 
-// [ADMIN] 06 상품 수정 — GET /product/bb 로 불러와 PUT /product/dd 로 저장
-// ProductDto 응답에 시작가가 없어 목록에서 넘어온 값(location.state)이 있으면 채우고, 없으면 다시 입력받는다.
+// [ADMIN] 06 상품 수정 — GET /admin/product/bb/{productId} 로 불러와 PUT /admin/product/dd 로 저장
+// TotalDto의 상품 정보와 경매 시작가를 사용하고, 경매 정보가 없으면 목록의 시작가를 보조로 쓴다.
 
 function toFormValues(product, startPrice) {
   return {
@@ -29,6 +29,8 @@ export default function ProductEditPage() {
   const detailPath = `/admin/products/${productId}`
 
   const detail = useAsync(() => fetchProduct(productId), [productId])
+  const product = detail.data?.productDto
+  const startPrice = detail.data?.productAuctionInfo?.startPrice ?? listState.startPrice
 
   const handleSubmit = async (productDto) => {
     await updateProduct(productDto)
@@ -38,16 +40,16 @@ export default function ProductEditPage() {
 
   return (
     <AdminPage title="상품 수정" back={detailPath}>
-      <AsyncBoundary loading={detail.loading && !detail.data} error={detail.error}>
-        {detail.data && (
+      <AsyncBoundary loading={detail.loading && !product} error={detail.error}>
+        {product && (
           <ProductForm
-            key={detail.data.productId}
-            initial={toFormValues(detail.data, listState.startPrice)}
+            key={product.productId}
+            initial={toFormValues(product, startPrice)}
             submitLabel="수정 저장"
             onSubmit={handleSubmit}
             onCancel={() => navigate(detailPath, { state: listState })}
             startPriceHint={
-              listState.startPrice == null ? '상세 조회 응답에 시작가가 없어 다시 입력해야 합니다.' : undefined
+              startPrice == null ? '상세 조회 응답에 시작가가 없어 다시 입력해야 합니다.' : undefined
             }
           />
         )}
