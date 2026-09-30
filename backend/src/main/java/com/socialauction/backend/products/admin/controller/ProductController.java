@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import com.socialauction.backend.products.admin.dto.ProductDto;
 import com.socialauction.backend.products.admin.dto.ProductListResponse;
 import com.socialauction.backend.products.admin.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.dto.TotalDto;
 import com.socialauction.backend.products.admin.service.ProductService;
 
 import jakarta.transaction.Transactional;
@@ -42,7 +43,7 @@ public class ProductController {
 
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
     @GetMapping("/bb/{productId}") // 주소 추후에 설정
-    public ProductDto findDetail(@PathVariable ("productId") Integer productId) {
+    public TotalDto findDetail(@PathVariable ("productId") Integer productId) {
         return productService.findDetail(productId);
     }
 
