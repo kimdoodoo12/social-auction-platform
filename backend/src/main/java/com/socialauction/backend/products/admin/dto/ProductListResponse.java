@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 
 import com.socialauction.backend.products.entity.ProductEntity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@Builder @NoArgsConstructor @AllArgsConstructor @Data 
 public class ProductListResponse {
 
     private Integer productId;          // 상품번호
