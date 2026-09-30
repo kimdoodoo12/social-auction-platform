@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,10 +21,13 @@ import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
+import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
 import com.socialauction.backend.products.admin.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.admin.dto.ProductDto;
 import com.socialauction.backend.products.admin.dto.ProductListResponse;
 import com.socialauction.backend.products.admin.dto.ProductManageDto;
+import com.socialauction.backend.products.admin.dto.RecentBid;
+import com.socialauction.backend.products.admin.dto.TotalDto;
 import com.socialauction.backend.products.admin.repository.ImageRepository;
 import com.socialauction.backend.products.admin.repository.ProductRepository;
 import com.socialauction.backend.products.entity.ImageEntity;
@@ -93,7 +97,7 @@ public class ProductService {
 
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
     @Transactional(readOnly = true)
-    public ProductDto findDetail(Integer productId) {
+    public TotalDto findDetail(Integer productId) {
         // 상품아이디로 상품 정보 가져오기
         ProductEntity productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -103,8 +107,16 @@ public class ProductService {
         
         // productEntity를 dto로 변환, 이미지 정보도 담기
         ProductDto productDto = ProductDto.from(productEntity, imageEntities);
+
+        ProductAuctionInfo auctionInfo = productRepository.findAuctionInfo(productId);
+        List<RecentBid> bidInfo = productRepository.findRecentBids(auctionInfo.getAuctionId());
         
-        return productDto;
+        TotalDto totalDto = new TotalDto();
+        totalDto.setProductAuctionInfo(auctionInfo);
+        totalDto.setProductDto(productDto);
+        totalDto.setRecentBid(bidInfo);
+
+        return totalDto;
         
         
     }
