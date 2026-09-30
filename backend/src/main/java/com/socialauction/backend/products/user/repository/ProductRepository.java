@@ -14,7 +14,7 @@ import com.socialauction.backend.products.user.dto.ProductRecommendDto;
 
 import lombok.RequiredArgsConstructor;
 
-@Repository 
+@Repository("userProductRepository") 
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer>{
 
     // 현재 로그인한 사용자의 카테고리별 입찰 횟수 확인

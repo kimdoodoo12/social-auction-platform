@@ -10,7 +10,7 @@ import com.socialauction.backend.products.user.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service 
+@Service("userProductService") 
 @RequiredArgsConstructor 
 public class ProductService {
     private final ProductRepository productRepository;

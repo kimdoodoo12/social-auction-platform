@@ -1,14 +1,14 @@
 import { api, BASE_URL, toPage } from './client'
 
-// 상품 API (backend products/controller/ProductController.java)
+// 상품 API (backend products/admin/controller/ProductController.java)
 // 백엔드 주소가 임시값(aa, bb ...)이라 바뀌면 여기만 고친다.
 export const PRODUCT_API = {
-  list: '/product/aa', // GET  Pageable(size 8, createdAt·productId DESC) → Page<ProductListResponse>
-  detail: '/product/bb', // GET  ?productId → ProductDto
-  stop: '/product/tt', // POST ?productId → boolean (판매 중지)
-  create: '/product/cc', // POST body ProductDto → boolean
-  update: '/product/dd', // PUT  body ProductDto → boolean
-  search: '/product/ee', // GET  ?productName&organizationName&auctionStatus&categoryName&page → Page<ProductManageDto>
+  list: '/admin/product/aa', // GET  Pageable(size 8, createdAt·productId DESC) → Page<ProductListResponse>
+  detail: '/admin/product/bb', // GET  /{productId} → ProductDto
+  stop: '/admin/product/tt', // POST ?productId → boolean (판매 중지)
+  create: '/admin/product/cc', // POST body ProductDto → boolean
+  update: '/admin/product/dd', // PUT  body ProductDto → boolean
+  search: '/admin/product/ee', // GET  ?productName&organizationName&auctionStatus&categoryName&page → Page<ProductManageDto>
 }
 
 // 폼/필터 선택지용 (읽기 전용)
@@ -68,7 +68,7 @@ export async function searchProducts({ productName, organizationName, auctionSta
 }
 
 export function fetchProduct(productId) {
-  return api.get(PRODUCT_API.detail, { productId })
+  return api.get(`${PRODUCT_API.detail}/${productId}`)
 }
 
 // 성공 시 백엔드는 true 를 준다. false 가 오면 실패로 본다.
