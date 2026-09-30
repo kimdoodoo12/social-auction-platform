@@ -50,7 +50,7 @@ function fromManageDto(row, index) {
     startPrice: row.startPrice,
     currentPrice: row.bidPrice,
     // 경매가 없으면 auction_status 가 null 이다. 목록(aa)과 같은 표기로 맞춘다.
-    status: row.auctionStatus ?? NO_AUCTION_STATUS,
+    status: row.auctionStatus ?? '대기',
     createdAt: row.createdAt,
   }
 }

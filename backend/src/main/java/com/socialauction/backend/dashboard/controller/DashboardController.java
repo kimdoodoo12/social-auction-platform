@@ -11,6 +11,4 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/ieum/admin")
 public class DashboardController {
     
-    @GetMapping("")
-    public 
 }

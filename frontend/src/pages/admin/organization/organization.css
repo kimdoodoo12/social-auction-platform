@@ -1,34 +1,74 @@
-/* 기관 상세 */
-.org-detail__head {
+/* 기관 화면 전용 스타일 (색상은 styles/tokens.css 변수만 사용) */
+
+/* 상세 헤더: 원형 로고 + 이름 옆 배지 */
+.org-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.org-hero-title {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
 }
 
-.org-detail__desc {
-  margin: 0;
-  color: var(--color-text-body);
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.org-detail__grid {
+/* 상세: 기관 정보(왼쪽) + 등록 상품(오른쪽) */
+.org-detail {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 16px;
   align-items: start;
 }
 
-/* 기관 등록/수정 폼 */
-.org-form__error {
-  color: var(--color-danger);
-  font-size: 12px;
+/* 읽기 전용 값을 입력칸 모양으로 표시 */
+.org-read {
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  word-break: break-all;
 }
 
-.org-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.org-read--multi {
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* 등록/수정 폼 */
+.org-split {
+  grid-template-columns: minmax(0, 1fr) 330px;
+}
+
+.org-textarea {
+  min-height: 90px;
+}
+
+.org-textarea--sm {
+  min-height: 64px;
+}
+
+.org-logo-box {
+  height: 150px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.org-logo-box .admin-image--empty {
+  border: 0;
+  background: transparent;
+}
+
+.org-logo-box img.admin-image {
+  object-fit: contain;
+}
+
+.org-file-input {
+  border-style: dashed;
+  background: var(--color-bg);
 }

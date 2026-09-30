@@ -1,20 +1,33 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import AdminPage from '../../../components/admin/AdminPage'
 import DataTable from '../../../components/admin/DataTable'
-import { AsyncBoundary, Badge, Button, Card, ConfirmModal, DetailList } from '../../../components/admin/ui'
-import { fetchMemberDetail, suspendMember, normalizeMember } from '../../../api/member'
+import {
+  AsyncBoundary,
+  BackLink,
+  Badge,
+  Button,
+  Card,
+  ConfirmModal,
+  InfoRows,
+  StatCard,
+} from '../../../components/admin/ui'
+import { fetchMemberDetail, normalizeMember, suspendMember } from '../../../api/member'
 import { useAsync } from '../../../hooks/useAsync'
 import { formatDate, formatDateTime, formatNumber, formatPrice } from '../../../utils/format'
 import { SUSPENDED_ROLE, memberRoleTone } from './memberStatus'
 import './member.css'
 
-// [ADMIN] 12 회원 상세
-// 응답: MemberBidHistoryDto { memberId, loginId, name, email, createdAt, bcount, pcount, role, lockedAt, bidDtos, payDtos }
+// [ADMIN] 12 회원 상세 (Figma 75:387) — GET /user/detail/info/{userid}
+// 응답: MemberBidHistoryDto { memberId, loginId, name, email, createdAt, bcount, pcount, role, lockedAt, notpay, bidDtos, payDtos }
+// 백엔드에 없는 값(관심 상품, 정지 이력, 연락처, 최근 로그인, 마케팅 수신, 표의 상품명 등)은
+// Figma 틀을 유지하고 '-'로 표시한다(사용자 결정).
+const RECENT_BIDS = 5
 const byTimeDesc = (key) => (a, b) => String(b[key] ?? '').localeCompare(String(a[key] ?? ''))
 
 export default function MemberDetailPage() {
   const { userId } = useParams()
+  const navigate = useNavigate()
   const detail = useAsync(() => fetchMemberDetail(userId), [userId])
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [actionError, setActionError] = useState(null)
@@ -22,117 +35,144 @@ export default function MemberDetailPage() {
   const member = detail.data
   const suspended = member?.role === SUSPENDED_ROLE
 
+  // 정지 ↔ 정상 복구
   const handleStatusChange = async () => {
-  setConfirmOpen(false)
-  setActionError(null)
-
-  try {
-    const ok = suspended
-      ? await normalizeMember(member.memberId)
-      : await suspendMember(member.memberId)
-
-    if (!ok) {
-      setActionError(
-        suspended
-          ? '회원을 정상 처리하지 못했습니다.'
-          : '회원을 정지하지 못했습니다.',
-      )
+    setConfirmOpen(false)
+    setActionError(null)
+    try {
+      const ok = suspended ? await normalizeMember(member.memberId) : await suspendMember(member.memberId)
+      if (!ok) setActionError(suspended ? '회원을 정지 해제하지 못했습니다.' : '회원을 정지하지 못했습니다.')
+    } catch (error) {
+      setActionError(error.message)
     }
-  } catch (error) {
-    setActionError(error.message)
+    detail.reload()
   }
 
-  detail.reload()
-}
-
-  const bids = [...(member?.bidDtos ?? [])].sort(byTimeDesc('bidTime'))
+  const allBids = [...(member?.bidDtos ?? [])].sort(byTimeDesc('bidTime'))
+  const bids = allBids.slice(0, RECENT_BIDS)
   const payments = [...(member?.payDtos ?? [])].sort(byTimeDesc('createdAt'))
-
-  const actions = member && (
-  <Button
-    variant={suspended ? 'dark' : 'danger'}
-    size="sm"
-    onClick={() => setConfirmOpen(true)}
-  >
-    {suspended ? '회원 정상' : '회원 정지'}
-  </Button>
-  )
+  const statusLabel = suspended ? '정지 해제' : '계정 정지'
 
   return (
-    <AdminPage title="회원 상세" back="/admin/members" actions={actions}>
+    <AdminPage title={`회원 상세 · ${userId}`}>
+      <BackLink to="/admin/members">회원 관리로 돌아가기</BackLink>
+
       <AsyncBoundary loading={detail.loading && !member} error={member ? null : detail.error}>
         {member && (
           <>
             {actionError && <div className="admin-state admin-state--error">{actionError}</div>}
-            <div className="member-detail-grid">
-              <div className="member-detail-side">
-                <Card title="회원 정보">
-                  <DetailList
-                    items={[
-                      { label: '회원번호', value: member.memberId },
-                      { label: '아이디', value: member.loginId },
-                      { label: '이름', value: member.name },
-                      { label: '이메일', value: member.email },
-                      { label: '가입일', value: formatDate(member.createdAt) },
-                      { label: '상태', value: <Badge tone={memberRoleTone(member.role)}>{member.role ?? '-'}</Badge> },
-                      { label: '잠금 일시', value: formatDateTime(member.lockedAt) },
-                    ]}
-                  />
-                </Card>
-                <div className="member-stats">
-                  <div className="admin-card member-stat">
-                    <span className="member-stat__label">입찰 횟수</span>
-                    <span className="member-stat__value">
-                      {formatNumber(member.bcount ?? 0)}
-                      <small>회</small>
-                    </span>
-                  </div>
-                  <div className="admin-card member-stat">
-                    <span className="member-stat__label">낙찰 횟수</span>
-                    <span className="member-stat__value highlight">
-                      {formatNumber(member.pcount ?? 0)}
-                      <small>회</small>
-                    </span>
-                  </div>
+
+            <section className="admin-card admin-hero">
+              <span className="member-avatar" aria-hidden="true" />
+              <div className="admin-hero__body">
+                <div className="admin-hero__meta">{member.memberId}</div>
+                <div className="member-hero-title">
+                  <span className="admin-hero__title">{member.name}</span>
+                  <Badge tone={memberRoleTone(member.role)}>{member.role ?? '-'}</Badge>
+                </div>
+                <div className="admin-hero__sub">
+                  {member.email} · - · 가입 {formatDate(member.createdAt)}
                 </div>
               </div>
+              <div className="admin-actions">
+                <Button size="lg" pending>
+                  비밀번호 초기화 안내
+                </Button>
+                <Button size="lg" onClick={() => setConfirmOpen(true)}>
+                  {statusLabel}
+                </Button>
+              </div>
+            </section>
 
-              <div className="member-detail-main">
-                <Card title={`입찰 내역 (${formatNumber(bids.length)}건)`} noBody>
+            <div className="member-stats">
+              <StatCard label="총 입찰" value={formatNumber(member.bcount ?? 0)} unit="회" />
+              <StatCard label="낙찰" value={formatNumber(member.pcount ?? 0)} unit="건" highlight />
+              <StatCard label="미결제" value={formatNumber(member.notpay ?? 0)} unit="건" />
+              <StatCard label="관심 상품" value={null} />
+              <StatCard label="정지 이력" value={null} />
+            </div>
+
+            <div className="admin-split member-split">
+              <div className="admin-stack">
+                <Card
+                  title="입찰 내역"
+                  actions={<span className="member-card-meta">총 {formatNumber(allBids.length)}회 · 최신 {bids.length}건</span>}
+                  noBody
+                >
                   <DataTable
                     rowKey="bidId"
                     rows={bids}
                     emptyText="입찰 내역이 없습니다."
                     columns={[
-                      { key: 'bidId', header: '입찰번호', width: 100 },
-                      { key: 'bidPrice', header: '입찰가', align: 'right', className: 'strong', render: (r) => formatPrice(r.bidPrice) },
-                      { key: 'bidTime', header: '입찰 일시', align: 'right', render: (r) => formatDateTime(r.bidTime) },
+                      { key: 'product', header: '상품명', render: () => '-' },
+                      { key: 'bidPrice', header: '내 입찰가', align: 'right', render: (r) => formatPrice(r.bidPrice) },
+                      { key: 'current', header: '현재/최종가', align: 'right', render: () => '-' },
+                      { key: 'result', header: '결과', render: () => '-' },
+                      { key: 'bidTime', header: '입찰 시각', align: 'right', render: (r) => formatDateTime(r.bidTime) },
                     ]}
                   />
                 </Card>
-                <Card title={`결제 내역 (${formatNumber(payments.length)}건)`} noBody>
+
+                <Card title="낙찰 내역" actions={<span className="member-card-meta">총 {formatNumber(payments.length)}건</span>} noBody>
                   <DataTable
                     rowKey="paymentId"
                     rows={payments}
-                    emptyText="결제 내역이 없습니다."
+                    emptyText="낙찰 내역이 없습니다."
+                    onRowClick={(r) => r.auctionId && navigate(`/admin/auctions/${r.auctionId}`)}
                     columns={[
-                      { key: 'paymentId', header: '결제번호', width: 100 },
-                      {
-                        key: 'auctionId',
-                        header: '경매번호',
-                        render: (r) => (r.auctionId ? <Link to={`/admin/auctions/${r.auctionId}`}>{r.auctionId}</Link> : '-'),
-                      },
-                      { key: 'paymentPrice', header: '결제 금액', align: 'right', className: 'strong', render: (r) => formatPrice(r.paymentPrice) },
+                      { key: 'auctionId', header: '경매번호', render: (r) => r.auctionId ?? '-' },
+                      { key: 'product', header: '상품명', render: () => '-' },
+                      { key: 'organization', header: '제작기관', render: () => '-' },
+                      { key: 'paymentPrice', header: '낙찰가', align: 'right', render: (r) => formatPrice(r.paymentPrice) },
+                      { key: 'createdAt', header: '낙찰일', align: 'right', render: (r) => formatDate(r.createdAt) },
                       {
                         key: 'paymentStatus',
                         header: '결제 상태',
-                        render: (r) => (
-                          <Badge tone={r.paymentStatus ? 'soft' : 'outline'}>{r.paymentStatus ? '결제 완료' : '결제 대기'}</Badge>
-                        ),
+                        align: 'right',
+                        render: (r) => (r.paymentStatus ? '결제 완료' : '결제 대기'),
                       },
-                      { key: 'createdAt', header: '등록 일시', align: 'right', render: (r) => formatDateTime(r.createdAt) },
                     ]}
                   />
+                </Card>
+              </div>
+
+              <div className="admin-stack">
+                <Card title="회원 정보">
+                  <InfoRows
+                    items={[
+                      { label: '이름', value: member.name },
+                      { label: '이메일', value: member.email },
+                      { label: '연락처', value: '-' },
+                      { label: '가입일', value: formatDate(member.createdAt) },
+                      { label: '최근 로그인', value: '-' },
+                      { label: '마케팅 수신', value: '-' },
+                    ]}
+                  />
+                </Card>
+
+                <Card title="계정 정지 · 삭제">
+                  <div className="admin-stack member-danger">
+                    <div>
+                      <strong>계정 정지</strong>
+                      <p>
+                        로그인과 입찰을 막습니다. 진행 중인 입찰은 유지되며, 정지 해제로 언제든 되돌릴 수 있습니다. 낙찰 후 반복
+                        미결제 시 사용합니다.
+                      </p>
+                      <Button size="lg" className="admin-btn--block" onClick={() => setConfirmOpen(true)}>
+                        {statusLabel}
+                      </Button>
+                    </div>
+                    <div>
+                      <strong>삭제</strong>
+                      <p>
+                        회원 탈퇴 처리입니다. 입찰·낙찰 기록은 거래 증빙으로 보존되며 개인정보만 파기됩니다. 관리자가 임의로 실행하지
+                        않습니다.
+                      </p>
+                      <Button size="lg" className="admin-btn--block" pending>
+                        삭제 (관리자 실행 불가)
+                      </Button>
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>
@@ -142,15 +182,9 @@ export default function MemberDetailPage() {
 
       <ConfirmModal
         open={confirmOpen}
-        title={suspended ? '회원 정상 처리' : '회원 정지'}
-        message={
-          member
-            ? `${member.name}(${member.loginId}) 회원을 ${
-                suspended ? '정상 처리' : '정지'
-              }하시겠습니까?`
-            : ''
-        }
-        confirmText={suspended ? '정상' : '정지'}
+        title={statusLabel}
+        message={member ? `${member.name}(${member.loginId}) 회원을 ${suspended ? '정지 해제' : '정지'}하시겠습니까?` : ''}
+        confirmText={suspended ? '정지 해제' : '정지'}
         danger={!suspended}
         onConfirm={handleStatusChange}
         onCancel={() => setConfirmOpen(false)}
