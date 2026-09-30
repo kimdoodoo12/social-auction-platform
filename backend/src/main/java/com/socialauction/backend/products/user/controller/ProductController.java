@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ProductController {
     private final ProductService productService;
 
-    // 추천 상품 조회
-    @GetMapping("aa")
-    public List<ProductDto> findRecommendProduct(Integer memberId ) {
-        return productService.findRecommendProduct(memberId);
-    }
+    // // 추천 상품 조회
+    // @GetMapping("aa")
+    // public List<ProductDto> findRecommendProduct(Integer memberId ) {
+    //     return productService.findRecommendProduct(memberId);
+    // }
     
     
     
