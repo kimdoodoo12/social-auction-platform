@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import AdminPage from '../../../components/admin/AdminPage'
 import DataTable from '../../../components/admin/DataTable'
-import { Button, Card, ConfirmModal, LinkButton, Summary } from '../../../components/admin/ui'
+import { Button, Card, ConfirmModal, Field, LinkButton, Summary } from '../../../components/admin/ui'
 import { createCategory, deleteCategory, fetchCategories, updateCategory } from '../../../api/category'
 import { useAsync } from '../../../hooks/useAsync'
 import { formatNumber } from '../../../utils/format'
 import './category.css'
 
-// [ADMIN] 15 카테고리 관리
+// [ADMIN] 15 카테고리 관리 (Figma 311:458) — 왼쪽 목록(행 안에서 바로 수정) + 오른쪽 등록 카드
+const NAME_MAX = 20
+
 export default function CategoryPage() {
   const { loading, error, data, reload } = useAsync(fetchCategories, [])
   // 목록 쿼리가 products 기준 LEFT JOIN이라 카테고리 없는 상품 묶음(categoryId null)이 섞일 수 있어 제외한다
@@ -39,11 +41,20 @@ export default function CategoryPage() {
     }
   }
 
+  // 백엔드는 길이·중복을 검사하지 않아 Figma 안내 문구대로 화면에서 막는다
+  const validateName = (name, exceptId) => {
+    if (!name) return '카테고리명을 입력하세요.'
+    if (name.length > NAME_MAX) return `카테고리명은 ${NAME_MAX}자 이하로 입력하세요.`
+    if (categories.some((c) => c.name === name && c.categoryId !== exceptId)) return '이미 있는 카테고리명입니다.'
+    return null
+  }
+
   const handleCreate = async (e) => {
     e.preventDefault()
     const name = newName.trim()
-    if (!name) {
-      setActionError('카테고리명을 입력하세요.')
+    const message = validateName(name)
+    if (message) {
+      setActionError(message)
       return
     }
     if (await run(() => createCategory(name), '카테고리를 추가하지 못했습니다.')) setNewName('')
@@ -51,8 +62,9 @@ export default function CategoryPage() {
 
   const handleUpdate = async () => {
     const name = editing.name.trim()
-    if (!name) {
-      setActionError('카테고리명을 입력하세요.')
+    const message = validateName(name, editing.categoryId)
+    if (message) {
+      setActionError(message)
       return
     }
     if (await run(() => updateCategory(editing.categoryId, name), '카테고리를 수정하지 못했습니다.')) setEditing(null)
@@ -93,11 +105,10 @@ export default function CategoryPage() {
     {
       key: 'actions',
       header: '관리',
-      align: 'right',
-      width: 160,
+      width: 120,
       render: (r) =>
         isEditing(r) ? (
-          <div className="admin-actions admin-actions--end">
+          <div className="admin-actions">
             <LinkButton tone="primary" disabled={busy} onClick={handleUpdate}>
               저장
             </LinkButton>
@@ -107,14 +118,14 @@ export default function CategoryPage() {
             </LinkButton>
           </div>
         ) : (
-          <div className="admin-actions admin-actions--end">
+          <div className="admin-actions">
             <LinkButton disabled={busy} onClick={() => setEditing({ categoryId: r.categoryId, name: r.name ?? '' })}>
               수정
             </LinkButton>
             <span className="admin-actions__sep">·</span>
             {/* 상품이 연결된 카테고리는 FK 제약으로 백엔드 삭제가 실패(500)하므로 막는다 */}
             <LinkButton
-              tone="muted"
+              tone={r.productCount > 0 ? 'muted' : 'primary'}
               disabled={busy || r.productCount > 0}
               title={r.productCount > 0 ? '등록된 상품이 있는 카테고리는 삭제할 수 없습니다.' : undefined}
               onClick={() => setDeleting(r)}
@@ -126,35 +137,54 @@ export default function CategoryPage() {
     },
   ]
 
+  const totalProducts = categories.reduce((sum, c) => sum + Number(c.productCount ?? 0), 0)
+
   return (
     <AdminPage title="카테고리 관리">
-      <Card title="카테고리 추가">
-        <form className="category-add" onSubmit={handleCreate}>
-          <input
-            className="admin-input"
-            placeholder="새 카테고리명을 입력하세요"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
+      <Summary label={`전체 ${formatNumber(categories.length)}개`}>
+        <span>· 등록 상품 총 {formatNumber(totalProducts)}개</span>
+      </Summary>
+
+      <div className="category-layout">
+        <Card noBody>
+          <DataTable
+            rowKey="categoryId"
+            rows={categories}
+            columns={columns}
+            rowClassName={(r) => (isEditing(r) ? 'category-row--editing' : '')}
+            loading={loading && !data}
+            error={error}
+            emptyText="등록된 카테고리가 없습니다."
           />
-          <Button variant="primary" type="submit" disabled={busy}>
-            + 추가
-          </Button>
-        </form>
-        {actionError && <p className="category-error">{actionError}</p>}
-      </Card>
+        </Card>
 
-      <Summary label={`전체 ${formatNumber(categories.length)}개`} />
-
-      <Card noBody>
-        <DataTable
-          rowKey="categoryId"
-          rows={categories}
-          columns={columns}
-          loading={loading && !data}
-          error={error}
-          emptyText="등록된 카테고리가 없습니다."
-        />
-      </Card>
+        <section className="admin-card category-side">
+          <form className="admin-stack" onSubmit={handleCreate}>
+            <h2 className="category-side__title">카테고리 등록</h2>
+            <Field label="카테고리명" hint={`최대 ${NAME_MAX}자 · 이미 있는 이름은 등록할 수 없어요`}>
+              <input
+                className="admin-input"
+                placeholder="예: 도자기·공예"
+                maxLength={NAME_MAX}
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+            </Field>
+            <Button variant="primary" size="lg" type="submit" className="admin-btn--block" disabled={busy}>
+              + 카테고리 등록
+            </Button>
+            {actionError && <p className="category-error">{actionError}</p>}
+          </form>
+          <div className="category-guide">
+            <strong>안내</strong>
+            <ul>
+              <li>ID는 등록 시 자동으로 부여됩니다.</li>
+              <li>이름은 목록의 [수정]을 눌러 바로 변경할 수 있어요.</li>
+              <li>등록된 상품이 있는 카테고리는 삭제할 수 없어요. 상품을 다른 카테고리로 옮긴 뒤 삭제해 주세요.</li>
+            </ul>
+          </div>
+        </section>
+      </div>
 
       <ConfirmModal
         open={Boolean(deleting)}

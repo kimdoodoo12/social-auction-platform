@@ -1,7 +1,16 @@
 // 목록 표
 // columns: [{ key, header, align: 'left'|'right'|'center', width, className, render: (row, index) => node }]
-// render가 없으면 row[key]를 그대로 표시한다.
-export default function DataTable({ columns, rows, rowKey, onRowClick, loading, error, emptyText = '데이터가 없습니다.' }) {
+// render가 없으면 row[key]를 그대로 표시한다. rowClassName: (row, index) => 추가 class
+export default function DataTable({
+  columns,
+  rows,
+  rowKey,
+  onRowClick,
+  rowClassName,
+  loading,
+  error,
+  emptyText = '데이터가 없습니다.',
+}) {
   const getKey = (row, index) => (typeof rowKey === 'function' ? rowKey(row) : (row[rowKey] ?? index))
 
   let body
@@ -18,7 +27,7 @@ export default function DataTable({ columns, rows, rowKey, onRowClick, loading, 
     body = rows.map((row, index) => (
       <tr
         key={getKey(row, index)}
-        className={onRowClick ? 'clickable' : undefined}
+        className={[onRowClick ? 'clickable' : '', rowClassName?.(row, index) ?? ''].join(' ').trim() || undefined}
         onClick={onRowClick ? () => onRowClick(row) : undefined}
       >
         {columns.map((col) => (

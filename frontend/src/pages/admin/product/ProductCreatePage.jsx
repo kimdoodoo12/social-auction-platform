@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { createProduct } from '../../../api/product'
 import AdminPage from '../../../components/admin/AdminPage'
+import { BackLink } from '../../../components/admin/ui'
 import ProductForm from './ProductForm'
 import './product.css'
 
-// [ADMIN] 05 상품 등록 — POST /product/cc
+// [ADMIN] 05 상품 등록 (Figma 52:200) — POST /admin/product/cc
 // 응답이 boolean 이라 새 상품번호를 알 수 없어, 등록 후 목록으로 돌아간다.
 const EMPTY_PRODUCT = {
   productId: null,
@@ -26,13 +27,9 @@ export default function ProductCreatePage() {
   }
 
   return (
-    <AdminPage title="상품 등록" back="/admin/products">
-      <ProductForm
-        initial={EMPTY_PRODUCT}
-        submitLabel="상품 등록"
-        onSubmit={handleSubmit}
-        onCancel={() => navigate('/admin/products')}
-      />
+    <AdminPage title="상품 등록">
+      <BackLink to="/admin/products">상품 관리로 돌아가기</BackLink>
+      <ProductForm initial={EMPTY_PRODUCT} onSubmit={handleSubmit} onCancel={() => navigate('/admin/products')} />
     </AdminPage>
   )
 }

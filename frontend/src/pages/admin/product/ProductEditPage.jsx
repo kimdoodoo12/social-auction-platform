@@ -1,13 +1,13 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchProduct, updateProduct } from '../../../api/product'
 import AdminPage from '../../../components/admin/AdminPage'
-import { AsyncBoundary } from '../../../components/admin/ui'
+import { AsyncBoundary, BackLink } from '../../../components/admin/ui'
 import { useAsync } from '../../../hooks/useAsync'
 import ProductForm from './ProductForm'
 import './product.css'
 
-// [ADMIN] 06 상품 수정 — GET /admin/product/bb/{productId} 로 불러와 PUT /admin/product/dd 로 저장
-// TotalDto의 상품 정보와 경매 시작가를 사용하고, 경매 정보가 없으면 목록의 시작가를 보조로 쓴다.
+// [ADMIN] 06 상품 수정 (Figma 73:3397) — GET /admin/product/bb/{productId} 로 불러와 PUT /admin/product/dd 로 저장
+// 시작가는 productAuctionInfo.startPrice 를 쓴다(productDto.startPrice 는 비어서 온다).
 
 function toFormValues(product, startPrice) {
   return {
@@ -30,27 +30,24 @@ export default function ProductEditPage() {
 
   const detail = useAsync(() => fetchProduct(productId), [productId])
   const product = detail.data?.productDto
-  const startPrice = detail.data?.productAuctionInfo?.startPrice ?? listState.startPrice
+  const startPrice = detail.data?.productAuctionInfo?.startPrice ?? product?.startPrice
 
   const handleSubmit = async (productDto) => {
     await updateProduct(productDto)
-    // 목록 상태값은 그대로 두고, 바뀐 시작가만 반영해서 상세로 돌아간다
-    navigate(detailPath, { state: { ...listState, startPrice: productDto.startPrice } })
+    navigate(detailPath, { state: listState })
   }
 
   return (
-    <AdminPage title="상품 수정" back={detailPath}>
+    <AdminPage title="상품 수정">
+      <BackLink to={detailPath}>상품 상세로 돌아가기</BackLink>
       <AsyncBoundary loading={detail.loading && !product} error={detail.error}>
         {product && (
           <ProductForm
             key={product.productId}
+            mode="edit"
             initial={toFormValues(product, startPrice)}
-            submitLabel="수정 저장"
             onSubmit={handleSubmit}
             onCancel={() => navigate(detailPath, { state: listState })}
-            startPriceHint={
-              startPrice == null ? '상세 조회 응답에 시작가가 없어 다시 입력해야 합니다.' : undefined
-            }
           />
         )}
       </AsyncBoundary>

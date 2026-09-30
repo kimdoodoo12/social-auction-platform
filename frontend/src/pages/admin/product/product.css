@@ -1,93 +1,213 @@
 /* 상품 화면 전용 스타일 (색상은 styles/tokens.css 변수만 사용) */
 
+/* 목록 썸네일 (Figma 34px) */
 .product-thumb {
-  display: block;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  object-fit: cover;
-  background: var(--color-surface-muted);
 }
 
-.product-thumb--empty {
-  display: block;
+/* 상세/폼: 오른쪽 사이드 폭 (Figma 1440 기준 약 270px) */
+.product-split {
+  grid-template-columns: minmax(0, 1fr) 330px;
 }
 
-.product-detail {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
+/* 상품 설명 블록 */
+.product-desc-list {
+  gap: 18px;
 }
 
-.product-detail__side {
+.product-desc {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 6px;
 }
 
-.product-text {
+.product-desc__label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.product-desc__text {
   margin: 0;
-  color: var(--color-text-body);
+  color: var(--color-text);
   font-size: 13px;
   line-height: 1.7;
   white-space: pre-wrap;
 }
 
-.product-text--empty {
+.product-desc__text--empty {
   color: var(--color-text-subtle);
 }
 
-.product-gallery {
+/* 최근 입찰 내역 */
+.product-bids {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.product-bids li {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: 40px minmax(0, 1fr) 120px 140px;
+  align-items: center;
   gap: 12px;
+  height: 36px;
+  padding: 0 20px;
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
 }
 
-.product-gallery .product-thumb {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
+.product-bids li.top {
+  background: var(--color-primary-soft);
 }
 
-.product-image-rows {
+.product-bids__no {
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.product-bids__name {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.product-bids__price {
+  color: var(--color-text);
+  font-weight: 700;
+  text-align: right;
+}
+
+.product-bids li.top .product-bids__price {
+  color: var(--color-primary);
+}
+
+.product-bids__time {
+  color: var(--color-text-subtle);
+  text-align: right;
+}
+
+/* 상세 이미지 갤러리: 큰 대표 + 작은 4칸 */
+.product-gallery {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.product-image-row {
+.product-gallery__main {
+  height: 160px;
+}
+
+.product-gallery__thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.product-gallery__thumb {
+  aspect-ratio: 1.2 / 1;
+  height: auto;
+}
+
+/* 상태 이력 타임라인 */
+.product-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.product-history li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 18px;
+  font-size: 11px;
+  color: var(--color-text-subtle);
+}
+
+.product-history li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+}
+
+.product-history li strong {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.product-history li.done::before {
+  background: var(--color-primary);
+}
+
+.product-history li.done strong {
+  color: var(--color-text);
+}
+
+/* 판매 중지 · 삭제 카드 */
+.product-danger strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+.product-danger p {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* 폼 이미지 박스 (Figma 점선 업로드 박스) */
+.product-slots {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-.product-image-row .admin-input {
-  flex: 1;
+.product-slots__row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.product-image-row__tag {
-  width: 44px;
-  color: var(--color-text-muted);
-  font-size: 11px;
-  text-align: center;
+.product-slot {
+  padding: 0;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.product-slot--main {
+  aspect-ratio: auto;
+  height: 180px;
+}
+
+.product-slot .admin-image--empty {
+  border: 0;
+  background: transparent;
+}
+
+.product-slot.selected {
+  border-style: solid;
+  border-color: var(--color-primary);
 }
 
 .product-form-error {
+  margin: 8px 0 0;
   color: var(--color-danger);
   font-size: 12px;
-}
-
-.product-form-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.product-list-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }

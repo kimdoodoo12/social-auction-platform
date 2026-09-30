@@ -309,7 +309,8 @@
   font-size: 12px;
 }
 
-.admin-link-btn:disabled {
+/* tone 클래스보다 우선하도록 선택자를 두 번 쓴다 */
+.admin-link-btn.admin-link-btn:disabled {
   color: var(--color-text-disabled);
   cursor: not-allowed;
 }
@@ -561,4 +562,268 @@
   font-size: 16px;
   font-weight: 700;
   color: var(--color-text);
+}
+
+/* ===== Figma 상세/폼 공통 ===== */
+.admin-card__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-card__subtitle {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.admin-back-link {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.admin-back-link:hover {
+  color: var(--color-text);
+}
+
+.admin-btn--lg {
+  height: 52px;
+  padding: 0 26px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.admin-btn--block {
+  width: 100%;
+}
+
+/* 비활성 버튼에도 "준비 중" 툴팁이 뜨도록 */
+.admin-btn[title]:disabled,
+.admin-link-btn[title]:disabled {
+  pointer-events: auto;
+}
+
+.admin-info-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 36px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-info-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-info-row__label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.admin-info-row__value {
+  font-size: 13px;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.admin-info-row__value.highlight {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.admin-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.admin-action-bar__text {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.admin-action-bar__error {
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+.admin-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+.admin-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-steps__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-surface-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-callout {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-text-body);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.admin-callout strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.admin-callout p {
+  margin: 0;
+}
+
+.admin-stat {
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-stat__label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.admin-stat__value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.admin-stat__value small {
+  margin-left: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.admin-stat--highlight {
+  border-color: var(--color-primary);
+}
+
+.admin-stat--highlight .admin-stat__value {
+  color: var(--color-primary);
+}
+
+/* 이미지 자리 (No image) */
+.admin-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.admin-image--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-subtle);
+  font-size: 11px;
+  border: 1px solid var(--color-border);
+}
+
+/* 2단 레이아웃: 본문 + 오른쪽 사이드 */
+.admin-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 상세 화면 상단 헤더 카드 (썸네일 + 제목 + 오른쪽 버튼) */
+.admin-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+}
+
+.admin-hero__thumb {
+  flex: none;
+  width: 72px;
+  height: 72px;
+}
+
+.admin-hero__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-hero__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.admin-hero__title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.admin-hero__sub {
+  font-size: 12px;
+  color: var(--color-text-body);
+}
+
+/* 검색 결과 요약 줄 + 오른쪽 큰 버튼 */
+.admin-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* 필터 영역의 검색 버튼 (Figma: 흰 바탕 큰 버튼) */
+.admin-search-btn {
+  min-width: 78px;
 }
