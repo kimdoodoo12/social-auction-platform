@@ -159,6 +159,8 @@ public class MemberService {
             PaymentDto paymentDto = PaymentDto.from(aaa);
             mDto.getPayDtos().add(paymentDto);
         });
+        mDto.setNotpay(memberRepository.notPay(mDto.getMemberId())); 
+        System.out.println(mDto.getNotpay());
         return mDto;
     }
 

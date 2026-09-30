@@ -46,6 +46,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     + "AND b.bid_time = (SELECT "
     + "MAX(b2.bid_time) FROM bid b2 "
     + "WHERE b2.auction_id = a.auction_id) "
-    + "WHERE p.organization_id = :id", nativeQuery = true)
+    + "WHERE p.organization_id = :id "
+    + "LIMIT 10", nativeQuery = true)
     List<OrganizationProductResponse> findOrganizationProduct(@Param("id") int id);
 }

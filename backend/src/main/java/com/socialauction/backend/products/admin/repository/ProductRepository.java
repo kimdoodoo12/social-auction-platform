@@ -137,7 +137,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             a.start_time,
             a.end_time
         """, nativeQuery = true)
-    Optional<ProductAuctionInfo> findAuctionInfo(
+    ProductAuctionInfo findAuctionInfo(
         @Param("productId") Integer productId
     );
 	

@@ -15,8 +15,8 @@ import { formatDateTime, formatPrice } from '../../../utils/format'
 import { ProductImage, ProductStatusBadge } from './ProductParts'
 import './product.css'
 
-// [ADMIN] 04 상품 상세 — GET /product/bb?productId
-// ProductDto 에는 시작가(백엔드에서 제외)·경매 상태가 없어 목록에서 넘겨준 값(location.state)을 보조로 쓴다.
+// [ADMIN] 04 상품 상세 — GET /admin/product/bb/{productId}
+// 상품은 productDto, 시작가는 productAuctionInfo에서 읽고 경매 상태는 목록에서 전달받는다.
 
 const nameOf = (options, id) => options?.find((o) => o.id === id)?.name
 
@@ -37,7 +37,9 @@ export default function ProductDetailPage() {
   const categories = useAsync(fetchCategoryOptions, [])
   const organizations = useAsync(fetchOrganizationOptions, [])
 
-  const product = detail.data
+  const product = detail.data?.productDto
+  const auctionInfo = detail.data?.productAuctionInfo
+  const startPrice = auctionInfo?.startPrice ?? listState.startPrice
   const status = stopResult?.ok ? STOPPED_STATUS : listState.status
   // 목록을 거치지 않고 들어오면 상태를 알 수 없으므로 버튼을 열어두고 서버 응답으로 판단한다
   const stopDisabled = status === NO_AUCTION_STATUS || status === STOPPED_STATUS
@@ -91,7 +93,7 @@ export default function ProductDetailPage() {
                     label: '카테고리',
                     value: nameOf(categories.data, product.categoryId) ?? `카테고리 #${product.categoryId}`,
                   },
-                  { label: '시작가', value: listState.startPrice != null ? formatPrice(listState.startPrice) : '-' },
+                  { label: '시작가', value: startPrice != null ? formatPrice(startPrice) : '-' },
                   { label: '경매 상태', value: status ? <ProductStatusBadge status={status} /> : '-' },
                   { label: '등록일', value: formatDateTime(product.createdAt) },
                   { label: '수정일', value: formatDateTime(product.updatedAt) },

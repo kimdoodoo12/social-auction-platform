@@ -74,6 +74,36 @@ INSERT INTO products (name, organization_id, category_id, start_price, descripti
 ('수제 도자기 머그컵 2종 세트',  1,  3,  22000, '백자 흙을 사용해 손으로 빚고 유약을 입힌 머그컵 2개 세트입니다.',  '도예 직업훈련에 참여한 교육생들이 성형부터 유약 작업까지 직접 진행했습니다.',          '2026-09-03 10:30:00', NULL),
 ('자수 꽃무늬 파우치',  5,  4,  12000,  '면 원단에 꽃무늬 자수를 놓아 제작한 다용도 파우치입니다.', '청각장애 재봉사들이 디자인부터 봉제까지 직접 제작했습니다.',                                       '2026-09-05 14:30:00', NULL),
 ('원목 휴대폰 거치대',  7,  3,  13000,  '자작나무 원목으로 제작한 스마트폰 및 태블릿 겸용 거치대입니다.',   '목공 직업훈련생들이 남은 목재를 활용해 직접 가공했습니다.',                                 '2026-09-06 15:00:00', NULL);
+
+-- Sample product images: first image per product is the representative image.
+INSERT INTO image (product_id, image) VALUES
+(1, '/images/product_01_1.png'),
+(1, '/images/product_01_2.png'),
+(2, '/images/product_02_1.png'),
+(2, '/images/product_02_2.png'),
+(3, '/images/product_03_1.png'),
+(3, '/images/product_03_2.png'),
+(4, '/images/product_04_1.png'),
+(4, '/images/product_04_2.png'),
+(5, '/images/product_05_1.png'),
+(5, '/images/product_05_2.png'),
+(6, '/images/product_06_1.png'),
+(6, '/images/product_06_2.png'),
+(7, '/images/product_07_1.png'),
+(7, '/images/product_07_2.png'),
+(8, '/images/product_08_1.png'),
+(9, '/images/product_09_1.png'),
+(9, '/images/product_09_2.png'),
+(10, '/images/product_10_1.png'),
+(10, '/images/product_10_2.png'),
+(11, '/images/product_11_1.png'),
+(11, '/images/product_11_2.png'),
+(12, '/images/product_12_1.png'),
+(13, '/images/product_13_1.png'),
+(13, '/images/product_13_2.png'),
+(13, '/images/product_13_3.png');
+
+
 -- ------------------------------------------------------------
 -- 경매 (auction_status: 대기 / 진행 / 완료)
 -- current_price: 가장 최근 입찰가, 입찰이 없는 대기 상태는 NULL (시작가는 products.start_price)

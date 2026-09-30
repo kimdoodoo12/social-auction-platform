@@ -35,6 +35,9 @@ public class MemberBidHistoryDto {
     private String role;
     private LocalDateTime lockedAt;
 
+    // 미낙찰 번호
+    private Integer notpay;
+
     // 입찰내역 전체 조회 
     @Builder .Default
     // @ToString .Exclude

@@ -45,4 +45,19 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
             @Param("endDate") LocalDateTime endDate,
             Pageable pageable
     );
+
+    // 낙찰 + 결제 안한거 / 미결제 
+     @Query(
+        value = """
+            SELECT COUNT(*)
+            FROM payment
+            WHERE member_id = :memberId
+            AND payment_status = 0
+            """,
+        nativeQuery = true
+    )
+    int notPay(@Param("memberId") int memberId);
+    
 }
+
+//(:email IS NULL OR m.email = :email)
