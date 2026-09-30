@@ -1,12 +1,17 @@
 package com.socialauction.backend.auction.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.socialauction.backend.auction.dto.AuctionFindAllDto;
+import com.socialauction.backend.auction.dto.AuctionSearchDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 
 @Repository
@@ -61,5 +66,40 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     Integer countBidsByAuctionId(
         @Param("auctionId") Integer auctionId
     );
+
+    
+
+   
+
+    @Query(value = "SELECT a FROM AuctionEntity a " +
+                   "JOIN FETCH a.productEntity p " +
+                   "LEFT JOIN FETCH p.organizationEntity o " +
+                   "WHERE (:keyword IS NULL " +
+                   "   OR p.name LIKE CONCAT('%', :keyword, '%') " +
+                   "   OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%')) " +
+                   "AND (:status IS NULL OR a.auctionStatus = :status) " +
+                   "AND (:organization IS NULL OR o.name = :organization) " +
+                   "AND (:startDate IS NULL OR a.startTime >= :startDate) " +
+                   "AND (:endDate IS NULL OR a.endTime <= :endDate)",
+           countQuery = "SELECT COUNT(a) FROM AuctionEntity a " +
+                   "JOIN a.productEntity p " +
+                   "LEFT JOIN p.organizationEntity o " +
+                   "WHERE (:keyword IS NULL " +
+                   "   OR p.name LIKE CONCAT('%', :keyword, '%') " +
+                   "   OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%')) " +
+                   "AND (:status IS NULL OR a.auctionStatus = :status) " +
+                   "AND (:organization IS NULL OR o.name = :organization) " +
+                   "AND (:startDate IS NULL OR a.startTime >= :startDate) " +
+                   "AND (:endDate IS NULL OR a.endTime <= :endDate)")
+    Page<AuctionEntity> searchAuctions(
+        @Param("keyword") String keyword,
+        @Param("status") String status,
+        @Param("organization") String organization,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable
+    );
+
+
 
 }

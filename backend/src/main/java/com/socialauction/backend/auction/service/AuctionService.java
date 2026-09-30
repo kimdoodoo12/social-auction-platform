@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.socialauction.backend.auction.dto.AuctionDetailDto;
 import com.socialauction.backend.auction.dto.AuctionFindAllDto;
+import com.socialauction.backend.auction.dto.AuctionSearchDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.products.dto.ImageDto;
@@ -81,5 +82,29 @@ public class AuctionService {
         auctionDetailDto.setUserName(userName);
 
         return auctionDetailDto;
+    }
+
+    public Page<AuctionFindAllDto> auctionSearch(AuctionSearchDto auctionSearchDto, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<AuctionEntity> result =  auctionRepository.searchAuctions(auctionSearchDto.getKeyword(), auctionSearchDto.getStatus(), auctionSearchDto.getOrganization(), auctionSearchDto.getStartDate(), auctionSearchDto.getEndDate(), pageable);
+        
+        return result.map(entity -> {
+        // (1) 현재 순회 중인 entity를 기본 DTO로 변환
+        AuctionFindAllDto dto = AuctionFindAllDto.from(entity);
+
+        // (2) '현재 entity'의 auctionId를 꺼내서 최고가 조회 후 DTO에 세팅
+        Integer topPrice = auctionRepository.findTopPriceByAuctionId(entity.getAuctionId()); 
+        dto.setTopPrice(topPrice != null ? topPrice : 0);
+
+        // (3) '현재 entity'의 auctionId를 꺼내서 입찰 수 조회 후 DTO에 세팅
+        Integer bidCount = auctionRepository.countBidsByAuctionId(entity.getAuctionId());
+        dto.setBidCount(bidCount != null ? bidCount : 0);
+
+        // (4) 완성된 dto 반환 
+        return dto;
+    });
+
+    
     }
 }
