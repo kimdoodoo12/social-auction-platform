@@ -80,6 +80,9 @@ public class AuctionService {
         // 최고가 입찰 쿼리문으로 가져오기
         String userName = auctionRepository.findTopBidNameByAuctionId(auctionId).orElse(null);
         auctionDetailDto.setUserName(userName);
+        
+        Long countUser = auctionRepository.countUserAuctionId(auctionId);
+        auctionDetailDto.setCountUser(countUser);
 
         return auctionDetailDto;
     }

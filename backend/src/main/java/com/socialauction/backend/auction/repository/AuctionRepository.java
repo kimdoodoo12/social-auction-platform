@@ -17,11 +17,11 @@ import com.socialauction.backend.auction.entity.AuctionEntity;
 @Repository
 public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer> {
 
-    // 상품 번호로 경매 조회
+    // * 상품 번호로 경매 조회
     AuctionEntity findByProductEntity_ProductId(Integer productId);
 
 
-    // 경매 조회 - 현재 최고가
+    // * 경매 조회 - 현재 최고가
     @Query(
         value = """
             SELECT MAX(b.bid_price)
@@ -35,7 +35,7 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     );
 
 
-    // 경매 조회 - 현재 최고가 입찰한 사람 이름
+    // * 경매 조회 - 현재 최고가 입찰한 사람 이름
     @Query(
         value = """
             SELECT m.name
@@ -54,7 +54,7 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     );
 
 
-    // 경매 조회 - 입찰 횟수
+    // * 경매 조회 - 입찰 횟수
     @Query(
         value = """
             SELECT COUNT(*)
@@ -66,6 +66,23 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     Integer countBidsByAuctionId(
         @Param("auctionId") Integer auctionId
     );
+
+
+    // * 경매 조회 - 입찰자 수
+    @Query(
+        value = """
+            SELECT COUNT(DISTINCT member_id)
+            FROM bid
+            WHERE auction_id = :auctionId
+            """,
+        nativeQuery = true
+    )
+    Long countUserAuctionId(
+        @Param("auctionId") Integer auctionId
+    );
+
+
+    
 
     
 

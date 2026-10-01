@@ -31,6 +31,7 @@ public class AuctionDetailDto {
 
     //유저정보
     String userName;
+    Long countUser;
 
     public static AuctionDetailDto from(AuctionEntity auctionEntity){
         return AuctionDetailDto.builder()
@@ -41,6 +42,7 @@ public class AuctionDetailDto {
             .agreementDate(auctionEntity.getProductEntity().getOrganizationEntity().getAgreementDate())
             //이미지는 서비스에서
             // 최고입찰자 이름 서비스에서
+            // 참여입찰자는 서비스에서
             .build();
     }
 
