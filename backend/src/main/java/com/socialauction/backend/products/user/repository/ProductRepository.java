@@ -114,7 +114,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         LIMIT 4
         """, nativeQuery = true)
     List<ProductDto> findPopularProduct();
-
+    
+    // 새로 등록된 상품 조회
     @Query(value = """
         SELECT
             a.auction_status AS auctionStatus,

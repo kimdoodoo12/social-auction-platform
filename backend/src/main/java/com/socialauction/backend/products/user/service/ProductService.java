@@ -48,13 +48,9 @@ public class ProductService {
                 break;
             }
             recent = currentTotal;
-            
         }
-
         ProductDto productDto = productRepository.findRecommend(categoryNumber);
         return productDto;
-
-        
     }
 
     // 마감 임박 상품 조회

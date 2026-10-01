@@ -36,21 +36,15 @@ public class ProductController {
         return "bb";
     }
     
-
     // 인기 상품 조회
     @GetMapping("cc")
     public List<ProductDto> findPopularProduct( ) {
         return productService.findPopularProduct();
     }
     
-
-
     // 새로 등록된 상품 조회
     @GetMapping("dd")
     public List<ProductDto> findNewProduct( ) {
         return productService.findNewProduct();
     }
-    
-    
-    
 }
