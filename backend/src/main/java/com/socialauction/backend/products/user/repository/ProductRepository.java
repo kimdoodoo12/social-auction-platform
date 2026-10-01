@@ -39,13 +39,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
     // 입력받은 categoryId를 가지고 있는 상품 1개를 무작위로 가져옴
     @Query(value = """
         SELECT
-            p.product_id AS productId,
             a.auction_status AS auctionStatus,
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
-            COALESCE(bs.bid_count, 0) AS bidCount
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
         LEFT JOIN organization o
             ON o.organization_id = p.organization_id
@@ -84,8 +83,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
-            COALESCE(bs.bid_count, 0) AS bidCount
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
         LEFT JOIN organization o
             ON o.organization_id = p.organization_id
@@ -120,8 +119,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
-            COALESCE(bs.bid_count, 0) AS bidCount
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
         LEFT JOIN organization o
             ON o.organization_id = p.organization_id
@@ -149,5 +148,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         LIMIT 4
         """, nativeQuery = true)
     List<ProductDto> findNewProduct();
+
 
 }
