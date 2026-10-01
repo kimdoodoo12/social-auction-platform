@@ -114,5 +114,40 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         """, nativeQuery = true)
     List<ProductDto> findPopularProduct();
 
+    @Query(value = """
+        SELECT
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            COALESCE(bs.bid_count, 0) AS bidCount
+        FROM products p
+        LEFT JOIN organization o
+            ON o.organization_id = p.organization_id
+        LEFT JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        LEFT JOIN image i
+            ON i.product_id = p.product_id
+            AND i.image_id = (
+                SELECT min(img.image_id)
+                FROM image img
+                WHERE img.product_id = p.product_id
+            )
+        where bs.auction_id is null
+        ORDER BY bs.current_price ASC
+        LIMIT 4
+        """, nativeQuery = true)
+    List<ProductDto> findNewProduct();
 
 }

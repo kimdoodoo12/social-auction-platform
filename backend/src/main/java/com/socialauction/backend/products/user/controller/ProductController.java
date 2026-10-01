@@ -40,7 +40,11 @@ public class ProductController {
     
 
 
-
+    // 새로 등록된 상품 조회
+    @GetMapping("dd")
+    public List<ProductDto> findNewProduct( ) {
+        return productService.findNewProduct();
+    }
     
     
     

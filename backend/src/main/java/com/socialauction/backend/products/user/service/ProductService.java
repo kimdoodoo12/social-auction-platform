@@ -62,7 +62,10 @@ public class ProductService {
         return productRepository.findPopularProduct();
     }
     
-
+    // 새로 등록된 상품 조회
+    public List<ProductDto> findNewProduct( ) {
+        return productRepository.findNewProduct();
+    }
 
 
 }
