@@ -2,6 +2,8 @@ package com.socialauction.backend.products.user.repository;
 
 import java.util.List;
 
+import org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -148,6 +150,56 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         LIMIT 4
         """, nativeQuery = true)
     List<ProductDto> findNewProduct();
+
+    // 상품 목록
+    @Query(value = """
+        SELECT
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+        FROM products p
+        LEFT JOIN organization o
+            ON o.organization_id = p.organization_id
+        LEFT JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        LEFT JOIN image i
+            ON i.product_id = p.product_id
+            AND i.image_id = (
+                SELECT min(img.image_id)
+                FROM image img
+                WHERE img.product_id = p.product_id
+            )
+        where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */
+        and (
+            
+        )
+        ORDER BY
+            case when : sort = 'popular'
+                then bs.bid_count end desc,
+            case when : sort = 'time' /* 마감시간 순 추후에 작업 */
+                then 
+            case when : sort = ''
+        """, nativeQuery = true)
+    Page<ProductDto> findProductList( 
+        @Param ("productName") String productName,
+        @Param ("organizationId") String organizationId,
+        @Param ("auctionStatus") String auctionStatus,
+        @Param ("categoryId") String categoryId,
+        @Param ("sort") String sort,
+        Pageable pageable );
 
 
 }
