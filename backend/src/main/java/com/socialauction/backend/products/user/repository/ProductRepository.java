@@ -31,14 +31,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         AND p.category_id IS NOT NULL
         GROUP BY p.category_id
         """, nativeQuery = true)
-    List<ProductRecommendDto> findcount(
+    List<ProductRecommendDto> findCount(
         @Param("memberId") Integer memberId
     );
 
-
-
-
     // 추천 상품을 출력하기 위한거
+    // 입력받은 categoryId를 가지고 있는 상품 1개를 무작위로 가져옴
     @Query(value = """
         SELECT
             p.product_id AS productId,
@@ -70,10 +68,14 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
                 FROM image img
                 WHERE img.product_id = p.product_id
             )
-        where c.name = :categoryName
+        where (:categoryId is null or p.category_id = :categoryId)
+        ORDER BY RAND()
+        LIMIT 1
         """, nativeQuery = true)
-    List<ProductDto> findRecommend(
-        @Param ("categoryName") String categoryName
+    ProductDto findRecommend(
+        @Param ("categoryId") Integer categoryId
     );
     
+
+
 }

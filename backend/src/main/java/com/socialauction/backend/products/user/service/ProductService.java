@@ -16,21 +16,50 @@ public class ProductService {
     private final ProductRepository productRepository;
     
     // 추천 상품 조회
-    // public List<ProductDto> findRecommendProduct( Integer memberId ) {
-    //     // 카테고리, 입찰횟수를 담는 dto
-    //     // List<ProductRecommendDto> recommendDtos = productRepository.findcount(memberId);
-    //     // private int total = 0;
-    //     // recommendDtos.forEach( a -> {
-    //     //     a.getCategoryId();
-    //     //     total += a.getCount();
-    //     // });
+    public ProductDto findRecommendProduct( Integer memberId ) {
+        // 카테고리, 입찰횟수를 담는 dto
+        List<ProductRecommendDto> recommendDtos = productRepository.findCount(memberId);
+        int total = 0;
 
-    //     // 추천 로직
-    //     // int random;
-    //     // random = (int)Math.random() * total;
-    //     // int categoryNumber;
-    //     // if(random < ) 
+        for ( int i = 0; i < recommendDtos.size(); i++ ) {
+            total += recommendDtos.get(i).getCount(); // 총 입찰 횟수
+        }
+        // 입찰 횟수가 없는경우 바로 로직을 적용하지 않은 랜덤 상품 추천
+        if ( total == 0 ) { return productRepository.findRecommend(null); }
+
+        // 추천 로직(사용자가 많이 입찰한 카테고리의 상품을 추천)
+        int random; // 랜덤값 저장
+        random = (int) (Math.random() * total) + 1; // 랜덤 숫자 범위 : 1~total
+        Integer categoryNumber = 0;; // 추천할 카테고리 번호
+        int recent = 0; // 이전값
+
+        // 입찰 횟수를 모두 더해서 총 입찰 횟수를 구하고,
+        // 카테고리 별 입찰횟수만큼 가중치를 가짐
+        // 예) 카테고리1의 입찰횟수가 13, 총 입찰횟수가 50
+        // 카테고리1이 나올 확률은 13/50
+        // 그러므로 입찰횟수가 많을 수록 그 카테고리가 나올 확률이 올라감
+        int currentTotal = 0;
+        for ( int i = 0; i < recommendDtos.size(); i++ ) {
+            currentTotal += recommendDtos.get(i).getCount();
+            if( random <= currentTotal && random > recent) {
+                categoryNumber = recommendDtos.get(i).getCategoryId();
+                break;
+            }
+            recent = currentTotal;
+            
+        }
+
+        ProductDto productDto = productRepository.findRecommend(categoryNumber);
+        return productDto;
 
         
-    //}
+    }
+
+
+    
+
+    
+
+
+
 }
