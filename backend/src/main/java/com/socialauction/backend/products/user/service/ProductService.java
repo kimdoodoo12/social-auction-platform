@@ -3,6 +3,8 @@ package com.socialauction.backend.products.user.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.socialauction.backend.products.user.dto.ProductDto;
 import com.socialauction.backend.products.user.dto.ProductRecommendDto;
@@ -55,7 +57,10 @@ public class ProductService {
         
     }
 
-
+    // 마감 임박 상품 조회
+    public String findEndProduct(@RequestParam String param) {
+        return "bb";
+    }
     
     // 인기 상품 조회
     public List<ProductDto> findPopularProduct( ) {

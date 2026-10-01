@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -29,7 +30,11 @@ public class ProductController {
         return productService.findRecommendProduct(memberId);
     }
     
-
+    // 마감 임박 상품 조회
+    @GetMapping("bb")
+    public String findEndProduct(@RequestParam String param) {
+        return "bb";
+    }
     
 
     // 인기 상품 조회
