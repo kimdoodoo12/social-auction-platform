@@ -57,7 +57,10 @@ public class ProductService {
 
 
     
-
+    // 인기 상품 조회
+    public List<ProductDto> findPopularProduct( ) {
+        return productRepository.findPopularProduct();
+    }
     
 
 

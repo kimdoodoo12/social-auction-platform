@@ -32,7 +32,11 @@ public class ProductController {
 
     
 
-
+    // 인기 상품 조회
+    @GetMapping("cc")
+    public List<ProductDto> findPopularProduct( ) {
+        return productService.findPopularProduct();
+    }
     
 
 
