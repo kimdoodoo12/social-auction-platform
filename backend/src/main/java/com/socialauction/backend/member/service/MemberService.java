@@ -4,6 +4,7 @@ import com.socialauction.backend.member.controller.MemberController;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -18,9 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.entity.BidEntity;
+import com.socialauction.backend.member.dto.MBResultDto;
+import com.socialauction.backend.member.dto.MemberBhistory;
 import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
 import com.socialauction.backend.member.dto.MemberSearchDto;
+import com.socialauction.backend.member.dto.MproductDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.entity.MemberEntity;
 import com.socialauction.backend.member.repository.MemberRepository;
@@ -149,17 +153,42 @@ public class MemberService {
 
     // 회원별 상세 페이지
     public MemberBidHistoryDto userDetailInfo(int userid){
+
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
+
+        if(memberEntity == null){ return null; }
         MemberBidHistoryDto mDto = MemberBidHistoryDto.from(memberEntity);
-        memberEntity.getBidEntities().forEach((aaa)->{
-            BidDto bidDto = BidDto.from(aaa);
-            mDto.getBidDtos().add(bidDto);
+
+
+        // 최근 입찰 내역
+        // 1. 해당 회원이 입찰한 최근 상품 목록 조회
+        List<MproductDto> productList =
+                memberRepository.findRecentBidProducts(userid);
+
+        // 2. 회원번호 + 상품번호로 입찰 상세 조회
+        productList.forEach((product) -> {
+            int productId = product.getProductId();
+            MemberBhistory history =
+                    memberRepository
+                            .findBidHistory(userid, productId)
+                            .orElse(null);
+
+            // 조회된 입찰 내역이 있으면 배열에 추가
+            if(history != null){
+                mDto.getBidHistory().add(history);
+            }
         });
-        memberEntity.getPaymentEntities().forEach((aaa)->{
-            PaymentDto paymentDto = PaymentDto.from(aaa);
-            mDto.getPayDtos().add(paymentDto);
-        });
-        mDto.setNotpay(memberRepository.notPay(mDto.getMemberId())); 
+
+        // 최근 낙찰내역 5개
+        mDto.getPayDtos().addAll(
+            memberRepository.findWinHistory(userid)
+        );
+        // 미결제 개수
+        mDto.setNotpay(
+                memberRepository.notPay(
+                        mDto.getMemberId()
+                )
+        );
         System.out.println(mDto.getNotpay());
         return mDto;
     }
@@ -185,6 +214,20 @@ public class MemberService {
             );
 
         return result.map(MemberDto::from);
+    }
+
+
+    // 최근입찰내역 5개 
+    @Transactional (readOnly = true)
+    public List<MemberBhistory> findRecentBidHistory (int memberId){
+        List<MproductDto> productlist = memberRepository.findRecentBidProducts(memberId);
+
+        return productlist.stream().map(product ->
+             memberRepository.findBidHistory(
+                memberId, 
+                product.getProductId()
+            ).orElse(null)
+    ).filter(Objects::nonNull).toList();
     }
 
 

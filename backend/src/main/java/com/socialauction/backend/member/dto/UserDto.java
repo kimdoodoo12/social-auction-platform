@@ -35,7 +35,7 @@ public class UserDto {
     public static UserDto from(MemberEntity memberEntity){
         return UserDto.builder()
             .loginId(memberEntity.getLoginId())
-            .password(memberEntity.getPassword())
+            // 비번은 Dto로 변환 안함. 
             .name(memberEntity.getName())
             .email(memberEntity.getEmail())
             .phone(memberEntity.getPhone())

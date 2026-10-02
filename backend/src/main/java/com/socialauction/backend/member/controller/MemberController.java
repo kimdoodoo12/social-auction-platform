@@ -12,8 +12,10 @@ import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
 import com.socialauction.backend.member.dto.MemberSearchDto;
 import com.socialauction.backend.member.dto.UserDto;
+import com.socialauction.backend.member.service.MUserService;
 import com.socialauction.backend.member.service.MemberService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor 
 public class MemberController {
     private final MemberService memberService;
+    private final MUserService mUserService;
 
     // 회원관리 관리자 페이지 (전체 조회)
     @GetMapping("/admin/user/manage")
@@ -102,6 +105,42 @@ public class MemberController {
     ) {
         return memberService.userSearch(dto, page, size);
     }
+    // ============================================================================================= //
+    // 사용자 / 세션
+
+    // 회원가입 
+    @PostMapping("/user/signup")
+    public boolean signup(@RequestBody UserDto userDto) {
+        return mUserService.signup(userDto);
+    }
+
+    // 로그인
+    @PostMapping("/user/login")
+    public boolean login(@RequestBody UserDto userDto , HttpSession session) {
+        MemberDto result = mUserService.login(userDto);
+        if(result == null) return false;
+
+        session.setAttribute("login_member", result);
+        
+        return true;
+    }
+    
+    // 로그아웃 
+    @PostMapping("/user/logout")
+    public boolean logout(HttpSession httpSession) {
+        httpSession.invalidate();
+        
+        return true;
+    }
+
+    // 아이디 중복 여부
+    @GetMapping("/user/signup/findid")
+    public boolean userfindid(@RequestBody String newid) {
+        return mUserService.userfindid(newid);
+    }
+    
+    
+    
     
     
     

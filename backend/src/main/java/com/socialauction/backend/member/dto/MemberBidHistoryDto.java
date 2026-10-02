@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
+
 import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.member.entity.MemberEntity;
@@ -39,13 +41,17 @@ public class MemberBidHistoryDto {
     private Integer notpay;
 
     // 입찰내역 전체 조회 
-    @Builder .Default
-    // @ToString .Exclude
-    public  List<BidDto> bidDtos = new ArrayList<>();
+    // @Builder .Default
+    // // @ToString .Exclude
+    // public  List<BidDto> bidDtos = new ArrayList<>();
 
     @Builder .Default
     @ToString .Exclude
-    public  List<PaymentDto> payDtos = new ArrayList<>();
+    public  List<MBResultDto> payDtos = new ArrayList<>();
+
+    @Builder .Default
+    @ToString.Exclude
+    private  List<MemberBhistory> bidHistory = new ArrayList<>();
 
 
     // entity -> dto 

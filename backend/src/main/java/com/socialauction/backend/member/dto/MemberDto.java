@@ -15,6 +15,7 @@ public class MemberDto {
     private String loginId;
     private String name;
     private String email;
+    private String phone;
     
     // 가입일
     private LocalDateTime createdAt;
@@ -29,6 +30,15 @@ public class MemberDto {
     private LocalDateTime lockedAt;
 
 
+    public MemberEntity toEntity(){
+        return MemberEntity.builder()
+                        .loginId(this.loginId)
+                        .name(this.name)
+                        .email(this.email)
+                        .phone(this.phone)
+                        .build();
+    }
+
     // entity -> dto 
     public static  MemberDto from(MemberEntity memberEntity){
         return MemberDto.builder()
@@ -36,6 +46,7 @@ public class MemberDto {
             .loginId(memberEntity.getLoginId())
             .name(memberEntity.getName())
             .email(memberEntity.getEmail())
+            .phone(memberEntity.getPhone())
             .createdAt(memberEntity.getCreatedAt())
             .role(memberEntity.getRole())
             .lockedAt(memberEntity.getLockedAt())
