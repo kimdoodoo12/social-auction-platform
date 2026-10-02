@@ -2,7 +2,7 @@ package com.socialauction.backend.products.user.repository;
 
 import java.util.List;
 
-import org.springframework.boot.data.autoconfigure.web.DataWebProperties.Pageable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -185,20 +185,41 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             )
         where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */
         and (
-            
+            :categoryId is null or p.category_id = :categoryId /* 카테고리 필터링 */
+        )
+        and (
+            :auctionStatus is null or :auctionStatus = a.auction_status /* 경매 상태 필터링 */
+        )
+        and (
+            :organizationId is null or :organizationId = p.organization_id /* 기관 필터링 */
+        )
+        and (
+            (:lowprice is null and :highprice is null) /* 가격 필터링 */
+            or (
+                coalesce(bs.current_price, p.start_price) /* 현재가가 있으면 현재가, 없으면 시작가 */
+                between :lowprice and :highprice
+            )
         )
         ORDER BY
-            case when : sort = 'popular'
+            case when :sort = 'popular' /* 인기순 */
                 then bs.bid_count end desc,
-            case when : sort = 'time' /* 마감시간 순 추후에 작업 */
-                then 
-            case when : sort = ''
+            case when :sort = 'time' /* 마감시간 순 추후에 작업 */
+                then bs.bid_count end desc,
+            case when :sort = 'new'  /* 최신순 */
+                then p.created_at end desc,
+            case when :sort = 'lowprice'  /* 가격 낮은 순 */
+                then coalesce(bs.current_price, p.start_price) end asc,
+            case when :sort = 'highprice' /* 가격 높은 순 */
+                then coalesce(bs.current_price, p.start_price) end desc,
+            p.product_id desc /* 조건이 같다면 상품번호 내림차순 */
         """, nativeQuery = true)
     Page<ProductDto> findProductList( 
         @Param ("productName") String productName,
-        @Param ("organizationId") String organizationId,
+        @Param ("organizationId") Integer organizationId,
         @Param ("auctionStatus") String auctionStatus,
-        @Param ("categoryId") String categoryId,
+        @Param ("categoryId") Integer categoryId,
+        @Param ("lowprice") Integer lowprice,
+        @Param ("highprice") Integer highprice,
         @Param ("sort") String sort,
         Pageable pageable );
 

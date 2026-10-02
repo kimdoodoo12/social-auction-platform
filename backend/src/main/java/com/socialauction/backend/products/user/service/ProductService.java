@@ -2,6 +2,8 @@ package com.socialauction.backend.products.user.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,5 +70,15 @@ public class ProductService {
         return productRepository.findNewProduct();
     }
 
-
+    // 상품 목록 조회
+    public Page<ProductDto> findList(
+        Pageable pageable,
+        String productName, Integer organizationId, String auctionStatus,
+        Integer categoryId, Integer lowprice, Integer highprice, String sort
+    ) {
+        Page<ProductDto> list = productRepository.findProductList(
+            productName, organizationId, auctionStatus,
+            categoryId, lowprice, highprice, sort, pageable);
+        return list;
+    }
 }
