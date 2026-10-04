@@ -93,8 +93,15 @@ public class OrganizationService {
                 if(savedImageFileName == null){return false;}
             }
 
-            oEntity.setAgreementFileName(savedAgreementFileName);
-            oEntity.setOrganizationImageFileName(savedImageFileName);
+            // 새 파일이 업로드된 경우에만 교체하고, 이전 파일은 삭제한다 (없으면 기존 파일 유지)
+            if(savedAgreementFileName != null){
+                fileService.fileDelete(oEntity.getAgreementFileName());
+                oEntity.setAgreementFileName(savedAgreementFileName);
+            }
+            if(savedImageFileName != null){
+                fileService.fileDelete(oEntity.getOrganizationImageFileName());
+                oEntity.setOrganizationImageFileName(savedImageFileName);
+            }
             oEntity.updateOrganization(oInfoRequest);
 
             return true;

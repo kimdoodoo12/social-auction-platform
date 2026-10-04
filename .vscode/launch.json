@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // 저장소 루트에서 백엔드 실행.
+            // VS Code는 backend를 bin/main으로 빌드하지만, 업로드 파일은 FileService가
+            // backend/build/resources/main/static/ 아래에 저장한다.
+            // 클래스패스 끝에 build/resources/main을 붙여서 업로드한 이미지도 정적 파일로 서빙되게 한다.
+            "type": "java",
+            "name": "AppStart (backend)",
+            "request": "launch",
+            "mainClass": "com.socialauction.backend.AppStart",
+            "projectName": "backend",
+            "cwd": "${workspaceFolder}",
+            "classPaths": [
+                "$Auto",
+                "${workspaceFolder}/backend/build/resources/main"
+            ]
+        }
+    ]
+}

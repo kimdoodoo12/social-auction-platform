@@ -18,7 +18,7 @@ public class FileService {
     String baseDir = System.getProperty("user.dir");
 
     // 서버 build용 경로
-    private String uploadPath = baseDir+"/build/resources/main/static/organization/";
+    private String uploadPath = baseDir+"/backend/build/resources/main/static/organization/";
 
     public String fileUpload(MultipartFile multipartFile){
         if (multipartFile == null || multipartFile.isEmpty()){return null;}

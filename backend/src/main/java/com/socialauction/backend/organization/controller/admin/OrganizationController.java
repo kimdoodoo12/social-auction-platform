@@ -72,4 +72,5 @@ public class OrganizationController {
     public boolean update(@PathVariable("id") int id, @ModelAttribute OrganizationInfoRequest oInfoResquest){
         return oService.update(id, oInfoResquest);
     }
+
 }

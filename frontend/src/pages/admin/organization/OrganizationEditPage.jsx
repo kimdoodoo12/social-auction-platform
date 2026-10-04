@@ -23,7 +23,7 @@ export default function OrganizationEditPage() {
             key={organizationId}
             mode="edit"
             initial={data.info}
-            onSubmit={(body) => updateOrganization(organizationId, body)}
+            onSubmit={(fields, files) => updateOrganization(organizationId, fields, files)}
             onSuccess={goDetail}
             onCancel={goDetail}
           />
