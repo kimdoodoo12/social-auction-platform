@@ -7,5 +7,5 @@ import com.socialauction.backend.payment.entity.PaymentEntity;
 
 @Repository 
 public interface PaymentRepository extends JpaRepository<PaymentEntity,Integer> {
-    
+
 }

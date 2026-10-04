@@ -101,5 +101,13 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     );
 
 
+    // @Query(value = """
+    //         SELECT products.name, COALESCE(MAX(bid.bid_price), products.start_price) AS currentPrice
+    //          FROM auction LEFT JOIN products on products.product_id = auction.product_id 
+    //          LEFT JOIN bid on bid.auction_id = auction.auction_id 
+    //          WHERE auction_status = "진행"
+    //          GROUP BY products.product_id;
+    //         """, nativeQuery = true;)
+               
 
 }

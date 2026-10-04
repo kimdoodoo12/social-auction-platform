@@ -1,6 +1,7 @@
 package com.socialauction.backend.organization.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class OrganizationService {
     private final OrganizationRepository oRepository;
+    private final FileService fileService;
 
     @Transactional(readOnly = true)
     public Page<OrganizationListResponse> findAll(Pageable pageable){
@@ -45,7 +47,23 @@ public class OrganizationService {
     }
 
     public boolean save(OrganizationInfoRequest oInfoRequest){
+        String savedImageFileName = null;
+        String savedAgreementFileName = null;
+
+        // 협약서 첨부파일이 존재하면
+        if(oInfoRequest.getAgreementFile() != null && !oInfoRequest.getAgreementFile().isEmpty()){
+            savedAgreementFileName = fileService.fileUpload(oInfoRequest.getAgreementFile());
+            if(savedAgreementFileName == null){return false;}
+        }
+
+        // 기관이미지 첨부파일이 존재하면
+        if(oInfoRequest.getOrganizationImageFile() != null && !oInfoRequest.getOrganizationImageFile().isEmpty()){
+            savedImageFileName = fileService.fileUpload(oInfoRequest.getOrganizationImageFile());
+            if(savedImageFileName == null){return false;}
+        }
         OrganizationEntity oEntity = oInfoRequest.toEntity();
+        oEntity.setAgreementFileName(savedAgreementFileName);
+        oEntity.setOrganizationImageFileName(savedImageFileName);
         oRepository.save(oEntity);
         if(oEntity.getOrganizationId() >= 1){
             return true;
@@ -55,8 +73,51 @@ public class OrganizationService {
 
     @Transactional
     public boolean update(int id, OrganizationInfoRequest oInfoRequest){
-        OrganizationEntity oEntity = oRepository.findById(id).get();
-        oEntity.updateOrganization(oInfoRequest);
-        return true;
+
+        Optional<OrganizationEntity> optional = oRepository.findById(id);
+        String savedImageFileName = null;
+        String savedAgreementFileName = null;
+
+        if(optional.isPresent()){
+            OrganizationEntity oEntity = optional.get();
+            
+            // 협약서 첨부파일이 존재하면
+            if(oInfoRequest.getAgreementFile() != null && !oInfoRequest.getAgreementFile().isEmpty()){
+                savedAgreementFileName = fileService.fileUpload(oInfoRequest.getAgreementFile());
+                if(savedAgreementFileName == null){return false;}
+            }
+
+            // 기관이미지 첨부파일이 존재하면
+            if(oInfoRequest.getOrganizationImageFile() != null && !oInfoRequest.getOrganizationImageFile().isEmpty()){
+                savedImageFileName = fileService.fileUpload(oInfoRequest.getOrganizationImageFile());
+                if(savedImageFileName == null){return false;}
+            }
+
+            oEntity.setAgreementFileName(savedAgreementFileName);
+            oEntity.setOrganizationImageFileName(savedImageFileName);
+            oEntity.updateOrganization(oInfoRequest);
+
+            return true;
+        }
+        return false;
+    }
+
+
+    // 협약서 파일명 PK로 참조
+    public String getAgreementFileName(int id){
+        Optional<OrganizationEntity> optional = oRepository.findById(id);
+        if(optional.isPresent()){
+            return optional.get().getAgreementFileName();
+        }
+        return null;
+    }
+
+    // 기관 이미지 파일명 PK로 참조
+    public String getOrganizationImageFileName(int id){
+        Optional<OrganizationEntity> optional = oRepository.findById(id);
+        if(optional.isPresent()){
+            return optional.get().getOrganizationImageFileName();
+        }
+        return null;
     }
 }

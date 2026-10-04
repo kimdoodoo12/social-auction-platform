@@ -56,6 +56,14 @@ CREATE TABLE products (
   UPDATED_AT DATETIME
 );
 
+CREATE TABLE image(
+  image_id INT PRIMARY KEY AUTO_INCREMENT,
+  product_id INT NOT NULL,
+  CONSTRAINT fk_image_products FOREIGN KEY(product_id)
+    REFERENCES products(product_id) ON UPDATE CASCADE,
+  image VARCHAR(255)
+);
+
 CREATE TABLE auction(
   auction_id INT PRIMARY KEY AUTO_INCREMENT,
   product_id INT NOT NULL,
