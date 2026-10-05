@@ -24,6 +24,10 @@ import com.socialauction.backend.member.entity.MemberEntity;
 @Repository 
 public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
 
+
+    // 임시
+    Optional<MemberEntity> findByMId(Long mno);
+
     // 아이디로 자료 검색 
     MemberEntity findByMemberId(String memberId);
 

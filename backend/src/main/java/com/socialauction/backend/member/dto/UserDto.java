@@ -19,11 +19,12 @@ public class UserDto {
     private String email;
     private String phone;
 
+    private LocalDateTime createdAt;
+    private long memberId;
+
     public MemberEntity toEntity(){
         return MemberEntity.builder()
             .loginId(this.loginId)
-
-            // 암호 구현 해야됨. 
             .password(this.password)
             .name(this.name)
             .email(this.email)
@@ -39,6 +40,8 @@ public class UserDto {
             .name(memberEntity.getName())
             .email(memberEntity.getEmail())
             .phone(memberEntity.getPhone())
+            .createdAt(memberEntity.getCreatedAt())
+            .memberId(memberEntity.getMemberId())
             .build();
     }
 }
