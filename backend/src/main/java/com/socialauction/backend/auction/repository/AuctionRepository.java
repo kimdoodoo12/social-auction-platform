@@ -178,7 +178,7 @@ Optional<AuctionEntity> findByIdForUpdate(@Param("id") Integer auctionId);
         o.organization_id AS organizationId,
         o.name AS organizationName,
         o.description AS organizationDescription,
-        o.organization_image AS organizationImage,
+        o.organization_image_file_name AS organizationImage,
         o.agreement_date AS agreementDate,
         (SELECT COUNT(*)
          FROM products op

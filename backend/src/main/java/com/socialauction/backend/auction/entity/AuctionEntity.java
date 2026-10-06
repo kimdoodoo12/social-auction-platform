@@ -14,7 +14,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -59,5 +58,11 @@ public class AuctionEntity  {
         this.startTime = startTime;
         this.endTime = endTime;
         this.auctionStatus = "진행";
+    }
+
+    // 첫입찰인지 아닌지 판단, 대기이면 입찰자가 0인 상태, 진행이면 입찰차가 최소 1인 상태
+    public boolean isWaiting(){
+        if(auctionStatus.equals("대기")){return true;}
+        return false;
     }
 }

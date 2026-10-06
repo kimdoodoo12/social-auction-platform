@@ -1,6 +1,7 @@
 package com.socialauction.backend.organization.controller.admin;
 
-import com.socialauction.backend.organization.service.OFileService;
+import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.UploadFolder;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -30,12 +31,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor 
 @RequestMapping("/ieum/admin/organization")
 public class OrganizationController {
 
-    private final OFileService fileService;
+    private final FileService fileService;
     private final OrganizationService oService;
 
 
@@ -59,7 +60,7 @@ public class OrganizationController {
     public void download(@PathVariable("id") int id, HttpServletResponse response){
         String fileName = oService.getAgreementFileName(id);
         if(fileName != null){
-            fileService.fileDownload(fileName, response);
+            fileService.download(UploadFolder.ORGANIZATION, fileName, response);
         }
     }
 

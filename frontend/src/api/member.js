@@ -4,7 +4,7 @@ import { api, toPage } from './client'
 
 // 전체 회원 목록 (memberId 내림차순) - GET /admin/user/manage?page&size
 export async function fetchMembers({ page = 0, size = 10 } = {}) {
-  return toPage(await api.get('/admin/user/manage', { page, size }))
+  return toPage(await api.get('/ieum/admin/member/manage', { page, size }))
 }
 
 // 조건 검색 - GET /admin/user/search?name&email&role&startDate&endDate&page&size
@@ -13,7 +13,7 @@ export async function fetchMembers({ page = 0, size = 10 } = {}) {
 // page/size는 백엔드에서 필수 파라미터다.
 export async function searchMembers({ name, email, role, startDate, endDate, page = 0, size = 10 } = {}) {
   return toPage(
-    await api.get('/admin/user/search', {
+    await api.get('/ieum/admin/member/search', {
       name,
       email,
       role,
@@ -27,15 +27,15 @@ export async function searchMembers({ name, email, role, startDate, endDate, pag
 
 // 회원 상세 + 입찰 내역(bidDtos) + 결제 내역(payDtos) - GET /user/detail/info/{userid}
 export function fetchMemberDetail(userId) {
-  return api.get(`/user/detail/info/${userId}`)
+  return api.get(`/ieum/admin/member/detail/info/${userId}`)
 }
 
 // 회원 정지 (role을 '정지'로 변경) - PUT /user/stop/{userid}, 응답: boolean
 export function suspendMember(userId) {
-  return api.put(`/user/stop/${userId}`)
+  return api.put(`/ieum/admin/member/stop/${userId}`)
 }
 
 // 회원 정상 복구
 export function normalizeMember(userId) {
-  return api.put(`/user/normal/${userId}`)
+  return api.put(`/ieum/admin/member/user/normal/${userId}`)
 }

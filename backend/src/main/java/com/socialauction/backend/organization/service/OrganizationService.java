@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.UploadFolder;
 import com.socialauction.backend.organization.dto.admin.OrganizationDetailResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
@@ -23,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class OrganizationService {
     private final OrganizationRepository oRepository;
-    private final OFileService fileService;
+    private final FileService fileService;
 
     @Transactional(readOnly = true)
     public Page<OrganizationListResponse> findAll(Pageable pageable){
@@ -52,13 +54,13 @@ public class OrganizationService {
 
         // 협약서 첨부파일이 존재하면
         if(oInfoRequest.getAgreementFile() != null && !oInfoRequest.getAgreementFile().isEmpty()){
-            savedAgreementFileName = fileService.fileUpload(oInfoRequest.getAgreementFile());
+            savedAgreementFileName = fileService.upload(UploadFolder.ORGANIZATION, oInfoRequest.getAgreementFile());
             if(savedAgreementFileName == null){return false;}
         }
 
         // 기관이미지 첨부파일이 존재하면
         if(oInfoRequest.getOrganizationImageFile() != null && !oInfoRequest.getOrganizationImageFile().isEmpty()){
-            savedImageFileName = fileService.fileUpload(oInfoRequest.getOrganizationImageFile());
+            savedImageFileName = fileService.upload(UploadFolder.ORGANIZATION, oInfoRequest.getOrganizationImageFile());
             if(savedImageFileName == null){return false;}
         }
         OrganizationEntity oEntity = oInfoRequest.toEntity();
@@ -83,23 +85,23 @@ public class OrganizationService {
             
             // 협약서 첨부파일이 존재하면
             if(oInfoRequest.getAgreementFile() != null && !oInfoRequest.getAgreementFile().isEmpty()){
-                savedAgreementFileName = fileService.fileUpload(oInfoRequest.getAgreementFile());
+                savedAgreementFileName = fileService.upload(UploadFolder.ORGANIZATION, oInfoRequest.getAgreementFile());
                 if(savedAgreementFileName == null){return false;}
             }
 
             // 기관이미지 첨부파일이 존재하면
             if(oInfoRequest.getOrganizationImageFile() != null && !oInfoRequest.getOrganizationImageFile().isEmpty()){
-                savedImageFileName = fileService.fileUpload(oInfoRequest.getOrganizationImageFile());
+                savedImageFileName = fileService.upload(UploadFolder.ORGANIZATION, oInfoRequest.getOrganizationImageFile());
                 if(savedImageFileName == null){return false;}
             }
 
             // 새 파일이 업로드된 경우에만 교체하고, 이전 파일은 삭제한다 (없으면 기존 파일 유지)
             if(savedAgreementFileName != null){
-                fileService.fileDelete(oEntity.getAgreementFileName());
+                fileService.delete(UploadFolder.ORGANIZATION, oEntity.getAgreementFileName());
                 oEntity.setAgreementFileName(savedAgreementFileName);
             }
             if(savedImageFileName != null){
-                fileService.fileDelete(oEntity.getOrganizationImageFileName());
+                fileService.delete(UploadFolder.ORGANIZATION, oEntity.getOrganizationImageFileName());
                 oEntity.setOrganizationImageFileName(savedImageFileName);
             }
             oEntity.updateOrganization(oInfoRequest);

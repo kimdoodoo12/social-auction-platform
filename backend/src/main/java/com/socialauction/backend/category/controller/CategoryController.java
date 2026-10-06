@@ -19,7 +19,7 @@ import com.socialauction.backend.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/ieum/admin/category")
 @RequiredArgsConstructor 
 public class CategoryController {

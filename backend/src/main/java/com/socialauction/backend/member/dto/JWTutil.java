@@ -33,7 +33,7 @@ public class JWTutil {
                         .claim("type", "ACCESS")
                         .subject(mno+"")
                         .issuedAt(new Date())
-                        .expiration(new Date(new Date().getTime() + 1000L * 60 * 30))
+                        .expiration(new Date(new Date().getTime() + 1000L * 60 * 20))
                         .signWith(secretkey)
                         .compact();
         System.out.println(jwt);
@@ -67,7 +67,7 @@ public class JWTutil {
                     .claim("type", "REFRESH")
                     .subject(mno+"")
                     .issuedAt(new Date())
-                    .expiration(new Date(new Date().getTime() + 1000L * 60 * 60 * 24 * 7))
+                    .expiration(new Date(new Date().getTime() + 1000L * 60 * 60 * 23))
                     .signWith(secretkey)
                     .compact();
     }

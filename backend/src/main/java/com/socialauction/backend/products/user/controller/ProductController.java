@@ -69,11 +69,6 @@ public class ProductController {
             categoryId,lowprice,highprice,sort
         );
     }
-    // // 추천 상품 조회
-    // @GetMapping("aa")
-    // public List<ProductDto> findRecommendProduct(Long memberId ) {
-    //     return productService.findRecommendProduct(memberId);
-    // }
     
     
     

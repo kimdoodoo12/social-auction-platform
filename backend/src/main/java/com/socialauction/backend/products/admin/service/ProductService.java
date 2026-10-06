@@ -2,6 +2,8 @@ package com.socialauction.backend.products.admin.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +21,8 @@ import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
+import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.UploadFolder;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
 import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
@@ -43,7 +47,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final OrganizationRepository organizationRepository;
     private final AuctionRepository auctionRepository;
-    private final PFileService fileService;
+    private final FileService fileService;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
@@ -170,13 +174,16 @@ public class ProductService {
                         .orElseThrow(() -> new ResponseStatusException( // 예외 처리
                                 HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다.")));
 
+        validateNewImages(productDto.getImages());
+
         // 이미지 설정
         
         productDto.getImages().forEach(dto -> {
             if (dto.getFile() != null && !dto.getFile().isEmpty()) {
-                String savedFileName = fileService.fildUpload(dto.getFile());
+                String savedFileName = fileService.upload(UploadFolder.IMAGES, dto.getFile());
                 ImageEntity imageEntity = ImageEntity.builder()
                         .image(savedFileName)
+                        .sortOrder(dto.getSortOrder())
                         .productEntity(productEntity)
                         .build();
                 productEntity.getImageEntity().add(imageEntity);
@@ -226,21 +233,7 @@ public class ProductService {
                         HttpStatus.BAD_REQUEST, "존재하지 않는 상품번호입니다."
                 ));
 
-        // 기존 이미지와 새 이미지의 개수 확인
-        if (productDto.getImages() != null) { // 이미지가 있는지 확인
-            int newImageCount = 0;
-            for (ImageDto imageDto : productDto.getImages()) {
-                // 이미지 정보 확인
-                Checks.check(imageDto == null, "이미지 정보를 입력해주세요.");
-                // 이미지 id가 없으면 새 이미지로 계산
-                if (imageDto.getImageId() == null) {
-                    newImageCount++;
-                }
-            }
-            // 기존 이미지를 교체하는 경우는 개수가 늘어나지 않음
-            Checks.check(savedEntity.getImageEntity().size() + newImageCount > 5,
-                    "상품 이미지는 최대 5개까지 등록할 수 있습니다.");
-        }
+        validateImageUpdates(savedEntity, productDto.getImages());
 
         // 받아온 Dto를 Entity로 변환
         ProductEntity productEntity = productDto.toEntity();
@@ -281,6 +274,7 @@ public class ProductService {
                 if (imageDto.getImageId() == null) {
                     ImageEntity imageEntity = ImageEntity.builder()
                             .image(imagePath)
+                            .sortOrder(imageDto.getSortOrder())
                             .productEntity(savedEntity)
                             .build();
                     savedEntity.getImageEntity().add(imageEntity);
@@ -299,6 +293,57 @@ public class ProductService {
         }
 
         return true;
+    }
+
+    // 파일을 쓰기 전에 전체 요청을 검증한다.
+    private void validateNewImages(List<ImageDto> images) {
+        Checks.check(images == null || images.isEmpty(), "1번 대표 이미지를 등록해주세요.");
+        Checks.check(images.size() > 5, "상품 이미지는 최대 5개까지 등록할 수 있습니다.");
+        Set<Integer> positions = new HashSet<>();
+        for (ImageDto image : images) {
+            validatePosition(image);
+            Checks.check(image.getImageId() != null, "등록할 이미지에는 기존 이미지 ID를 지정할 수 없습니다.");
+            Checks.check(!positions.add(image.getSortOrder()), "이미지 위치가 중복되었습니다.");
+            Checks.check(image.getFile() == null || image.getFile().isEmpty(), "이미지 파일을 선택해주세요.");
+        }
+        Checks.check(!positions.contains(1), "1번 대표 이미지를 등록해주세요.");
+    }
+
+    private void validatePosition(ImageDto image) {
+        Checks.check(image == null, "이미지 정보를 입력해주세요.");
+        Checks.check(image.getSortOrder() == null || image.getSortOrder() < 1
+                || image.getSortOrder() > 5, "이미지 위치는 1~5여야 합니다.");
+    }
+
+    private void validateImageUpdates(ProductEntity product, List<ImageDto> images) {
+        Map<Integer, ImageEntity> existing = new HashMap<>();
+        Set<Integer> positions = new HashSet<>();
+        for (ImageEntity image : product.getImageEntity()) {
+            Checks.check(image.getSortOrder() == null || image.getSortOrder() < 1
+                    || image.getSortOrder() > 5, "기존 이미지 위치 데이터를 먼저 설정해주세요.");
+            Checks.check(!positions.add(image.getSortOrder()), "기존 이미지 위치가 중복되었습니다.");
+            existing.put(image.getImageId(), image);
+        }
+        Set<Integer> requestedPositions = new HashSet<>();
+        Set<Integer> requestedIds = new HashSet<>();
+        if (images != null) {
+            Checks.check(images.size() > 5, "상품 이미지는 최대 5개까지 등록할 수 있습니다.");
+            for (ImageDto image : images) {
+                validatePosition(image);
+                Checks.check(!requestedPositions.add(image.getSortOrder()), "이미지 위치가 중복되었습니다.");
+                Checks.check(image.getImage() == null || image.getImage().isBlank(), "유효한 이미지 경로가 아닙니다.");
+                if (image.getImageId() == null) {
+                    Checks.check(!positions.add(image.getSortOrder()), "이미 사용 중인 이미지 위치입니다.");
+                } else {
+                    Checks.check(!requestedIds.add(image.getImageId()), "같은 이미지를 중복 수정할 수 없습니다.");
+                    ImageEntity original = existing.get(image.getImageId());
+                    Checks.check(original == null, "해당 상품의 이미지가 아닙니다.");
+                    Checks.check(!original.getSortOrder().equals(image.getSortOrder()),
+                            "사진 교체 시 기존 위치를 유지해주세요.");
+                }
+            }
+        }
+        Checks.check(!positions.contains(1), "1번 대표 이미지는 비울 수 없습니다.");
     }
 
     // 검색기능

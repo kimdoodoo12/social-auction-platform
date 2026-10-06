@@ -18,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +46,7 @@ public class ProductEntity extends BaseTime{
     private CategoryEntity categoryEntity;
 
     @OneToMany (mappedBy = "productEntity", cascade = CascadeType.ALL)
+    @OrderBy("sortOrder ASC")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude // 무한재귀방지
     @Builder.Default 

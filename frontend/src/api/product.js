@@ -82,7 +82,15 @@ export async function stopSelling(productId) {
 }
 
 export async function createProduct(productDto) {
-  return ensureTrue(await api.post(PRODUCT_API.create, productDto), '상품 등록에 실패했습니다.')
+  const body = new FormData()
+  for (const key of ['name', 'organizationId', 'categoryId', 'startPrice', 'description', 'background']) {
+    body.append(key, productDto[key] ?? '')
+  }
+  productDto.images.forEach((image, index) => {
+    body.append(`images[${index}].file`, image.file)
+    body.append(`images[${index}].sortOrder`, String(image.sortOrder))
+  })
+  return ensureTrue(await api.post(PRODUCT_API.create, body), '상품 등록에 실패했습니다.')
 }
 
 export async function updateProduct(productDto) {
