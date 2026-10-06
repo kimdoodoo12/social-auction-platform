@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.socialauction.backend.auction.user.dto.AuctionConfirmDto;
 import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
+import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 import com.socialauction.backend.auction.user.service.UserAuctionService;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 
@@ -25,10 +26,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController 
 @CrossOrigin (origins = "http://localhost:5173")
 @RequiredArgsConstructor 
-@RequestMapping ("/user/auction")
+@RequestMapping ("/ieum/user/auction")
 public class UserAuctionController {
 
-    private final UserAuctionService auctionService;
+    private final UserAuctionService userAuctionService;
 
     // * ---사용자------------------------------------------------------------------------------------
     
@@ -36,18 +37,27 @@ public class UserAuctionController {
     @GetMapping("/{id}")
     public AuctionDetailProjection findUserPageAuction(@PathVariable (name = "id") int auctionId) {
     
-        return auctionService.findUserPageAuction(auctionId);
+        return userAuctionService.findUserPageAuction(auctionId);
     }
 
+    // * 입찰 정보 조회
     @GetMapping("/bid")
-    public List<RecentBid> getMethodName(@RequestParam("id") int auctionId) {
-        return auctionService.findUserPageBid(auctionId);
+    public List<RecentBid> findUserPageBid(@RequestParam("id") int auctionId) {
+        return userAuctionService.findUserPageBid(auctionId);
     }
 
+    // * 경매 입찰 
     @PostMapping ("insert")
     public boolean auctionConfirmed(@RequestBody AuctionConfirmDto auctionConfirmDto) {
         
-        return auctionService.auctionConfirmed(auctionConfirmDto);
+        return userAuctionService.auctionConfirmed(auctionConfirmDto);
+    }
+    
+
+    // * 경매 상품 정보
+    @GetMapping("/product/{id}")
+    public ProductDetailProjection findDetailProduct(@PathVariable (name = "id") Integer auctionId) {
+        return userAuctionService.findDetailProduct(auctionId);
     }
     
 }
