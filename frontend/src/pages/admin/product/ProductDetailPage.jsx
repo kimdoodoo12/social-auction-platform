@@ -15,7 +15,7 @@ import { formatDateTime, formatPrice } from '../../../utils/format'
 import { ProductImage, ProductStatusBadge } from './ProductParts'
 import './product.css'
 
-// [ADMIN] 04 상품 상세 — GET /admin/product/bb/{productId}
+// [ADMIN] 04 상품 상세 — GET /ieum/admin/product/detail/{productId}
 // 상품은 productDto, 시작가는 productAuctionInfo에서 읽고 경매 상태는 목록에서 전달받는다.
 
 const nameOf = (options, id) => options?.find((o) => o.id === id)?.name

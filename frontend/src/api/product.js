@@ -1,14 +1,14 @@
 import { api, BASE_URL, toPage } from './client'
 
 // 상품 API (backend products/admin/controller/ProductController.java)
-// 백엔드 주소가 임시값(aa, bb ...)이라 바뀌면 여기만 고친다.
+// 상품 API 주소는 백엔드 관리자 상품 컨트롤러 매핑과 맞춘다.
 export const PRODUCT_API = {
-  list: '/admin/product/aa', // GET  Pageable(size 8, createdAt·productId DESC) → Page<ProductListResponse>
-  detail: '/admin/product/bb', // GET  /{productId} → ProductDto
-  stop: '/admin/product/tt', // POST ?productId → boolean (판매 중지)
-  create: '/admin/product/cc', // POST body ProductDto → boolean
-  update: '/admin/product/dd', // PUT  body ProductDto → boolean
-  search: '/admin/product/ee', // GET  ?productName&organizationName&auctionStatus&categoryName&page → Page<ProductManageDto>
+  list: '/ieum/admin/product/main', // GET  Pageable(size 8, createdAt·productId DESC) → Page<ProductListResponse>
+  detail: '/ieum/admin/product/detail', // GET  /{productId} → ProductDto
+  stop: '/ieum/admin/product/stop', // POST ?productId → boolean (판매 중지)
+  create: '/ieum/admin/product/add', // POST body ProductDto → boolean
+  update: '/ieum/admin/product/update', // PUT  body ProductDto → boolean
+  search: '/ieum/admin/product/search', // GET  ?productName&organizationName&auctionStatus&categoryName&page → Page<ProductManageDto>
 }
 
 // 폼/필터 선택지용 (읽기 전용)
@@ -24,7 +24,7 @@ export const STOPPED_STATUS = '판매 중지'
 // 백엔드 제약 (ProductService.saveProduct / updateProduct)
 export const PRODUCT_LIMITS = { name: 30, text: 255, images: 5 }
 
-// 목록(aa)과 검색(ee)의 응답 필드명이 달라 한 가지 형태로 맞춘다.
+// 목록(main)과 검색(search)의 응답 필드명이 달라 한 가지 형태로 맞춘다.
 function fromListResponse(row, index) {
   return {
     key: `${row.productId}-${index}`,
@@ -49,7 +49,7 @@ function fromManageDto(row, index) {
     organizationName: row.organizationName,
     startPrice: row.startPrice,
     currentPrice: row.bidPrice,
-    // 경매가 없으면 auction_status 가 null 이다. 목록(aa)과 같은 표기로 맞춘다.
+    // 경매가 없으면 auction_status 가 null 이다. 목록(main)과 같은 표기로 맞춘다.
     status: row.auctionStatus ?? NO_AUCTION_STATUS,
     createdAt: row.createdAt,
   }

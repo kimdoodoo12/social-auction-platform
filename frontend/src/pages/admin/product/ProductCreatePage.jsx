@@ -4,7 +4,7 @@ import AdminPage from '../../../components/admin/AdminPage'
 import ProductForm from './ProductForm'
 import './product.css'
 
-// [ADMIN] 05 상품 등록 — POST /product/cc
+// [ADMIN] 05 상품 등록 — POST /ieum/admin/product/add
 // 응답이 boolean 이라 새 상품번호를 알 수 없어, 등록 후 목록으로 돌아간다.
 const EMPTY_PRODUCT = {
   productId: null,

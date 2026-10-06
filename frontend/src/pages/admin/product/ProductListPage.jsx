@@ -20,7 +20,7 @@ import { ProductImage, ProductStatusBadge } from './ProductParts'
 import './product.css'
 
 // [ADMIN] 03 상품 관리
-// 검색 조건이 없으면 GET /product/aa, 하나라도 있으면 GET /product/ee 를 호출한다.
+// 검색 조건이 없으면 GET /ieum/admin/product/main, 하나라도 있으면 GET /ieum/admin/product/search 를 호출한다.
 const FILTER_KEYS = ['productName', 'organizationName', 'categoryName', 'auctionStatus']
 
 // 경매가 없는 상품은 백엔드 판매 중지 처리 시 경매를 찾지 못해 실패하므로 막는다.
