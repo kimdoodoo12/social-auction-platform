@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service 
-public class FileService {
+public class PFileService {
     private String baseDir = System.getProperty("user.dir");
     // 경로 지정
     private String uploadPath = baseDir+"/src/main/resources/static/images/";

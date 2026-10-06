@@ -50,7 +50,6 @@ public class ProductController {
         return productService.findNewProduct();
     }
 
-<<<<<<< HEAD
 
     /* ------------- 상품목록 페이지 ------------------- */
     // 상품 목록
@@ -70,7 +69,6 @@ public class ProductController {
             categoryId,lowprice,highprice,sort
         );
     }
-=======
     // // 추천 상품 조회
     // @GetMapping("aa")
     // public List<ProductDto> findRecommendProduct(Long memberId ) {
@@ -79,5 +77,4 @@ public class ProductController {
     
     
     
->>>>>>> 77c0cf1a7b827598c2d3e44e3ac5fd85a37f416a
 }

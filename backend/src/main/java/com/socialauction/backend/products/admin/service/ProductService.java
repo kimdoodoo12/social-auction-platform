@@ -43,7 +43,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final OrganizationRepository organizationRepository;
     private final AuctionRepository auctionRepository;
-    private final FileService fileService;
+    private final PFileService fileService;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
