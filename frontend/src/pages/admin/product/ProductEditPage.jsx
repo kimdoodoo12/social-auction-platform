@@ -18,7 +18,11 @@ function toFormValues(product, startPrice) {
     startPrice: startPrice != null ? String(startPrice) : '',
     description: product.description ?? '',
     background: product.background ?? '',
-    images: (product.images ?? []).map((img) => ({ imageId: img.imageId, image: img.image ?? '' })),
+    images: (product.images ?? []).map((img) => ({
+      imageId: img.imageId,
+      image: img.image ?? '',
+      sortOrder: img.sortOrder,
+    })),
   }
 }
 

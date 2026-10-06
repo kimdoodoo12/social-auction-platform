@@ -46,46 +46,53 @@ function toProductDto(values, mode) {
       ? values.images.filter((img) => img.file).map(({ file, sortOrder }) => ({ file, sortOrder }))
       : values.images
       .filter((img) => img.imageId != null || img.image.trim())
-      .map((img) => ({ imageId: img.imageId ?? null, image: img.image.trim() })),
+      .map((img) => ({
+        imageId: img.imageId ?? null,
+        image: img.image.trim(),
+        sortOrder: img.sortOrder,
+      })),
   }
 }
 
 // Figma의 대표 1 + 추가 4 업로드 박스. 업로드 API가 없어 박스를 누르고 이미지 경로를 입력한다.
 function ImageSlots({ images, onChange }) {
-  const [selected, setSelected] = useState(0)
-  const current = images[selected]
+  const [selected, setSelected] = useState(1)
+  const current = images.find((img) => img.sortOrder === selected)
   const slotCount = PRODUCT_LIMITS.images
 
   const handlePath = (e) => {
     const image = e.target.value
-    if (selected < images.length) {
-      onChange(images.map((img, i) => (i === selected ? { ...img, image } : img)))
+    const exists = images.some((img) => img.sortOrder === selected)
+    if (exists) {
+      onChange(images.map((img) => (img.sortOrder === selected ? { ...img, image } : img)))
     } else {
-      // 빈 박스를 고르면 다음 빈 자리에 추가한다
-      onChange([...images, { imageId: null, image }])
-      setSelected(images.length)
+      // 빈 박스를 고르면 해당 sortOrder를 부여하여 추가한다
+      onChange([...images, { imageId: null, image, sortOrder: selected }])
     }
   }
 
-  const slot = (i, className, label) => (
-    <button
-      key={i}
-      type="button"
-      className={`product-slot ${className}${i === selected ? ' selected' : ''}`}
-      onClick={() => setSelected(Math.min(i, images.length))}
-    >
-      <ImageBox path={images[i]?.image.trim()} label={label} />
-    </button>
-  )
+  const slot = (sortOrder, className, label) => {
+    const img = images.find((item) => item.sortOrder === sortOrder)
+    return (
+      <button
+        key={sortOrder}
+        type="button"
+        className={`product-slot ${className}${sortOrder === selected ? ' selected' : ''}`}
+        onClick={() => setSelected(sortOrder)}
+      >
+        <ImageBox path={img?.image?.trim()} label={label} />
+      </button>
+    )
+  }
 
   return (
     <div className="product-slots">
-      {slot(0, 'product-slot--main', '대표 이미지')}
+      {slot(1, 'product-slot--main', '대표 이미지')}
       <div className="product-slots__row">
-        {Array.from({ length: slotCount - 1 }, (_, i) => slot(i + 1, '', ''))}
+        {Array.from({ length: slotCount - 1 }, (_, i) => slot(i + 2, '', ''))}
       </div>
       <Field
-        label={`${selected === 0 ? '대표' : `추가 ${selected}`} 이미지 경로`}
+        label={`${selected === 1 ? '대표' : `추가 ${selected - 1}`} 이미지 경로`}
         hint={current?.imageId != null ? '기존 이미지는 경로만 바꿀 수 있습니다.' : '예) /images/product_01_1.png'}
       >
         <input className="admin-input" value={current?.image ?? ''} placeholder="/images/파일명.png" onChange={handlePath} />
