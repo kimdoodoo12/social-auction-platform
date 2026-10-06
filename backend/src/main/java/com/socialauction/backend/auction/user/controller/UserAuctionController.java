@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController 
-@CrossOrigin (origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor 
 @RequestMapping ("/ieum/user/auction")
 public class UserAuctionController {

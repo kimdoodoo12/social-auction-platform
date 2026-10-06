@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor 
 @RequestMapping("/ieum/admin/organization")
 public class OrganizationController {
