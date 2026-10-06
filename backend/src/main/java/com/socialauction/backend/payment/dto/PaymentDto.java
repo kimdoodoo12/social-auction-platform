@@ -22,7 +22,7 @@ public class PaymentDto {
     private Integer auctionId;
 
     // 회원번호 (FK)
-    private Integer memberId;
+    private Long memberId;
 
     // Entity ->DTO 
     public static PaymentDto from(PaymentEntity paymentEntity){

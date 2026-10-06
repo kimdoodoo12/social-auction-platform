@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS ieum;
 USE ieum;
 
 CREATE TABLE member (
-  member_id INT PRIMARY KEY AUTO_INCREMENT,
+  member_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   login_id VARCHAR(30) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   name VARCHAR(30) NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE bid(
   CONSTRAINT fk_bid_auction FOREIGN KEY(auction_id)
     REFERENCES auction(auction_id)
     ON UPDATE CASCADE,
-  member_id INT NOT NULL,
+  member_id BIGINT NOT NULL,
   CONSTRAINT fk_bid_member FOREIGN KEY(member_id)
     REFERENCES member(member_id)
     ON UPDATE CASCADE,
@@ -101,7 +101,7 @@ CREATE TABLE payment(
   CONSTRAINT fk_payment_auction FOREIGN KEY(auction_id)
     REFERENCES auction(auction_id)
     ON UPDATE CASCADE,
-  member_id INT NOT NULL,
+  member_id BIGINT NOT NULL,
   CONSTRAINT fk_payment_member FOREIGN KEY(member_id)
     REFERENCES member(member_id)
     ON UPDATE CASCADE,

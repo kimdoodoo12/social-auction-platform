@@ -34,7 +34,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         GROUP BY p.category_id
         """, nativeQuery = true)
     List<ProductRecommendDto> findCount(
-        @Param("memberId") Integer memberId
+        @Param("memberId") Long memberId
     );
 
     // 추천 상품을 출력하기 위한거

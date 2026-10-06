@@ -14,12 +14,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.socialauction.backend.member.dto.MBResultDto;
+import com.socialauction.backend.member.dto.MemberBhistory;
+import com.socialauction.backend.member.dto.MproductDto;
 import com.socialauction.backend.member.entity.MemberEntity;
 
 
 
 @Repository 
-public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
+public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
+
+
+    // 임시
+
+
+    // 아이디로 자료 검색 
+    MemberEntity findByLoginId(String loginId);
 
     // 이름으로 자료 검색
     List<MemberEntity> findByName(String name);
@@ -56,7 +66,162 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
             """,
         nativeQuery = true
     )
-    int notPay(@Param("memberId") int memberId);
+    int notPay(@Param("memberId") Long memberId);
+
+
+    // ============================
+    // 회원이 입찰한 상품 목록 조회 / 최대 5개 
+    @Query(
+        value = """
+            SELECT
+                p.product_id AS productId,
+                p.name AS productName,
+                MAX(b.bid_time) AS lastBidTime
+            FROM bid b
+            JOIN auction a
+                ON b.auction_id = a.auction_id
+            JOIN products p
+                ON a.product_id = p.product_id
+            WHERE b.member_id = :memberId
+            GROUP BY
+                p.product_id,
+                p.name
+            ORDER BY lastBidTime DESC
+            LIMIT 5
+            """,
+        nativeQuery = true
+    )
+    List<MproductDto> findRecentBidProducts(
+        @Param("memberId") Long memberId
+    );
+
+
+    // 2. 회원PK + 상품PK
+    // 상품명 / 내 입찰가 / 최종가 / 결과 / 입찰시각
+    // =========================================================
+    @Query(
+        value = """
+            SELECT
+                p.product_id AS productId,
+
+                p.name AS productName,
+
+                mybid.bid_price AS myBidPrice,
+
+                (
+                    SELECT MAX(b2.bid_price)
+                    FROM bid b2
+                    WHERE b2.auction_id = mybid.auction_id
+                ) AS finalPrice,
+
+                CASE
+
+                    WHEN NOW() < a.end_time
+                        AND mybid.bid_price = (
+                            SELECT MAX(b3.bid_price)
+                            FROM bid b3
+                            WHERE b3.auction_id = mybid.auction_id
+                        )
+                    THEN '최고입찰'
+
+                    WHEN NOW() < a.end_time
+                    THEN '밀렸어요'
+
+                    WHEN NOW() >= a.end_time
+                        AND mybid.bid_price = (
+                            SELECT MAX(b4.bid_price)
+                            FROM bid b4
+                            WHERE b4.auction_id = mybid.auction_id
+                        )
+                    THEN '낙찰'
+
+                    ELSE '미낙찰'
+
+                END AS result,
+
+                mybid.bid_time AS bidTime
+
+            FROM (
+
+                SELECT
+                    b.auction_id,
+                    b.member_id,
+                    b.bid_price,
+                    b.bid_time,
+                    b.bid_id
+
+                FROM bid b
+
+                JOIN auction a2
+                    ON b.auction_id = a2.auction_id
+
+                WHERE b.member_id = :memberId
+                  AND a2.product_id = :productId
+
+                ORDER BY
+                    b.bid_time DESC,
+                    b.bid_id DESC
+
+                LIMIT 1
+
+            ) mybid
+
+            JOIN auction a
+                ON mybid.auction_id = a.auction_id
+
+            JOIN products p
+                ON a.product_id = p.product_id
+
+            WHERE p.product_id = :productId
+            """,
+        nativeQuery = true
+    )
+    Optional<MemberBhistory> findBidHistory(
+        @Param("memberId") Long memberId,
+        @Param("productId") int productId
+    );
+
+
+    // 회원별 최근 낙찰내역 5개
+    @Query(
+        value = """
+            SELECT
+                a.auction_id AS auctionId,
+                p.name AS product,
+                o.name AS organization,
+                pay.payment_price AS paymentPrice,
+                a.end_time AS winningDate,
+
+                CASE
+                    WHEN pay.payment_status = 1
+                    THEN '결제 완료'
+                    ELSE '미결제'
+                END AS paymentStatus
+
+            FROM payment pay
+
+            JOIN auction a
+                ON pay.auction_id = a.auction_id
+
+            JOIN products p
+                ON a.product_id = p.product_id
+
+            JOIN organization o
+                ON p.organization_id = o.organization_id
+
+            WHERE pay.member_id = :memberId
+            AND pay.payment_status = 1
+
+            ORDER BY a.end_time DESC
+
+            LIMIT 5
+            """,
+        nativeQuery = true
+    )
+    List<MBResultDto> findWinHistory(
+        @Param("memberId") Long memberId
+    );
+
     
 }
 

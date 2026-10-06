@@ -20,10 +20,18 @@ public class ProductService {
     private final ProductRepository productRepository;
     
     // 추천 상품 조회
-    public ProductDto findRecommendProduct( Integer memberId ) {
+    public ProductDto findRecommendProduct( Long memberId ) {
         // 카테고리, 입찰횟수를 담는 dto
         List<ProductRecommendDto> recommendDtos = productRepository.findCount(memberId);
         int total = 0;
+    // public List<ProductDto> findRecommendProduct( Long memberId ) {
+    //     // 카테고리, 입찰횟수를 담는 dto
+    //     // List<ProductRecommendDto> recommendDtos = productRepository.findcount(memberId);
+    //     // private int total = 0;
+    //     // recommendDtos.forEach( a -> {
+    //     //     a.getCategoryId();
+    //     //     total += a.getCount();
+    //     // });
 
         for ( int i = 0; i < recommendDtos.size(); i++ ) {
             total += recommendDtos.get(i).getCount(); // 총 입찰 횟수
