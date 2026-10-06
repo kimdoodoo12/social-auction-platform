@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController 
 @CrossOrigin(origins = "http://localhost:5173" , allowCredentials = "true")
+@RequestMapping("/ieum/admin/member")
 @RequiredArgsConstructor 
 public class MemberController {
     private final MemberService memberService;
@@ -47,7 +49,7 @@ public class MemberController {
     
 
     // 회원관리 관리자 페이지 (전체 조회)
-    @GetMapping("/admin/user/manage")
+    @GetMapping("/manage")
     public Page<MemberDto> memberfindAll(
         @RequestParam(name="page", defaultValue = "0") int page,
         @RequestParam(name="size", defaultValue = "4") int size
@@ -57,13 +59,13 @@ public class MemberController {
 
 
     // 회원정보수정( 등록때 한것만 수정할 수 있도록 )
-    @PutMapping("/user/update/{userid}")
+    @PutMapping("/update/{userid}")
     public boolean userUpdate(@PathVariable ("userid") Long userid , @RequestBody UserDto userDto) {
         return memberService.userUpdate(userid,userDto);
     }
 
     // 회원 정지 기능 
-    @PutMapping("/user/stop/{userid}")
+    @PutMapping("/stop/{userid}")
     public boolean userStop(@PathVariable ("userid")Long userid) {
         return memberService.userStop(userid);
     }
@@ -74,13 +76,13 @@ public class MemberController {
     }
 
     // 회원 상세 페이지 
-    @GetMapping("/user/detail/info/{userid}")
+    @GetMapping("/detail/info/{userid}")
     public MemberBidHistoryDto userDetailInfo(@PathVariable ("userid")Long userid){
         return memberService.userDetailInfo(userid);
     }
     
     // 이름 + 아이디 + 가입일 + 전체 상태 
-    @GetMapping("/admin/user/search")
+    @GetMapping("/search")
     public Page<MemberDto> userSearch(
         @ModelAttribute MemberSearchDto dto,
         @RequestParam(name = "page") int page,
