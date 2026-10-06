@@ -22,30 +22,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController("userProductController") 
 @RequiredArgsConstructor 
-@RequestMapping ("/user/product")
+@RequestMapping ("/ieum/user/product")
 public class ProductController {
     private final ProductService productService;
     /* ----------- 메인페이지 ------------------ */
     // 추천 상품 조회
-    @GetMapping("aa")
+    @GetMapping("recommend")
     public ProductDto findRecommendProduct(Long memberId ) {
         return productService.findRecommendProduct(memberId);
     }
     
     // 마감 임박 상품 조회
-    @GetMapping("bb")
+    @GetMapping("end")
     public String findEndProduct(@RequestParam String param) {
         return "bb";
     }
     
     // 인기 상품 조회
-    @GetMapping("cc")
+    @GetMapping("popular")
     public List<ProductDto> findPopularProduct( ) {
         return productService.findPopularProduct();
     }
     
     // 새로 등록된 상품 조회
-    @GetMapping("dd")
+    @GetMapping("new")
     public List<ProductDto> findNewProduct( ) {
         return productService.findNewProduct();
     }

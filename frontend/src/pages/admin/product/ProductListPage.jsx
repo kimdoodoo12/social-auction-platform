@@ -17,10 +17,9 @@ import { formatDate, formatNumber, formatPrice } from '../../../utils/format'
 import { ProductStatusBadge, ProductThumb } from './ProductParts'
 import './product.css'
 
-// [ADMIN] 03 상품 관리 (Figma 48:37)
-// 검색 조건이 없으면 GET /admin/product/aa, 하나라도 있으면 GET /admin/product/ee 를 호출한다.
-// Figma의 "상품번호로 검색"과 상태별 개수는 백엔드가 지원하지 않아 뺐다.
-const FILTER_KEYS = ['productName', 'organizationName', 'auctionStatus', 'categoryName']
+// [ADMIN] 03 상품 관리
+// 검색 조건이 없으면 GET /ieum/admin/product/main, 하나라도 있으면 GET /ieum/admin/product/search 를 호출한다.
+const FILTER_KEYS = ['productName', 'organizationName', 'categoryName', 'auctionStatus']
 
 const STATUS_LABEL = { 대기: '경매 대기', 진행: '경매 진행 중', 완료: '경매 종료' }
 
