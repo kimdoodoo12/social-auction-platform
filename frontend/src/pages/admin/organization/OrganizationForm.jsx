@@ -33,9 +33,9 @@ function toFormState(info) {
     agreementDateOriginal: info?.agreementDate ?? null,
     agreementStatus: info?.agreementStatus === true ? 'true' : info?.agreementStatus === false ? 'false' : '',
     agreementInfo: info?.agreementInfo ?? '',
-    // 이미 저장된 파일명 (수정 화면 표시용)
+    // 이미 저장된 협약서 파일명과 로고 URL (수정 화면 표시용)
     agreementFileName: info?.agreementFileName ?? null,
-    organizationImageFileName: info?.organizationImageFileName ?? null,
+    organizationImageUrl: info?.organizationImageFileName ?? null,
     businessRegistration: info?.businessRegistration ?? '',
   }
 }
@@ -61,9 +61,8 @@ function toRequest(form) {
     agreementDate,
     agreementStatus: form.agreementStatus === '' ? null : form.agreementStatus === 'true',
     agreementInfo: emptyToNull(form.agreementInfo),
-    // 기존 파일명도 함께 보낸다(백엔드가 새 파일이 없을 때 유지하는 데 쓸 수 있도록)
+    // 기존 파일은 백엔드가 새 파일이 없을 때 그대로 유지한다. 로고는 URL로 오므로 되돌려 보내지 않는다.
     agreementFileName: form.agreementFileName,
-    organizationImageFileName: form.organizationImageFileName,
     businessRegistration: emptyToNull(form.businessRegistration),
   }
 }
@@ -221,7 +220,7 @@ export default function OrganizationForm({ initial, mode = 'create', onSubmit, o
                 {logoPreview ? (
                   <img className="admin-image" src={logoPreview} alt="새 로고 미리보기" />
                 ) : (
-                  <ImageBox path={organizationFilePath(form.organizationImageFileName)} label="로고 업로드 (선택)" />
+                  <ImageBox path={organizationFilePath(form.organizationImageUrl)} label="로고 업로드 (선택)" />
                 )}
               </label>
               <div className="org-file-meta">

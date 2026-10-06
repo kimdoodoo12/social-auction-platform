@@ -3,7 +3,7 @@ import { api, BASE_URL, toPage } from './client'
 // 기관 관리 API (backend: organization/controller/admin/OrganizationController.java)
 const BASE = '/ieum/admin/organization'
 
-// 업로드 파일은 백엔드 static/organization/ 아래에 "UUID_원본파일명"으로 저장된다 (FileService).
+// 업로드 파일은 백엔드 static/organization/ 아래에 "UUID_원본파일명"으로 저장되고 /organization/** 로 제공된다.
 const FILE_DIR = '/organization/'
 
 // 목록. 검색 조건이 하나라도 있으면 /search, 없으면 전체 목록을 호출한다.
@@ -16,7 +16,7 @@ export async function fetchOrganizations({ name, agreementStatus, page = 0, size
 }
 
 // 상세. 응답: { organizationInfoResponse, organizationProductResponse: [] }
-// organizationInfoResponse의 파일 필드: organizationImageFileName, agreementFileName
+// organizationInfoResponse의 파일 필드: organizationImageFileName(조회 URL, 예: /organization/UUID_logo.png), agreementFileName(파일명)
 export async function fetchOrganizationDetail(id) {
   const data = await api.get(`${BASE}/detail/${id}`)
   return {
@@ -47,9 +47,12 @@ export function updateOrganization(id, fields, files) {
   return api.put(`${BASE}/detail/${id}`, toFormData(fields, files))
 }
 
-// 저장된 파일명 → 이미지 경로 (ImageBox가 백엔드 주소를 붙인다)
-export function organizationFilePath(fileName) {
-  return fileName ? `${FILE_DIR}${encodeURIComponent(fileName)}` : null
+// 로고 경로. 백엔드가 상품 이미지처럼 URL(/organization/...)로 내려주므로 그대로 쓰고,
+// 파일명만 온 경우에만 경로를 붙인다. (ImageBox가 백엔드 주소를 붙인다)
+export function organizationFilePath(value) {
+  if (!value) return null
+  if (value.startsWith('/') || /^https?:\/\//.test(value)) return value
+  return `${FILE_DIR}${encodeURIComponent(value)}`
 }
 
 // "UUID_원본파일명" → "원본파일명"

@@ -5,7 +5,7 @@ import { Button, Callout, Card, Field, FormActionBar, StepList } from '../../../
 import { useAsync } from '../../../hooks/useAsync'
 
 // 05 상품 등록 / 06 상품 수정 공용 폼 (Figma 52:200). 요청 본문은 백엔드 ProductDto 형태로 만든다.
-// initial: { productId, name, organizationId, categoryId, startPrice, description, background, images: [{ imageId, image }] }
+// initial: { productId, name, organizationId, categoryId, startPrice, description, background, images: [{ imageId, image, sortOrder }] }
 // Figma 항목 중 백엔드 DTO에 없는 공개 여부·최소 입찰 단위·간단한 설명 입력칸은 숨겼다(사용자 결정).
 
 const MAX_INT = 2147483647
@@ -46,18 +46,25 @@ function toProductDto(values, mode) {
       ? values.images.filter((img) => img.file).map(({ file, sortOrder }) => ({ file, sortOrder }))
       : values.images
       .filter((img) => img.imageId != null || img.image.trim())
+<<<<<<< HEAD
       .map((img) => ({
         imageId: img.imageId ?? null,
         image: img.image.trim(),
         sortOrder: img.sortOrder,
       })),
+=======
+      .map((img) => ({ imageId: img.imageId ?? null, image: img.image.trim(), sortOrder: img.sortOrder })),
+>>>>>>> e1ec1f78e4a8da1f95779ee87dad1abff140d63a
   }
 }
 
-// Figma의 대표 1 + 추가 4 업로드 박스. 업로드 API가 없어 박스를 누르고 이미지 경로를 입력한다.
+// 수정 화면의 대표 1 + 추가 4 박스. 칸 번호가 곧 이미지 위치(sortOrder 1~5)다.
+// 수정 API는 JSON이라 파일 업로드 대신 이미지 경로를 입력한다.
+// 기존 이미지는 원래 칸에서 경로만 바꿀 수 있고, 빈 칸에 경로를 넣으면 그 위치로 새 이미지가 추가된다.
 function ImageSlots({ images, onChange }) {
   const [selected, setSelected] = useState(1)
   const current = images.find((img) => img.sortOrder === selected)
+<<<<<<< HEAD
   const slotCount = PRODUCT_LIMITS.images
 
   const handlePath = (e) => {
@@ -84,15 +91,44 @@ function ImageSlots({ images, onChange }) {
       </button>
     )
   }
+=======
+
+  const handlePath = (e) => {
+    const image = e.target.value
+    if (current) {
+      onChange(images.map((img) => (img.sortOrder === selected ? { ...img, image } : img)))
+    } else {
+      onChange([...images, { imageId: null, image, sortOrder: selected }].sort((a, b) => a.sortOrder - b.sortOrder))
+    }
+  }
+
+  const slot = (sortOrder, className, label) => (
+    <button
+      key={sortOrder}
+      type="button"
+      className={`product-slot ${className}${sortOrder === selected ? ' selected' : ''}`}
+      onClick={() => setSelected(sortOrder)}
+    >
+      <ImageBox path={images.find((img) => img.sortOrder === sortOrder)?.image.trim()} label={label} />
+    </button>
+  )
+>>>>>>> e1ec1f78e4a8da1f95779ee87dad1abff140d63a
 
   return (
     <div className="product-slots">
       {slot(1, 'product-slot--main', '대표 이미지')}
       <div className="product-slots__row">
+<<<<<<< HEAD
         {Array.from({ length: slotCount - 1 }, (_, i) => slot(i + 2, '', ''))}
       </div>
       <Field
         label={`${selected === 1 ? '대표' : `추가 ${selected - 1}`} 이미지 경로`}
+=======
+        {Array.from({ length: PRODUCT_LIMITS.images - 1 }, (_, i) => slot(i + 2, '', ''))}
+      </div>
+      <Field
+        label={`${selected === 1 ? '대표' : `${selected}번`} 이미지 경로`}
+>>>>>>> e1ec1f78e4a8da1f95779ee87dad1abff140d63a
         hint={current?.imageId != null ? '기존 이미지는 경로만 바꿀 수 있습니다.' : '예) /images/product_01_1.png'}
       >
         <input className="admin-input" value={current?.image ?? ''} placeholder="/images/파일명.png" onChange={handlePath} />
