@@ -27,6 +27,7 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
 
 
 
+    // ! 사용자가 결제 취소 했을 때  차순위 사용자 조회 안됨
     //현재 입찰기록 최근 기록 기준으로 출력 
     // 회원: 해당 입찰을 한 회원을 찾기
     // 경매: 해당 입찰이 속한 경매를 찾기
@@ -58,5 +59,17 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
         @Param("bidPrice") Integer bidPrice
     );
 
+    // * 입찰가 가장 높은 사람
+@Query(
+    value = """
+        SELECT b.*
+        FROM bid b
+        WHERE b.auction_id = :auctionId
+        ORDER BY b.bid_price DESC
+        LIMIT 1
+        """,
+    nativeQuery = true
+)
+Optional<BidEntity> findHighestBid(@Param("auctionId") Integer auctionId);
     
 }

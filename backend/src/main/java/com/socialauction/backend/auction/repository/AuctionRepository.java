@@ -193,20 +193,8 @@ Optional<ProductDetailProjection> findProductDetail(
     @Param("auctionId") Integer auctionId
 );
 
-// * 입찰가 가장 높은 사람
-@Query(
-    value = """
-        SELECT b.*
-        FROM bid b
-        WHERE b.auction_id = :auctionId
-        ORDER BY b.bid_price DESC, b.bid_time ASC, b.bid_id ASC
-        LIMIT 1
-        """,
-    nativeQuery = true
-)
-Optional<BidEntity> findHighestBid(
-    @Param("auctionId") Integer auctionId
-);
+
+
 
 
 
