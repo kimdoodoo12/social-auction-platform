@@ -76,32 +76,32 @@ INSERT INTO products (name, organization_id, category_id, start_price, descripti
 ('원목 휴대폰 거치대',  7,  3,  13000,  '자작나무 원목으로 제작한 스마트폰 및 태블릿 겸용 거치대입니다.',   '목공 직업훈련생들이 남은 목재를 활용해 직접 가공했습니다.',                                 '2026-09-06 15:00:00', NULL);
 
 -- Sample product images: first image per product is the representative image.
-INSERT INTO image (product_id, image) VALUES
-(1, '/images/product_01_1.png'),
-(1, '/images/product_01_2.png'),
-(2, '/images/product_02_1.png'),
-(2, '/images/product_02_2.png'),
-(3, '/images/product_03_1.png'),
-(3, '/images/product_03_2.png'),
-(4, '/images/product_04_1.png'),
-(4, '/images/product_04_2.png'),
-(5, '/images/product_05_1.png'),
-(5, '/images/product_05_2.png'),
-(6, '/images/product_06_1.png'),
-(6, '/images/product_06_2.png'),
-(7, '/images/product_07_1.png'),
-(7, '/images/product_07_2.png'),
-(8, '/images/product_08_1.png'),
-(9, '/images/product_09_1.png'),
-(9, '/images/product_09_2.png'),
-(10, '/images/product_10_1.png'),
-(10, '/images/product_10_2.png'),
-(11, '/images/product_11_1.png'),
-(11, '/images/product_11_2.png'),
-(12, '/images/product_12_1.png'),
-(13, '/images/product_13_1.png'),
-(13, '/images/product_13_2.png'),
-(13, '/images/product_13_3.png');
+INSERT INTO image (product_id, image, sort_order) VALUES
+(1, '/images/product_01_1.png', 1),
+(1, '/images/product_01_2.png', 2),
+(2, '/images/product_02_1.png', 1),
+(2, '/images/product_02_2.png', 2),
+(3, '/images/product_03_1.png', 1),
+(3, '/images/product_03_2.png', 2),
+(4, '/images/product_04_1.png', 1),
+(4, '/images/product_04_2.png', 2),
+(5, '/images/product_05_1.png', 1),
+(5, '/images/product_05_2.png', 2),
+(6, '/images/product_06_1.png', 1),
+(6, '/images/product_06_2.png', 2),
+(7, '/images/product_07_1.png', 1),
+(7, '/images/product_07_2.png', 2),
+(8, '/images/product_08_1.png', 1),
+(9, '/images/product_09_1.png', 1),
+(9, '/images/product_09_2.png', 2),
+(10, '/images/product_10_1.png', 1),
+(10, '/images/product_10_2.png', 2),
+(11, '/images/product_11_1.png', 1),
+(11, '/images/product_11_2.png', 2),
+(12, '/images/product_12_1.png', 1),
+(13, '/images/product_13_1.png', 1),
+(13, '/images/product_13_2.png', 2),
+(13, '/images/product_13_3.png', 3);
 
 
 -- ------------------------------------------------------------

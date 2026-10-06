@@ -61,7 +61,10 @@ CREATE TABLE image(
   product_id INT NOT NULL,
   CONSTRAINT fk_image_products FOREIGN KEY(product_id)
     REFERENCES products(product_id) ON UPDATE CASCADE,
-  image VARCHAR(255)
+  image VARCHAR(255),
+  sort_order INT NOT NULL,
+  CONSTRAINT uk_image_product_order UNIQUE (product_id, sort_order),
+  CONSTRAINT ck_image_sort_order CHECK (sort_order BETWEEN 1 AND 5)
 );
 
 CREATE TABLE auction(
