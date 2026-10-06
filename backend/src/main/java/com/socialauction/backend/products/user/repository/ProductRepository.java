@@ -33,13 +33,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         AND p.category_id IS NOT NULL
         GROUP BY p.category_id
         """, nativeQuery = true)
-<<<<<<< HEAD
-    List<ProductRecommendDto> findcount(
-        @Param("memberId") Long memberId
-=======
     List<ProductRecommendDto> findCount(
-        @Param("memberId") Integer memberId
->>>>>>> 0846411d178c1e8c5185ac842b27dc00e4aef61e
+        @Param("memberId") Long memberId
     );
 
     // 추천 상품을 출력하기 위한거

@@ -28,7 +28,7 @@ public class ProductController {
     /* ----------- 메인페이지 ------------------ */
     // 추천 상품 조회
     @GetMapping("aa")
-    public ProductDto findRecommendProduct(Integer memberId ) {
+    public ProductDto findRecommendProduct(Long memberId ) {
         return productService.findRecommendProduct(memberId);
     }
     
@@ -50,16 +50,6 @@ public class ProductController {
         return productService.findNewProduct();
     }
 
-<<<<<<< HEAD
-    // // 추천 상품 조회
-    // @GetMapping("aa")
-    // public List<ProductDto> findRecommendProduct(Long memberId ) {
-    //     return productService.findRecommendProduct(memberId);
-    // }
-    
-    
-    
-=======
 
     /* ------------- 상품목록 페이지 ------------------- */
     // 상품 목록
@@ -79,5 +69,4 @@ public class ProductController {
             categoryId,lowprice,highprice,sort
         );
     }
->>>>>>> 0846411d178c1e8c5185ac842b27dc00e4aef61e
 }
