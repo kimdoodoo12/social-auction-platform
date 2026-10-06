@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.UploadUrls;
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 
 import lombok.AllArgsConstructor;
@@ -56,7 +58,8 @@ public class OrganizationInfoResponse {
             .agreementDate(entity.getAgreementDate())
             .agreementStatus(entity.getAgreementStatus())
             .agreementFileName(entity.getAgreementFileName())
-            .organizationImageFileName(entity.getOrganizationImageFileName())
+            // 상품 이미지처럼 조회 가능한 URL(/organization/파일명)로 내려준다
+            .organizationImageFileName(UploadUrls.from(UploadFolder.ORGANIZATION, entity.getOrganizationImageFileName()))
             .agreementInfo(entity.getAgreementInfo())
             .businessRegistration(entity.getBusinessRegistration())
             .build();

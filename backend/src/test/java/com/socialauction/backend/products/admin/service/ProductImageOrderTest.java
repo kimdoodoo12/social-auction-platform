@@ -17,25 +17,27 @@ import com.socialauction.backend.products.entity.ImageEntity;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.auction.repository.AuctionRepository;
+import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.UploadFolder;
 
 class ProductImageOrderTest {
     ProductRepository products;
     ImageRepository images;
-    PFileService files;
+    FileService files;
     ProductService service;
     ProductEntity existing;
 
     @BeforeEach void setup() {
         products = mock(ProductRepository.class);
         images = mock(ImageRepository.class);
-        files = mock(PFileService.class);
+        files = mock(FileService.class);
         var categories = mock(CategoryRepository.class);
         var organizations = mock(OrganizationRepository.class);
         service = new ProductService(products, images, categories, organizations,
                 mock(AuctionRepository.class), files);
         when(categories.findById(1)).thenReturn(Optional.of(new com.socialauction.backend.category.entity.CategoryEntity()));
         when(organizations.findById(1)).thenReturn(Optional.of(new com.socialauction.backend.organization.entity.OrganizationEntity()));
-        when(files.fildUpload(any())).thenReturn("test.png");
+        when(files.upload(eq(UploadFolder.IMAGES), any())).thenReturn("test.png");
         when(products.save(any())).thenAnswer(inv -> {
             ProductEntity product = inv.getArgument(0);
             product.setProductId(10);

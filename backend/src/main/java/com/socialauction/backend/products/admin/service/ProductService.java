@@ -21,6 +21,8 @@ import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
+import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.UploadFolder;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
 import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
@@ -45,7 +47,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final OrganizationRepository organizationRepository;
     private final AuctionRepository auctionRepository;
-    private final PFileService fileService;
+    private final FileService fileService;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
@@ -178,7 +180,7 @@ public class ProductService {
         
         productDto.getImages().forEach(dto -> {
             if (dto.getFile() != null && !dto.getFile().isEmpty()) {
-                String savedFileName = fileService.fildUpload(dto.getFile());
+                String savedFileName = fileService.upload(UploadFolder.IMAGES, dto.getFile());
                 ImageEntity imageEntity = ImageEntity.builder()
                         .image(savedFileName)
                         .sortOrder(dto.getSortOrder())

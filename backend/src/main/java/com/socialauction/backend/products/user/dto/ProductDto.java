@@ -1,6 +1,7 @@
 package com.socialauction.backend.products.user.dto;
 
-import com.socialauction.backend.global.ProductImageUrls;
+import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.UploadUrls;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,6 @@ public class ProductDto {
     private Long bidCount; // 입찰 횟수
 
     public String getImage() {
-        return ProductImageUrls.from(image);
+        return UploadUrls.from(UploadFolder.IMAGES, image);
     }
 }

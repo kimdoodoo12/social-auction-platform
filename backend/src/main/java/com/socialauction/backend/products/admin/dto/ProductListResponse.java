@@ -1,6 +1,7 @@
 package com.socialauction.backend.products.admin.dto;
 
-import com.socialauction.backend.global.ProductImageUrls;
+import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.UploadUrls;
 
 import java.time.LocalDateTime;
 
@@ -45,6 +46,6 @@ public class ProductListResponse {
     }
 
     public String getImageUrl() {
-        return ProductImageUrls.from(imageUrl);
+        return UploadUrls.from(UploadFolder.IMAGES, imageUrl);
     }
 }

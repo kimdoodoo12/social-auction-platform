@@ -18,7 +18,10 @@ function toFormValues(product, startPrice) {
     startPrice: startPrice != null ? String(startPrice) : '',
     description: product.description ?? '',
     background: product.background ?? '',
-    images: (product.images ?? []).map((img) => ({ imageId: img.imageId, image: img.image ?? '' })),
+    // 백엔드는 이미지 위치(sortOrder 1~5)를 그대로 유지해야 수정을 허용한다
+    images: (product.images ?? [])
+      .map((img) => ({ imageId: img.imageId, image: img.image ?? '', sortOrder: img.sortOrder }))
+      .sort((a, b) => a.sortOrder - b.sortOrder),
   }
 }
 
