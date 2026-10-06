@@ -39,7 +39,7 @@ export async function request(method, path, { params, body } = {}) {
   //   // multipart/form-data: 브라우저가 boundary를 포함한 Content-Type을 직접 붙인다
   //   init.body = body
   // } else if (body !== undefined) {
-  const init = { method, headers: {}, credentials: 'include' }
+  const init = { method, headers: {} }
   if (body !== undefined) {
     init.headers['Content-Type'] = 'application/json'
     init.body = JSON.stringify(body)
