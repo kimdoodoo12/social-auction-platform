@@ -1,4 +1,4 @@
-package com.socialauction.backend.auction.service;
+package com.socialauction.backend.auction.admin.service;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.socialauction.backend.auction.dto.AuctionDetailDto;
-import com.socialauction.backend.auction.dto.AuctionFindAllDto;
-import com.socialauction.backend.auction.dto.AuctionSearchDto;
+import com.socialauction.backend.auction.admin.dto.AuctionDetailDto;
+import com.socialauction.backend.auction.admin.dto.AuctionFindAllDto;
+import com.socialauction.backend.auction.admin.dto.AuctionSearchDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
@@ -20,8 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service 
 @RequiredArgsConstructor 
-
-public class AuctionService {
+public class AdminAuctionService {
     
     private final AuctionRepository auctionRepository;
 
@@ -80,10 +79,14 @@ public class AuctionService {
         // 최고가 입찰 쿼리문으로 가져오기
         String userName = auctionRepository.findTopBidNameByAuctionId(auctionId).orElse(null);
         auctionDetailDto.setUserName(userName);
+        
+        Integer countUser = auctionRepository.countUserAuctionId(auctionId);
+        auctionDetailDto.setCountUser(countUser);
 
         return auctionDetailDto;
     }
 
+    //경매 검색 기능
     public Page<AuctionFindAllDto> auctionSearch(AuctionSearchDto auctionSearchDto, int page, int size){
         Pageable pageable = PageRequest.of(page, size);
 
@@ -107,4 +110,8 @@ public class AuctionService {
 
     
     }
+
+
+
+    
 }
