@@ -58,4 +58,5 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
         @Param("bidPrice") Integer bidPrice
     );
 
+    
 }

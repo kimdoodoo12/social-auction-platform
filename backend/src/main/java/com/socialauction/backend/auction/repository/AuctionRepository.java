@@ -156,8 +156,9 @@ Optional<LocalDateTime> findEndTimeById(@Param("id") Integer auctionid);
 )
 Optional<AuctionEntity> findByIdForUpdate(@Param("id") Integer auctionId);
 
-
-
+//todo
+// * 경매 상세 설명  
+// @Query ("SELECT ")
 
 
 }
