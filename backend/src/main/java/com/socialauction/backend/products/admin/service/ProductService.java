@@ -43,6 +43,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final OrganizationRepository organizationRepository;
     private final AuctionRepository auctionRepository;
+    private final FileService fileService;
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
@@ -170,26 +171,22 @@ public class ProductService {
                                 HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다.")));
 
         // 이미지 설정
-        if (productDto.getImages() != null) { // 비어있는지 확인
-            for (ImageDto imageDto : productDto.getImages()) {
-                Checks.check(imageDto == null, "이미지 정보를 입력해주세요.");
-                String imagePath = imageDto.getImage();
-                // 이미지 경로 확인
-                Checks.check(imagePath == null || imagePath.isBlank(),
-                        "유효한 이미지 경로가 아닙니다.");
+        
+        productDto.getImages().forEach(dto -> {
+            if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+                String savedFileName = fileService.fildUpload(dto.getFile());
                 ImageEntity imageEntity = ImageEntity.builder()
-                        .image(imagePath) // 받아온 경로를 설정
-                        .productEntity(productEntity) // 상품 번호 설정
+                        .image(savedFileName)
+                        .productEntity(productEntity)
                         .build();
-
-                productEntity.getImageEntity().add(imageEntity); // 상품에 연결
+                productEntity.getImageEntity().add(imageEntity);
             }
-        }
+        });
 
         // 저장
         ProductEntity savedEntity = productRepository.save(productEntity);
         AuctionEntity auctionEntity = new AuctionEntity();
-        auctionEntity.setProductEntity(productEntity);
+        auctionEntity.setProductEntity(savedEntity);
         auctionEntity.setAuctionStatus("대기");
         auctionRepository.save(auctionEntity);
         
