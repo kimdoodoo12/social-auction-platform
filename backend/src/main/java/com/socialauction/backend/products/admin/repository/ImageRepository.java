@@ -12,15 +12,12 @@ import com.socialauction.backend.products.entity.ImageEntity;
 @Repository
 public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
 
-    // 상품마다 이미지 번호가 가장 작은 이미지를 대표 이미지로 사용한다.
+    // 1번 위치의 이미지를 대표 이미지로 사용한다.
     @Query("""
             select i from ImageEntity i
             join fetch i.productEntity
             where i.productEntity.productId in :productIds
-              and i.imageId = (
-                  select min(other.imageId) from ImageEntity other
-                  where other.productEntity = i.productEntity
-              )
+              and i.sortOrder = 1
             """)
     List<ImageEntity> findRepresentImg(
             @Param("productIds") List<Integer> productIds);
@@ -30,6 +27,7 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Integer> {
     @Query("""
     select i from ImageEntity i
     where i.productEntity.productId = :productId
+    order by i.sortOrder asc
     """)
     List<ImageEntity> findByProductId(@Param("productId") Integer productId);
 }

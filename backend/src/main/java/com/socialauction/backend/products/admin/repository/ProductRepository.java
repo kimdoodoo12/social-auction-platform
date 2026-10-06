@@ -54,11 +54,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             left join image i                    /* 이미지 테이블 조인 */
                 on p.product_id = i.product_id
                 /* 이미지 번호가 제일 낮은 이미지 한개만 가져옴 */
-                and i.image_id = (
-                    select min(i2.image_id)
-                    from image i2
-                    where i2.product_id = p.product_id
-                )
+                AND i.sort_order = 1
             left join category c                 /* 카테고리 테이블 조인 */
                 on p.category_id = c.category_id
             where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */

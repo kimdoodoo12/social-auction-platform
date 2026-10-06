@@ -64,11 +64,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             ON bs.auction_id = a.auction_id
         LEFT JOIN image i
             ON i.product_id = p.product_id
-            AND i.image_id = (
-                SELECT min(img.image_id)
-                FROM image img
-                WHERE img.product_id = p.product_id
-            )
+            AND i.sort_order = 1
         where (:categoryId is null or p.category_id = :categoryId)
         ORDER BY RAND()
         LIMIT 1
@@ -104,11 +100,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             ON bs.auction_id = a.auction_id
         LEFT JOIN image i
             ON i.product_id = p.product_id
-            AND i.image_id = (
-                SELECT min(img.image_id)
-                FROM image img
-                WHERE img.product_id = p.product_id
-            )
+            AND i.sort_order = 1
         where bs.bid_count > 1 
         ORDER BY bs.bid_count DESC
         LIMIT 4
@@ -141,11 +133,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             ON bs.auction_id = a.auction_id
         LEFT JOIN image i
             ON i.product_id = p.product_id
-            AND i.image_id = (
-                SELECT min(img.image_id)
-                FROM image img
-                WHERE img.product_id = p.product_id
-            )
+            AND i.sort_order = 1
         where bs.auction_id is null
         ORDER BY bs.current_price ASC
         LIMIT 4
@@ -178,11 +166,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             ON bs.auction_id = a.auction_id
         LEFT JOIN image i
             ON i.product_id = p.product_id
-            AND i.image_id = (
-                SELECT min(img.image_id)
-                FROM image img
-                WHERE img.product_id = p.product_id
-            )
+            AND i.sort_order = 1
         where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */
         and (
             :categoryId is null or p.category_id = :categoryId /* 카테고리 필터링 */
