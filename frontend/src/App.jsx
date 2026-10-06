@@ -19,7 +19,7 @@ const router = createBrowserRouter([
   {
     path: '/admin',
     Component: AdminLayout,
-    loader: requireAuth,
+    // loader: requireAuth,
     shouldRevalidate: () => true,
     children: [
       { index: true, Component: DashboardPage },

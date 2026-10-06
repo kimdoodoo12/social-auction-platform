@@ -20,10 +20,13 @@ public class ProductService {
     private final ProductRepository productRepository;
     
     // 추천 상품 조회
+<<<<<<< HEAD
     public ProductDto findRecommendProduct( Long memberId ) {
         // 카테고리, 입찰횟수를 담는 dto
         List<ProductRecommendDto> recommendDtos = productRepository.findCount(memberId);
         int total = 0;
+=======
+>>>>>>> 22f2d1cf6d60e9505c0c41fd430bf504c8235d0b
     // public List<ProductDto> findRecommendProduct( Long memberId ) {
     //     // 카테고리, 입찰횟수를 담는 dto
     //     // List<ProductRecommendDto> recommendDtos = productRepository.findcount(memberId);
@@ -32,6 +35,13 @@ public class ProductService {
     //     //     a.getCategoryId();
     //     //     total += a.getCount();
     //     // });
+<<<<<<< HEAD
+=======
+    public ProductDto findRecommendProduct( Long memberId ) {
+        // 카테고리, 입찰횟수를 담는 dto
+        List<ProductRecommendDto> recommendDtos = productRepository.findCount(memberId);
+        int total = 0;
+>>>>>>> 22f2d1cf6d60e9505c0c41fd430bf504c8235d0b
 
         for ( int i = 0; i < recommendDtos.size(); i++ ) {
             total += recommendDtos.get(i).getCount(); // 총 입찰 횟수
