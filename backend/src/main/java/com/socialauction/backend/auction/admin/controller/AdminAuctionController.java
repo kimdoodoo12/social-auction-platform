@@ -23,13 +23,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController 
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor 
-@RequestMapping ("/auction")
+@RequestMapping ("/ieum/admin/auction")
 public class AdminAuctionController {
 
     private final AdminAuctionService auctionService;
 
     // * 관리자
 
+    // * 전체 경매 정보
    @GetMapping("")
     public Page<AuctionFindAllDto> auctionFindAll(@RequestParam(name="page", defaultValue = "0") int page, 
                                     @RequestParam(name="size", defaultValue = "8") int size) {
@@ -37,11 +38,14 @@ public class AdminAuctionController {
             
         }
 
+    // * 세부 경매 정보
     @GetMapping("/detail/{id}")
     public AuctionDetailDto auctionDetailFind(@PathVariable("id") int auctionId) {
         return auctionService.auctionDetailFind(auctionId);
     }
 
+
+    // * 경매 검색
     @GetMapping("/search")
     public Page<AuctionFindAllDto> auctionSearch(@ModelAttribute  AuctionSearchDto auctionSearchDto,
         @RequestParam(name = "page") int page,

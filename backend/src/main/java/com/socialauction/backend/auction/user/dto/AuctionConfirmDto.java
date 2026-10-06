@@ -14,7 +14,5 @@ public class AuctionConfirmDto {
 
     private Integer price;
 
-    private LocalDateTime endTime;
-
     private Integer memberId;
 }
