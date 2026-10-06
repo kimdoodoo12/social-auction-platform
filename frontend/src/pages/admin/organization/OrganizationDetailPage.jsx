@@ -1,5 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { fetchOrganizationDetail } from '../../../api/organization'
+import {
+  agreementDownloadUrl,
+  fetchOrganizationDetail,
+  organizationFilePath,
+  originalFileName,
+} from '../../../api/organization'
 import AdminPage from '../../../components/admin/AdminPage'
 import DataTable from '../../../components/admin/DataTable'
 import ImageBox from '../../../components/admin/ImageBox'
@@ -41,7 +46,7 @@ export default function OrganizationDetailPage() {
         {info && (
           <>
             <section className="admin-card admin-hero">
-              <ImageBox path={info.organizationImage} alt={info.name} className="admin-hero__thumb org-logo" label="" />
+              <ImageBox path={organizationFilePath(info.organizationImageFileName)} alt={info.name} className="admin-hero__thumb org-logo" label="" />
               <div className="admin-hero__body">
                 <div className="admin-hero__meta">{info.organizationId}</div>
                 <div className="org-hero-title">
@@ -76,7 +81,16 @@ export default function OrganizationDetailPage() {
                     value={info.agreementStatus === true ? '협약 중' : info.agreementStatus === false ? '협약 종료' : '-'}
                   />
                   <ReadField label="사업자등록번호" value={info.businessRegistration} />
-                  <ReadField label="협약서" value={info.agreementFile} />
+                  <ReadField
+                    label="협약서"
+                    value={
+                      info.agreementFileName && (
+                        <a className="org-download" href={agreementDownloadUrl(info.organizationId)}>
+                          {originalFileName(info.agreementFileName)}
+                        </a>
+                      )
+                    }
+                  />
                   <ReadField label="비고" value={info.agreementInfo} multiline className="span-2" />
                 </div>
               </Card>

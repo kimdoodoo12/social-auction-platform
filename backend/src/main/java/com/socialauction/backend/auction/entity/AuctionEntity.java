@@ -42,6 +42,9 @@ public class AuctionEntity  {
     @Column 
     private String auctionStatus;
 
+    @Column 
+    private Integer topPrice;
+
     @OneToOne
     @JoinColumn (name = "product_id")
     private ProductEntity productEntity;
@@ -51,4 +54,10 @@ public class AuctionEntity  {
     @ToString.Exclude
     @Builder.Default
     private List<BidEntity> bidList = new ArrayList<>();
+
+    public void start(LocalDateTime startTime, LocalDateTime endTime){
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.auctionStatus = "진행";
+    }
 }

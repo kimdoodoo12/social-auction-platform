@@ -30,8 +30,8 @@ CREATE TABLE organization(
   manager_phone VARCHAR(30) NOT NULL,
   agreement_date DATETIME,
   agreement_status BOOLEAN, -- 계약종료, 계약기간
-  agreement_file VARCHAR(255), -- 파일 경로, 위치
-  organization_image VARCHAR(255), -- 기관 이미지
+  agreement_file_name VARCHAR(255), -- 협약서 파일명 (static/organization/UUID_원본파일명)
+  organization_image_file_name VARCHAR(255), -- 기관 이미지 파일명 (static/organization/UUID_원본파일명)
   agreement_info VARCHAR(255), -- 협약정보
   business_registration VARCHAR(20) NOT NULL -- 사업자 등록번호
   -- 등록상품은 JOIN
@@ -54,6 +54,14 @@ CREATE TABLE products (
   background VARCHAR(255),
   CREATED_AT DATETIME,
   UPDATED_AT DATETIME
+);
+
+CREATE TABLE image(
+  image_id INT PRIMARY KEY AUTO_INCREMENT,
+  product_id INT NOT NULL,
+  CONSTRAINT fk_image_products FOREIGN KEY(product_id)
+    REFERENCES products(product_id) ON UPDATE CASCADE,
+  image VARCHAR(255)
 );
 
 CREATE TABLE auction(

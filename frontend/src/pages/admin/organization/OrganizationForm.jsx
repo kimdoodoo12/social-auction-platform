@@ -1,11 +1,17 @@
 import { useState } from 'react'
+import { organizationFilePath, originalFileName } from '../../../api/organization'
 import ImageBox from '../../../components/admin/ImageBox'
 import { Button, Card, Field, FormActionBar, StepList } from '../../../components/admin/ui'
 import './organization.css'
 
 // 09 기관 등록 / 10 기관 수정 공통 폼 (Figma 74:325). 필드는 OrganizationInfoRequest와 같다.
-// Figma 항목 중 DTO에 없는 기관 유형·직함·이메일 입력칸은 숨겼다(사용자 결정).
-// 파일 업로드 API가 없어 로고·협약서는 경로 문자열로 입력받는다. 비고 → agreementInfo.
+// Figma 항목 중 DTO에 없는 기관 유형·직함·이메일 입력칸은 숨겼다(사용자 결정). 비고 → agreementInfo.
+// 로고(organizationImageFile)·협약서(agreementFile)는 multipart 파일로 함께 보낸다.
+
+const MB = 1024 * 1024
+// Figma 안내 문구 기준 제한 (백엔드 multipart 최대 10MB)
+const LOGO_LIMIT = { size: 2 * MB, accept: 'image/png,image/jpeg' }
+const AGREEMENT_LIMIT = { size: 10 * MB, accept: 'application/pdf' }
 
 const AFTER_STEPS = [
   '기관 등록 → 선택한 협약 상태로 저장',
@@ -27,8 +33,9 @@ function toFormState(info) {
     agreementDateOriginal: info?.agreementDate ?? null,
     agreementStatus: info?.agreementStatus === true ? 'true' : info?.agreementStatus === false ? 'false' : '',
     agreementInfo: info?.agreementInfo ?? '',
-    agreementFile: info?.agreementFile ?? '',
-    organizationImage: info?.organizationImage ?? '',
+    // 이미 저장된 파일명 (수정 화면 표시용)
+    agreementFileName: info?.agreementFileName ?? null,
+    organizationImageFileName: info?.organizationImageFileName ?? null,
     businessRegistration: info?.businessRegistration ?? '',
   }
 }
@@ -38,7 +45,7 @@ const emptyToNull = (value) => {
   return v === '' ? null : v
 }
 
-// 폼 상태 → OrganizationInfoRequest. 수정 API는 모든 필드를 덮어쓰므로 빈 값도 null로 보낸다.
+// 폼 상태 → OrganizationInfoRequest의 문자열 필드. 빈 값(null)은 FormData에 넣지 않는다.
 function toRequest(form) {
   let agreementDate = null
   if (form.agreementDate) {
@@ -54,8 +61,9 @@ function toRequest(form) {
     agreementDate,
     agreementStatus: form.agreementStatus === '' ? null : form.agreementStatus === 'true',
     agreementInfo: emptyToNull(form.agreementInfo),
-    agreementFile: emptyToNull(form.agreementFile),
-    organizationImage: emptyToNull(form.organizationImage),
+    // 기존 파일명도 함께 보낸다(백엔드가 새 파일이 없을 때 유지하는 데 쓸 수 있도록)
+    agreementFileName: form.agreementFileName,
+    organizationImageFileName: form.organizationImageFileName,
     businessRegistration: emptyToNull(form.businessRegistration),
   }
 }
@@ -71,12 +79,57 @@ const REQUIRED = [
   ['agreementStatus', '협약 상태'],
 ]
 
-// onSubmit(request) → Promise<boolean>. true면 onSuccess 호출.
+// 파일 선택 검사: 형식과 크기
+function checkFile(file, limit, label) {
+  const types = limit.accept.split(',')
+  if (!types.includes(file.type)) return `${label} 형식이 올바르지 않습니다.`
+  if (file.size > limit.size) return `${label}은(는) ${limit.size / MB}MB 이하만 올릴 수 있습니다.`
+  return null
+}
+
+// onSubmit(fields, files) → Promise<boolean>. true면 onSuccess 호출.
 export default function OrganizationForm({ initial, mode = 'create', onSubmit, onSuccess, onCancel }) {
   const [form, setForm] = useState(() => toFormState(initial))
+  const [logoFile, setLogoFile] = useState(null)
+  const [logoPreview, setLogoPreview] = useState(null) // 새로 고른 로고의 미리보기 object URL
+  const [agreementFile, setAgreementFile] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const isEdit = mode === 'edit'
+
+  const pickLogo = (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const message = checkFile(file, LOGO_LIMIT, '로고 이미지')
+    if (message) {
+      setError(message)
+      return
+    }
+    setError(null)
+    if (logoPreview) URL.revokeObjectURL(logoPreview)
+    setLogoFile(file)
+    setLogoPreview(URL.createObjectURL(file))
+  }
+
+  const clearLogo = () => {
+    if (logoPreview) URL.revokeObjectURL(logoPreview)
+    setLogoFile(null)
+    setLogoPreview(null)
+  }
+
+  const pickAgreement = (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const message = checkFile(file, AGREEMENT_LIMIT, '협약서')
+    if (message) {
+      setError(message)
+      return
+    }
+    setError(null)
+    setAgreementFile(file)
+  }
 
   const bind = (key) => ({
     value: form[key],
@@ -93,7 +146,7 @@ export default function OrganizationForm({ initial, mode = 'create', onSubmit, o
     setSubmitting(true)
     setError(null)
     try {
-      const ok = await onSubmit(toRequest(form))
+      const ok = await onSubmit(toRequest(form), { organizationImageFile: logoFile, agreementFile })
       if (ok === true) {
         onSuccess()
         return
@@ -162,20 +215,37 @@ export default function OrganizationForm({ initial, mode = 'create', onSubmit, o
 
         <div className="admin-stack">
           <Card title="기관 로고" subtitle="사용자 상품 상세 페이지에 노출됩니다.">
-            <div className="admin-stack">
-              <div className="org-logo-box">
-                <ImageBox path={form.organizationImage.trim()} label="로고 (선택)" />
+            <div className="admin-stack org-file-stack">
+              <label className="org-logo-box">
+                <input type="file" accept={LOGO_LIMIT.accept} className="org-file-hidden" onChange={pickLogo} />
+                {logoPreview ? (
+                  <img className="admin-image" src={logoPreview} alt="새 로고 미리보기" />
+                ) : (
+                  <ImageBox path={organizationFilePath(form.organizationImageFileName)} label="로고 업로드 (선택)" />
+                )}
+              </label>
+              <div className="org-file-meta">
+                <span>JPG · PNG / 2MB 이하 / 정사각 권장</span>
+                {logoFile && (
+                  <button type="button" className="admin-link-btn admin-link-btn--muted" onClick={clearLogo}>
+                    선택 취소
+                  </button>
+                )}
               </div>
-              <Field label="로고 이미지 경로" hint="파일 업로드 API가 없어 경로를 입력합니다.">
-                <input className="admin-input" placeholder="/images/파일명.png" {...bind('organizationImage')} />
-              </Field>
             </div>
           </Card>
 
           <Card title="협약서 첨부">
-            <Field hint="PDF · 내부 보관용이며 사용자에게 노출되지 않습니다.">
-              <input className="admin-input org-file-input" placeholder="협약서 파일 경로를 입력하세요" {...bind('agreementFile')} />
-            </Field>
+            <div className="admin-stack org-file-stack">
+              <label className="org-file-row">
+                <input type="file" accept={AGREEMENT_LIMIT.accept} className="org-file-hidden" onChange={pickAgreement} />
+                <span className={agreementFile || form.agreementFileName ? 'org-file-name' : 'org-file-name empty'}>
+                  {agreementFile?.name ?? originalFileName(form.agreementFileName) ?? '협약서 파일을 첨부하세요'}
+                </span>
+                <span className="org-file-pick">파일 선택</span>
+              </label>
+              <span className="admin-field__hint">PDF · 10MB 이하 / 내부 보관용이며 사용자에게 노출되지 않습니다.</span>
+            </div>
           </Card>
 
           {!isEdit && (

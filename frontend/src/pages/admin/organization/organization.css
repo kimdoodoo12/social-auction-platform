@@ -51,12 +51,27 @@
   min-height: 64px;
 }
 
+.org-file-stack {
+  gap: 8px;
+}
+
+.org-file-hidden {
+  display: none;
+}
+
+/* Figma 점선 업로드 박스 (누르면 파일 선택) */
 .org-logo-box {
+  display: block;
   height: 150px;
   border: 1px dashed var(--color-border-strong);
   border-radius: var(--radius-md);
   background: var(--color-bg);
   overflow: hidden;
+  cursor: pointer;
+}
+
+.org-logo-box:hover {
+  border-color: var(--color-primary);
 }
 
 .org-logo-box .admin-image--empty {
@@ -68,7 +83,53 @@
   object-fit: contain;
 }
 
-.org-file-input {
-  border-style: dashed;
+.org-file-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.org-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
   background: var(--color-bg);
+  cursor: pointer;
+}
+
+.org-file-row:hover {
+  border-color: var(--color-primary);
+}
+
+.org-file-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.org-file-name.empty {
+  color: var(--color-text-subtle);
+}
+
+.org-file-pick {
+  flex: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* 상세: 협약서 다운로드 링크 */
+.org-download {
+  color: var(--color-primary);
+  text-decoration: underline;
 }

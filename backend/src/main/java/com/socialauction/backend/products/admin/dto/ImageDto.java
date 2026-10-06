@@ -1,5 +1,7 @@
 package com.socialauction.backend.products.admin.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.socialauction.backend.products.entity.ImageEntity;
 
 import lombok.AllArgsConstructor;
@@ -12,6 +14,7 @@ public class ImageDto {
     private Integer imageId;
     private Integer productId;
     private String image;
+    private MultipartFile file;     // 업로드/등록용
     
     public static ImageDto from(ImageEntity entity) {
         return ImageDto.builder()
