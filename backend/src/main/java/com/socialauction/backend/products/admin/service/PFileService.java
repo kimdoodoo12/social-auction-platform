@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class PFileService {
     private String baseDir = System.getProperty("user.dir");
     // 경로 지정
-    private String uploadPath = baseDir+"/src/main/resources/static/images/";
+    private String uploadPath = baseDir+"/backend/src/main/resources/static/images/";
 
     // 파일 업로드
     public String fildUpload( MultipartFile multipartFile ){
