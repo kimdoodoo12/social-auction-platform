@@ -20,7 +20,7 @@ public class UserDto {
     private String phone;
 
     private LocalDateTime createdAt;
-    private long memberId;
+    private Long memberId;
 
     public MemberEntity toEntity(){
         return MemberEntity.builder()

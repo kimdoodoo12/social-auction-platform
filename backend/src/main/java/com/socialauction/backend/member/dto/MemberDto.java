@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
 public class MemberDto {
-    private Integer memberId;
+    private Long memberId;
     private String loginId;
     private String name;
     private String email;

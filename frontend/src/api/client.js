@@ -34,12 +34,22 @@ async function parseBody(res) {
 }
 
 export async function request(method, path, { params, body } = {}) {
-  const init = { method, headers: {} }
+  const init = { method, headers: {}, credentials: 'include' }
   if (body !== undefined) {
     init.headers['Content-Type'] = 'application/json'
     init.body = JSON.stringify(body)
   }
-  const res = await fetch(buildUrl(path, params), init)
+  let res = await fetch(buildUrl(path, params), init)
+  if (res.status === 401) {
+    const { refreshSession } = await import('../pages/admin/member/authApi')
+    const member = await refreshSession()
+    if (member) res = await fetch(buildUrl(path, params), init)
+    if (!member || res.status === 401) {
+      const returnTo = window.location.pathname + window.location.search
+      window.location.replace('/login?returnTo=' + encodeURIComponent(returnTo))
+      throw new ApiError(401, '로그인이 필요합니다.', null)
+    }
+  }
   const data = await parseBody(res)
   if (!res.ok) {
     const message = (data && data.message) || `요청 실패 (${res.status})`

@@ -11,7 +11,7 @@ export default function UserLoginPage() {
   const [busy, setBusy] = useState(false)
   const pending = useRef(false) // 재렌더링 전에 발생하는 연속 제출도 즉시 차단한다.
   // 상품 화면 등에서 전달한 returnTo가 없거나 안전하지 않으면 마이페이지로 이동한다.
-  const returnTo = safeReturnPath(params.get('returnTo'))
+  const returnTo = safeReturnPath(params.get('returnTo') || (location.pathname === '/admin/login' ? '/admin' : '/mypage'))
 
   async function submit(event) {
     // 기본 폼 새로고침을 막고 현재 입력값으로 비동기 요청을 보낸다.
@@ -22,10 +22,17 @@ export default function UserLoginPage() {
     setBusy(true)
     setError('')
     try {
+      const loginId = form.get('loginId').trim()
+      const exists = await authApi.exists(loginId)
+      if (exists === false) {
+        navigate(`/signup?returnTo=${encodeURIComponent(returnTo)}`, { state: { loginId, accountMissing: true } })
+        return
+      }
+      if (exists !== true) throw new Error('Invalid account lookup response')
       // 아이디의 앞뒤 공백만 제거하고 비밀번호는 입력한 원문을 보낸다.
-      const member = await authApi.login(form.get('loginId').trim(), form.get('password'))
+      const member = await authApi.login(loginId, form.get('password'))
       if (!isMember(member)) {
-        setError('이메일(아이디) 또는 비밀번호를 확인해 주세요.')
+        setError('비밀번호를 확인해 주세요.')
         return
       }
       navigate(returnTo, { replace: true }) // 뒤로 가기 기록에서 제출한 로그인 화면을 교체한다.
@@ -44,9 +51,10 @@ export default function UserLoginPage() {
       {/* 회원가입에서 전달한 라우터 state로 완료 안내와 이메일 기본값을 표시한다. */}
       <p className="ua-notice">입찰에 참여하려면 로그인이 필요합니다. 로그인 후 보시던 상품으로 돌아갑니다.</p>
       {location.state?.signedUp && <p className="ua-success" role="status">회원가입이 완료되었습니다. 로그인해 주세요.</p>}
+      {params.get('unavailable') && <p className="ua-error" role="alert">로그인 상태를 확인하지 못했습니다. 서버 연결을 확인한 뒤 다시 로그인해 주세요.</p>}
       <form onSubmit={submit} aria-busy={busy}>
         {/* name은 FormData 키이며 autoComplete는 브라우저의 계정 자동완성을 돕는다. */}
-        <label className="ua-field">이메일 (아이디)<input name="loginId" autoComplete="username" placeholder="example@email.com" defaultValue={location.state?.email || ''} required maxLength={255} /></label>
+        <label className="ua-field">아이디<input name="loginId" autoComplete="username" placeholder="아이디를 입력해 주세요" defaultValue={location.state?.email || ''} required maxLength={30} /></label>
         <label className="ua-field">비밀번호<input name="password" type="password" autoComplete="current-password" placeholder="비밀번호를 입력해 주세요" required /></label>
         <p className="ua-hint ua-session-note">로그인 상태는 보안 쿠키로 유지됩니다.</p>
         {error && <p className="ua-error" role="alert">{error}</p>}

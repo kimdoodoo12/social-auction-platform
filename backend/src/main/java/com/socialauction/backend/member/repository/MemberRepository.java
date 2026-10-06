@@ -22,14 +22,14 @@ import com.socialauction.backend.member.entity.MemberEntity;
 
 
 @Repository 
-public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
+public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
 
 
     // 임시
-    Optional<MemberEntity> findByMId(Long mno);
+
 
     // 아이디로 자료 검색 
-    MemberEntity findByMemberId(String memberId);
+    MemberEntity findByLoginId(String loginId);
 
     // 이름으로 자료 검색
     List<MemberEntity> findByName(String name);
@@ -66,7 +66,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
             """,
         nativeQuery = true
     )
-    int notPay(@Param("memberId") int memberId);
+    int notPay(@Param("memberId") Long memberId);
 
 
     // ============================
@@ -92,7 +92,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
         nativeQuery = true
     )
     List<MproductDto> findRecentBidProducts(
-        @Param("memberId") int memberId
+        @Param("memberId") Long memberId
     );
 
 
@@ -177,7 +177,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
         nativeQuery = true
     )
     Optional<MemberBhistory> findBidHistory(
-        @Param("memberId") int memberId,
+        @Param("memberId") Long memberId,
         @Param("productId") int productId
     );
 
@@ -219,7 +219,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Integer> {
         nativeQuery = true
     )
     List<MBResultDto> findWinHistory(
-        @Param("memberId") int memberId
+        @Param("memberId") Long memberId
     );
 
     

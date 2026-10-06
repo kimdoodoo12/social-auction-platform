@@ -33,7 +33,7 @@ public class MUserService {
 
     // 로그인 
     public MemberDto login(UserDto userDto){
-        MemberEntity memberEntity = memberRepository.findByMemberId(userDto.getLoginId());
+        MemberEntity memberEntity = memberRepository.findByLoginId(userDto.getLoginId());
         if(memberEntity == null) return null;
 
         boolean result = passwordEncoder.matches(userDto.getPassword(), memberEntity.getPassword());
@@ -46,7 +46,7 @@ public class MUserService {
 
     // 아이디 중복 여부
     public boolean userfindid(String newid){
-        MemberEntity memberEntity = memberRepository.findByMemberId(newid);
+        MemberEntity memberEntity = memberRepository.findByLoginId(newid);
         if(memberEntity == null)return false;
         return true;
     } // 아이디 중복 여부 

@@ -42,12 +42,19 @@ public class JWTutil {
 
     // jwt 토큰 검증 메소드
     public Long getMnoFromToken(String token){
+        return getMnoFromToken(token, "ACCESS");
+    }
+    public Long getRefreshMnoFromToken(String token){
+        return getMnoFromToken(token, "REFRESH");
+    }
+    private Long getMnoFromToken(String token, String expectedType){
         try{
             Claims claims = Jwts.parser()   
                             .verifyWith(secretkey)
                             .build()
                             .parseSignedClaims(token)
                             .getPayload();
+            if (!expectedType.equals(claims.get("type", String.class))) return null;
             Long mno = Long.parseLong(claims.getSubject());
             System.out.println(mno);
             return mno;

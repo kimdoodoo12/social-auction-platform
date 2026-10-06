@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class RecentBid {
     private Long bidNumber;
     private Long totalCount;
-    private Integer memberId;
+    private Long memberId;
     private String memberName;
     private Integer bidPrice;
     private LocalDateTime bidTime;

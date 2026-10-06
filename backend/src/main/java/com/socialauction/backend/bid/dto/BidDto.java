@@ -15,7 +15,7 @@ public class BidDto {
 
     private String name;
 
-    private Integer memberId;
+    private Long memberId;
 
     private Integer bidPrice;
 

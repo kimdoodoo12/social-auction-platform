@@ -16,7 +16,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     
     // 추천 상품 조회
-    // public List<ProductDto> findRecommendProduct( Integer memberId ) {
+    // public List<ProductDto> findRecommendProduct( Long memberId ) {
     //     // 카테고리, 입찰횟수를 담는 dto
     //     // List<ProductRecommendDto> recommendDtos = productRepository.findcount(memberId);
     //     // private int total = 0;

@@ -22,7 +22,7 @@ import com.socialauction.backend.member.dto.MemberSearchDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.service.MUserService;
 import com.socialauction.backend.member.service.MemberService;
-
+import com.socialauction.backend.member.service.RedisTokenService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -43,6 +43,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MUserService mUserService;
     private final  JWTutil jwtUtil;
+    private final RedisTokenService redisTokenService;
     
 
     // 회원관리 관리자 페이지 (전체 조회)
@@ -57,24 +58,24 @@ public class MemberController {
 
     // 회원정보수정( 등록때 한것만 수정할 수 있도록 )
     @PutMapping("/user/update/{userid}")
-    public boolean userUpdate(@PathVariable ("userid") int userid , @RequestBody UserDto userDto) {
+    public boolean userUpdate(@PathVariable ("userid") Long userid , @RequestBody UserDto userDto) {
         return memberService.userUpdate(userid,userDto);
     }
 
     // 회원 정지 기능 
     @PutMapping("/user/stop/{userid}")
-    public boolean userStop(@PathVariable ("userid")int userid) {
+    public boolean userStop(@PathVariable ("userid")Long userid) {
         return memberService.userStop(userid);
     }
     // 회원 정지 풀기 
     @PutMapping("/user/normal/{userid}")
-    public boolean userNoStop(@PathVariable ("userid")int userid) {
+    public boolean userNoStop(@PathVariable ("userid")Long userid) {
         return memberService.userNoStop(userid);
     }
 
     // 회원 상세 페이지 
     @GetMapping("/user/detail/info/{userid}")
-    public MemberBidHistoryDto userDetailInfo(@PathVariable ("userid")int userid){
+    public MemberBidHistoryDto userDetailInfo(@PathVariable ("userid")Long userid){
         return memberService.userDetailInfo(userid);
     }
     
@@ -125,10 +126,10 @@ public class MemberController {
         if(result == null) return null;      // 로그인 실패 
 
         String accessToken = jwtUtil.createAccessToken(result.getMemberId());
-        String refreshToken = jwtUtil.createAccessToken(result.getMemberId());
+        String refreshToken = jwtUtil.createRefreshToken(result.getMemberId());
 
         // refreshToken만 레디스에 저장 
-        // redisTokenService.setRefreshToken(result.getMno(), refreshToken);
+        redisTokenService.setRefreshToken(result.getMemberId(), refreshToken);
 
         ResponseCookie cookie1 = ResponseCookie.from("accessToken",accessToken)
                                                 .path("/").maxAge(Duration.ofMinutes(20))
@@ -158,6 +159,7 @@ public class MemberController {
         if(token == null)return null;
         //=======================================
         Long loginMno = jwtUtil.getMnoFromToken(token);
+        if (loginMno == null) return null;
 
         return memberService.getMyInfo(loginMno);
     }
@@ -166,12 +168,13 @@ public class MemberController {
 
     // 로그아웃 (초기화)
     @PostMapping("/user/logout")
-    public boolean logout(@CookieValue (value = "accessToken" , required = false )String accessToken , HttpServletResponse response) {
-        if(accessToken != null){
+    public boolean logout(@CookieValue (value = "accessToken" , required = false )String accessToken , @CookieValue(value = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
+        if(accessToken != null || refreshToken != null){
             Long mno = jwtUtil.getMnoFromToken(accessToken);
+            if (mno == null) mno = jwtUtil.getRefreshMnoFromToken(refreshToken);
 
             // 레디스내 refresh토큰 삭제
-            // redisTokenService.deleteRefreshToken(mno);
+            if (mno != null) redisTokenService.deleteRefreshToken(mno);
         }
         
         // 쿠키삭제 
@@ -183,7 +186,7 @@ public class MemberController {
                                             .httpOnly(true).secure(false).build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie1.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE2, cookie2.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie2.toString());
         return true;
     }
     
@@ -194,14 +197,15 @@ public class MemberController {
     public UserDto reissue(@CookieValue(value = "refreshToken" , required = false)String refreshToken , HttpServletResponse response ) {
         if(refreshToken == null)return null;
 
-        Long mno = jwtUtil.getMnoFromToken(refreshToken);
-        // String savedRefreshToken = redisTokenService.getRefreshToken(mno);
-        // if(savedRefreshToken == null || !refreshToken.equals(savedRefreshToken)){ redisTokenService.deleteRefreshToken(mno); }
+        Long mno = jwtUtil.getRefreshMnoFromToken(refreshToken);
+        if (mno == null) return null;
+        String savedRefreshToken = redisTokenService.getRefreshToken(mno);
+        if(savedRefreshToken == null || !refreshToken.equals(savedRefreshToken)) return null;
 
         String newAccessToken = jwtUtil.createAccessToken(mno);
         String newRefreshToken = jwtUtil.createRefreshToken(mno);
 
-        // redisTokenService.setRefreshToken ( mno , newRefreshToken );
+        redisTokenService.setRefreshToken ( mno , newRefreshToken );
 
         ResponseCookie cookie1 = ResponseCookie.from("accessToken", newAccessToken)
                                         .path("/").maxAge(Duration.ofMinutes(20))
@@ -234,7 +238,7 @@ public class MemberController {
 
     // 아이디 중복 여부
     @GetMapping("/user/signup/findid")
-    public boolean userfindid(@RequestBody String newid) {
+    public boolean userfindid(@RequestParam(name = "newid") String newid) {
         return mUserService.userfindid(newid);
     }
     

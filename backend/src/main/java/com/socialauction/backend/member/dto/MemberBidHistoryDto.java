@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
 public class MemberBidHistoryDto {
-    private Integer memberId;
+    private Long memberId;
     private String loginId;
     private String name;
     private String email;

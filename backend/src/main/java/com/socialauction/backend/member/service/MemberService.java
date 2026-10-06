@@ -43,7 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService { 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
 
@@ -67,7 +68,7 @@ public class MemberService {
 
     // 회원정지 기능
     @Transactional 
-    public boolean userStop(int userid){
+    public boolean userStop(Long userid){
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         if(memberEntity != null){
             memberEntity.setRole("정지");
@@ -77,7 +78,7 @@ public class MemberService {
     } // userStop() end
     // 회원정지 복구
     @Transactional 
-    public boolean userNoStop(int userid){
+    public boolean userNoStop(Long userid){
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         if(memberEntity != null){
             memberEntity.setRole("정상");
@@ -88,7 +89,7 @@ public class MemberService {
 
 
     // 회원별 상세 페이지
-    public MemberBidHistoryDto userDetailInfo(int userid){
+    public MemberBidHistoryDto userDetailInfo(Long userid){
 
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
 
@@ -155,7 +156,7 @@ public class MemberService {
 
     // 최근입찰내역 5개 
     @Transactional (readOnly = true)
-    public List<MemberBhistory> findRecentBidHistory (int memberId){
+    public List<MemberBhistory> findRecentBidHistory (Long memberId){
         List<MproductDto> productlist = memberRepository.findRecentBidProducts(memberId);
 
         return productlist.stream().map(product ->
@@ -182,7 +183,7 @@ public class MemberService {
 
     // 회원정보 수정 
     @Transactional 
-    public boolean userUpdate(int userid, UserDto userDto){
+    public boolean userUpdate(Long userid, UserDto userDto){
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         if(memberEntity== null){
             return  false;
@@ -201,7 +202,7 @@ public class MemberService {
 
     // 로그인 
     public UserDto login(UserDto userDto){
-        MemberEntity memberEntity = memberRepository.findByMemberId(userDto.getLoginId());
+        MemberEntity memberEntity = memberRepository.findByLoginId(userDto.getLoginId());
         if(memberEntity == null) return null;
 
         boolean result = passwordEncoder.matches(userDto.getPassword(), memberEntity.getPassword());
@@ -214,7 +215,7 @@ public class MemberService {
 
     // 내정보 조회 
     public UserDto getMyInfo(Long mno){
-        Optional<MemberEntity> optional = memberRepository.findByMId(mno);
+        Optional<MemberEntity> optional = memberRepository.findById(mno);
         if(optional.isPresent()){
             MemberEntity memberEntity = optional.get();
             return UserDto.from(memberEntity);
@@ -224,7 +225,11 @@ public class MemberService {
 
 
 
-
+    // 관리자 여부 
+    public boolean isAdmin(Long memberId){
+        return memberRepository.findById(memberId)
+                            .map(MemberEntity::isStatus).orElse(false);
+    }
 
 
 
