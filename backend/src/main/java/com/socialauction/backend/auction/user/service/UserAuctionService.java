@@ -104,7 +104,7 @@ public class UserAuctionService {
 
     // * 경매 첫 입찰
     public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
-        
+        return true;
     }
 
     
