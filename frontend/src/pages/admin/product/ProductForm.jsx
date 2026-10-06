@@ -46,15 +46,7 @@ function toProductDto(values, mode) {
       ? values.images.filter((img) => img.file).map(({ file, sortOrder }) => ({ file, sortOrder }))
       : values.images
       .filter((img) => img.imageId != null || img.image.trim())
-<<<<<<< HEAD
-      .map((img) => ({
-        imageId: img.imageId ?? null,
-        image: img.image.trim(),
-        sortOrder: img.sortOrder,
-      })),
-=======
       .map((img) => ({ imageId: img.imageId ?? null, image: img.image.trim(), sortOrder: img.sortOrder })),
->>>>>>> e1ec1f78e4a8da1f95779ee87dad1abff140d63a
   }
 }
 
@@ -64,34 +56,6 @@ function toProductDto(values, mode) {
 function ImageSlots({ images, onChange }) {
   const [selected, setSelected] = useState(1)
   const current = images.find((img) => img.sortOrder === selected)
-<<<<<<< HEAD
-  const slotCount = PRODUCT_LIMITS.images
-
-  const handlePath = (e) => {
-    const image = e.target.value
-    const exists = images.some((img) => img.sortOrder === selected)
-    if (exists) {
-      onChange(images.map((img) => (img.sortOrder === selected ? { ...img, image } : img)))
-    } else {
-      // 빈 박스를 고르면 해당 sortOrder를 부여하여 추가한다
-      onChange([...images, { imageId: null, image, sortOrder: selected }])
-    }
-  }
-
-  const slot = (sortOrder, className, label) => {
-    const img = images.find((item) => item.sortOrder === sortOrder)
-    return (
-      <button
-        key={sortOrder}
-        type="button"
-        className={`product-slot ${className}${sortOrder === selected ? ' selected' : ''}`}
-        onClick={() => setSelected(sortOrder)}
-      >
-        <ImageBox path={img?.image?.trim()} label={label} />
-      </button>
-    )
-  }
-=======
 
   const handlePath = (e) => {
     const image = e.target.value
@@ -112,23 +76,15 @@ function ImageSlots({ images, onChange }) {
       <ImageBox path={images.find((img) => img.sortOrder === sortOrder)?.image.trim()} label={label} />
     </button>
   )
->>>>>>> e1ec1f78e4a8da1f95779ee87dad1abff140d63a
 
   return (
     <div className="product-slots">
       {slot(1, 'product-slot--main', '대표 이미지')}
       <div className="product-slots__row">
-<<<<<<< HEAD
-        {Array.from({ length: slotCount - 1 }, (_, i) => slot(i + 2, '', ''))}
-      </div>
-      <Field
-        label={`${selected === 1 ? '대표' : `추가 ${selected - 1}`} 이미지 경로`}
-=======
         {Array.from({ length: PRODUCT_LIMITS.images - 1 }, (_, i) => slot(i + 2, '', ''))}
       </div>
       <Field
         label={`${selected === 1 ? '대표' : `${selected}번`} 이미지 경로`}
->>>>>>> e1ec1f78e4a8da1f95779ee87dad1abff140d63a
         hint={current?.imageId != null ? '기존 이미지는 경로만 바꿀 수 있습니다.' : '예) /images/product_01_1.png'}
       >
         <input className="admin-input" value={current?.image ?? ''} placeholder="/images/파일명.png" onChange={handlePath} />
