@@ -11,6 +11,7 @@ import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.auction.user.dto.AuctionConfirmDto;
 import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
+import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 import com.socialauction.backend.bid.repository.BidRepository;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.admin.repository.ProductRepository;
@@ -101,11 +102,19 @@ public class UserAuctionService {
 
     }
 
+    // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
+    // * 경매 상품,기관 상세정보
+    public ProductDetailProjection findDetailProduct(Integer auctionId){
+        return auctionRepository.findProductDetail(auctionId).orElse(null);
+    }
 
     // * 경매 첫 입찰
-    public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
-        return true;
-    }
+    // public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
+        
+    // }
+
+
+
 
     
 }   

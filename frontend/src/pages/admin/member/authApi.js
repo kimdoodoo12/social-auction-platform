@@ -3,7 +3,7 @@ import { BASE_URL } from '../../../api/client'
 // 인증 전용 요청 함수: 본문이 없으면 GET, 있으면 JSON POST로 호출한다.
 // HttpOnly JWT 쿠키는 브라우저가 관리하므로 localStorage 등에 저장하지 않는다.
 async function request(path, body) {
-  const response = await fetch(`${BASE_URL}${path}`, {
+ const response = await fetch(`${BASE_URL}/ieum/admin/member${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     credentials: 'include', // 다른 포트의 백엔드에도 인증 쿠키를 전송하고 응답 쿠키를 수신한다.
     headers: body === undefined ? {} : { 'Content-Type': 'application/json' },

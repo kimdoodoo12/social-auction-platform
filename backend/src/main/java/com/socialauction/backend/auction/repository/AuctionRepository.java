@@ -17,6 +17,7 @@ import com.socialauction.backend.auction.admin.dto.AuctionSearchDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
+import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 
 @Repository
 public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer> {
@@ -164,10 +165,32 @@ Optional<LocalDateTime> findEndTimeById(@Param("id") Integer auctionid);
 )
 Optional<AuctionEntity> findByIdForUpdate(@Param("id") Integer auctionId);
 
-//todo
-// * 경매 상세 설명  
-// @Query ("SELECT ")
 
+// * 경매 ID로 상품 설명과 제작 기관 정보를 한 건 조회한다.
+// * 등록 상품 수는 별도 집계해 상품 정보가 중복되지 않도록 한다.
+@Query(value = """
+    SELECT
+        p.product_id AS productId,
+        p.name AS productName,
+        p.description AS description,
+        p.background AS background,
+        o.organization_id AS organizationId,
+        o.name AS organizationName,
+        o.description AS organizationDescription,
+        o.organization_image AS organizationImage,
+        o.agreement_date AS agreementDate,
+        (SELECT COUNT(*)
+         FROM products op
+         WHERE op.organization_id = o.organization_id)
+            AS registeredProductCount
+    FROM auction a
+    JOIN products p ON p.product_id = a.product_id
+    JOIN organization o ON o.organization_id = p.organization_id
+    WHERE a.auction_id = :auctionId
+    """, nativeQuery = true)
+Optional<ProductDetailProjection> findProductDetail(
+    @Param("auctionId") Integer auctionId
+);
 
 }
 
