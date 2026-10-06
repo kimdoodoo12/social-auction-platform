@@ -1,5 +1,7 @@
 package com.socialauction.backend.products.admin.dto;
 
+import com.socialauction.backend.global.ProductImageUrls;
+
 import java.time.LocalDateTime;
 
 import com.socialauction.backend.products.entity.ProductEntity;
@@ -40,5 +42,9 @@ public class ProductListResponse {
         .createdAt( entity.getCreatedAt() )
         .build();
 
+    }
+
+    public String getImageUrl() {
+        return ProductImageUrls.from(imageUrl);
     }
 }

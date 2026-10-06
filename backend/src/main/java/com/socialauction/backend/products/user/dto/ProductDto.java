@@ -1,5 +1,7 @@
 package com.socialauction.backend.products.user.dto;
 
+import com.socialauction.backend.global.ProductImageUrls;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +16,8 @@ public class ProductDto {
     private Long currentPrice; // 현재
     // 남은 시간도 추가해야함
     private Long bidCount; // 입찰 횟수
+
+    public String getImage() {
+        return ProductImageUrls.from(image);
+    }
 }
