@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -42,5 +43,19 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
         @Param("auctionId") Integer auctionId
     );
 
+
+
+
+    // * 새 입찰 레코드 추가
+    @Modifying
+    @Query(
+        value = "INSERT INTO bid (auction_id, member_id, bid_price, bid_time) VALUES (:auctionId, :memberId, :bidPrice, NOW())",
+        nativeQuery = true
+    )
+    int insertBid(
+        @Param("auctionId") Integer auctionId,
+        @Param("memberId") Integer memberId,
+        @Param("bidPrice") Integer bidPrice
+    );
 
 }

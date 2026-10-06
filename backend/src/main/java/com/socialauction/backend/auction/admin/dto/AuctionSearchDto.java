@@ -1,4 +1,4 @@
-package com.socialauction.backend.auction.dto;
+package com.socialauction.backend.auction.admin.dto;
 
 import java.time.LocalDateTime;
 

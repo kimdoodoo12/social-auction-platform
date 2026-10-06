@@ -1,4 +1,4 @@
-package com.socialauction.backend.auction.dto;
+package com.socialauction.backend.auction.admin.dto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class AuctionDetailDto {
 
     //유저정보
     String userName;
-    Long countUser;
+    Integer countUser;
 
     public static AuctionDetailDto from(AuctionEntity auctionEntity){
         return AuctionDetailDto.builder()
