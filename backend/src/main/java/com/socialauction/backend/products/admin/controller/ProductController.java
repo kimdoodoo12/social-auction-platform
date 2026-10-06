@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,12 +30,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController("adminProductController")
 @CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
-@RequestMapping ("/admin/product")
+@RequestMapping ("/ieum/admin/product")
 public class ProductController {
     private final ProductService productService;
 
     // 상품 첫 화면(상품관리) 조회
-    @GetMapping("aa") // 주소 추후에 설정
+    @GetMapping("main") // 주소 추후에 설정
     public Page<ProductListResponse> findAll(
             @PageableDefault(size = 8, sort = {"createdAt", "productId"},
                     direction = Sort.Direction.DESC) Pageable pageable) {
@@ -42,13 +43,13 @@ public class ProductController {
     }
 
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
-    @GetMapping("/bb/{productId}") // 주소 추후에 설정
+    @GetMapping("/detail/{productId}") // 주소 추후에 설정
     public TotalDto findDetail(@PathVariable ("productId") Integer productId) {
         return productService.findDetail(productId);
     }
 
     // 판매 중지 
-    @PostMapping("tt")
+    @PostMapping("stop")
     public boolean stopSelling( @RequestParam (name = "productId" ) Integer productId ) {
         return productService.stopSelling(productId);
     }
@@ -56,19 +57,19 @@ public class ProductController {
 
 
     // 상품 등록
-    @PostMapping("cc")
-    public boolean saveProduct(@RequestBody ProductDto productDto) {
+    @PostMapping("add")
+    public boolean saveProduct(@ModelAttribute ProductDto productDto) {
         return productService.saveProduct(productDto);
     }
     
     // 상품 수정
-    @PutMapping("dd")
+    @PutMapping("update")
     public boolean updateProduct(@RequestBody ProductDto productDto) {
         return productService.updateProduct(productDto);
     }
 
     // 검색 기능
-    @GetMapping("ee")
+    @GetMapping("search")
     public Page<ProductManageDto> findProductManage(
         @RequestParam(name = "productName", defaultValue = "") String productName,          // 상품 이름 (기본값을 공백으로 설정)
         // required = false : 요청을 받지 않아도 되게 설정( 받지 않을 경우 null )

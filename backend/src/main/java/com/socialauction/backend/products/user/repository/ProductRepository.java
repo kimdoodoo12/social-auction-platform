@@ -2,6 +2,8 @@ package com.socialauction.backend.products.user.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,23 +33,20 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         AND p.category_id IS NOT NULL
         GROUP BY p.category_id
         """, nativeQuery = true)
-    List<ProductRecommendDto> findcount(
-        @Param("memberId") Integer memberId
+    List<ProductRecommendDto> findCount(
+        @Param("memberId") Long memberId
     );
 
-
-
-
     // 추천 상품을 출력하기 위한거
+    // 입력받은 categoryId를 가지고 있는 상품 1개를 무작위로 가져옴
     @Query(value = """
         SELECT
-            p.product_id AS productId,
             a.auction_status AS auctionStatus,
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
-            COALESCE(bs.bid_count, 0) AS bidCount
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
         LEFT JOIN organization o
             ON o.organization_id = p.organization_id
@@ -70,10 +69,159 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
                 FROM image img
                 WHERE img.product_id = p.product_id
             )
-        where c.name = :categoryName
+        where (:categoryId is null or p.category_id = :categoryId)
+        ORDER BY RAND()
+        LIMIT 1
         """, nativeQuery = true)
-    List<ProductDto> findRecommend(
-        @Param ("categoryName") String categoryName
+    ProductDto findRecommend(
+        @Param ("categoryId") Integer categoryId
     );
     
+
+    // 인기 상품 조회
+    @Query(value = """
+        SELECT
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+        FROM products p
+        LEFT JOIN organization o
+            ON o.organization_id = p.organization_id
+        LEFT JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        LEFT JOIN image i
+            ON i.product_id = p.product_id
+            AND i.image_id = (
+                SELECT min(img.image_id)
+                FROM image img
+                WHERE img.product_id = p.product_id
+            )
+        where bs.bid_count > 1 
+        ORDER BY bs.bid_count DESC
+        LIMIT 4
+        """, nativeQuery = true)
+    List<ProductDto> findPopularProduct();
+    
+    // 새로 등록된 상품 조회
+    @Query(value = """
+        SELECT
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+        FROM products p
+        LEFT JOIN organization o
+            ON o.organization_id = p.organization_id
+        LEFT JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        LEFT JOIN image i
+            ON i.product_id = p.product_id
+            AND i.image_id = (
+                SELECT min(img.image_id)
+                FROM image img
+                WHERE img.product_id = p.product_id
+            )
+        where bs.auction_id is null
+        ORDER BY bs.current_price ASC
+        LIMIT 4
+        """, nativeQuery = true)
+    List<ProductDto> findNewProduct();
+
+    // 상품 목록
+    @Query(value = """
+        SELECT
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+        FROM products p
+        LEFT JOIN organization o
+            ON o.organization_id = p.organization_id
+        LEFT JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        LEFT JOIN image i
+            ON i.product_id = p.product_id
+            AND i.image_id = (
+                SELECT min(img.image_id)
+                FROM image img
+                WHERE img.product_id = p.product_id
+            )
+        where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */
+        and (
+            :categoryId is null or p.category_id = :categoryId /* 카테고리 필터링 */
+        )
+        and (
+            :auctionStatus is null or :auctionStatus = a.auction_status /* 경매 상태 필터링 */
+        )
+        and (
+            :organizationId is null or :organizationId = p.organization_id /* 기관 필터링 */
+        )
+        and (
+            (:lowprice is null and :highprice is null) /* 가격 필터링 */
+            or (
+                coalesce(bs.current_price, p.start_price) /* 현재가가 있으면 현재가, 없으면 시작가 */
+                between :lowprice and :highprice
+            )
+        )
+        ORDER BY
+            case when :sort = 'popular' /* 인기순 */
+                then bs.bid_count end desc,
+            case when :sort = 'time' /* 마감시간 순 추후에 작업 */
+                then bs.bid_count end desc,
+            case when :sort = 'new'  /* 최신순 */
+                then p.created_at end desc,
+            case when :sort = 'lowprice'  /* 가격 낮은 순 */
+                then coalesce(bs.current_price, p.start_price) end asc,
+            case when :sort = 'highprice' /* 가격 높은 순 */
+                then coalesce(bs.current_price, p.start_price) end desc,
+            p.product_id desc /* 조건이 같다면 상품번호 내림차순 */
+        """, nativeQuery = true)
+    Page<ProductDto> findProductList( 
+        @Param ("productName") String productName,
+        @Param ("organizationId") Integer organizationId,
+        @Param ("auctionStatus") String auctionStatus,
+        @Param ("categoryId") Integer categoryId,
+        @Param ("lowprice") Integer lowprice,
+        @Param ("highprice") Integer highprice,
+        @Param ("sort") String sort,
+        Pageable pageable );
+
+
 }

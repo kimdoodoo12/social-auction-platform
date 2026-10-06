@@ -49,16 +49,17 @@ public class OrganizationEntity {
     private Boolean agreementStatus;
 
     @Column
-    private String agreementFile;
-
-    @Column
-    private String organizationImage;
+    private String agreementFileName;
 
     @Column 
     private String agreementInfo;
 
     @Column
     private String businessRegistration;
+
+    @Column
+    private String organizationImageFileName;
+
     
     public void updateOrganization(OrganizationInfoRequest oInfoRequest){
         this.name = oInfoRequest.getName();
@@ -68,8 +69,9 @@ public class OrganizationEntity {
         this.managerPhone = oInfoRequest.getManagerPhone();
         this.agreementDate = oInfoRequest.getAgreementDate();
         this.agreementStatus = oInfoRequest.getAgreementStatus();
-        this.agreementFile = oInfoRequest.getAgreementFile();
-        this.organizationImage = oInfoRequest.getOrganizationImage();
+        // 파일명은 서비스에서만 교체
+        // this.agreementFileName = oInfoRequest.getAgreementFileName();
+        // this.organizationImageFileName = oInfoRequest.getOrganizationImageFileName();
         this.agreementInfo = oInfoRequest.getAgreementInfo();
         this.businessRegistration = oInfoRequest.getBusinessRegistration();
     }

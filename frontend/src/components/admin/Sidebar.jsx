@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { authApi } from '../../pages/admin/member/authApi'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 const MENUS = [
@@ -11,6 +13,19 @@ const MENUS = [
 
 export default function Sidebar() {
   const navigate = useNavigate()
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  async function logout() {
+    if (busy) return
+    setBusy(true)
+    setError('')
+    try {
+      if (await authApi.logout() !== true) throw new Error('Logout failed')
+      navigate('/admin/login', { replace: true })
+    } catch {
+      setError('로그아웃하지 못했습니다. 다시 시도해 주세요.')
+    } finally { setBusy(false) }
+  }
 
   return (
     <aside className="admin-sidebar">
@@ -32,8 +47,8 @@ export default function Sidebar() {
         ))}
       </nav>
       <div className="admin-sidebar__footer">
-        {/* 백엔드에 관리자 로그인/로그아웃 API가 없어 로그인 화면으로 이동만 한다 */}
-        <button type="button" className="admin-sidebar__logout" onClick={() => navigate('/admin/login')}>
+        {error && <p role="alert">{error}</p>}
+        <button type="button" className="admin-sidebar__logout" onClick={logout} disabled={busy}>
           로그아웃
         </button>
       </div>

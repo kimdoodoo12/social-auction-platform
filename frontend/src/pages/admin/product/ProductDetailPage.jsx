@@ -17,9 +17,8 @@ import { ProductStatusBadge } from './ProductParts'
 import { deriveStatus } from './productStatus'
 import './product.css'
 
-// [ADMIN] 04 상품 상세 (Figma 73:261) — GET /admin/product/bb/{productId} → TotalDto
-// TotalDto = { productDto, productAuctionInfo, recentBid[] }
-// Figma 항목 중 백엔드에 없는 공개 여부·최소 입찰 단위·등록자/수정자는 숨겼다(사용자 결정).
+// [ADMIN] 04 상품 상세 — GET /ieum/admin/product/detail/{productId}
+// 상품은 productDto, 시작가는 productAuctionInfo에서 읽고 경매 상태는 목록에서 전달받는다.
 
 const nameOf = (options, id) => options?.find((o) => o.id === id)?.name
 

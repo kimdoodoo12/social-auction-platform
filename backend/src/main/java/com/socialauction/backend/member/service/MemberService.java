@@ -1,9 +1,12 @@
 package com.socialauction.backend.member.service;
 
+import com.socialauction.backend.bid.repository.BidRepository;
 import com.socialauction.backend.member.controller.MemberController;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -12,39 +15,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.entity.BidEntity;
+import com.socialauction.backend.member.dto.MBResultDto;
+import com.socialauction.backend.member.dto.MemberBhistory;
 import com.socialauction.backend.member.dto.MemberBidHistoryDto;
 import com.socialauction.backend.member.dto.MemberDto;
 import com.socialauction.backend.member.dto.MemberSearchDto;
+import com.socialauction.backend.member.dto.MproductDto;
 import com.socialauction.backend.member.dto.UserDto;
 import com.socialauction.backend.member.entity.MemberEntity;
 import com.socialauction.backend.member.repository.MemberRepository;
 import com.socialauction.backend.payment.dto.PaymentDto;
 import com.socialauction.backend.payment.entity.PaymentEntity;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service 
-public class MemberService {
-    @Autowired 
-    private MemberRepository memberRepository;
+@RequiredArgsConstructor
+public class MemberService { 
+    private final MemberRepository memberRepository;
+    
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
 
-    // // 회원관리 관리자 페이지 (전체 조회)
-    // public List<MemberDto> memberfindAll(){
-    //     List<MemberEntity> memberEntities = memberRepository.findAll();
 
-    //     memberEntities.stream().map(MemberDto::from).toList();
-
-    //     return memberEntities.stream().map(MemberDto::from).toList();
-    // } // memberfindall end
 
     // 회원관리 관리자 페이지 (전체 조회)
     @Transactional 
@@ -62,72 +66,9 @@ public class MemberService {
             return members.map(MemberDto::from);
         } // memberfindall end
 
-
-    // 회원관리 관리자 페이지 (개별 조회 : 이름)
-    @Transactional (readOnly = true)
-    public List<MemberDto> memberfindName(String name) {
-        List<MemberEntity> list = memberRepository.findByName(name);
-        List<MemberDto> list2 = list.stream().map(MemberDto::from).toList();
-        return list2;
-    }// memberfindName() end
-
-
-    // 회원관리 관리자 페이지 (개별조회 : 이메일)
-    @Transactional (readOnly = true)
-    public MemberDto memberfindEmail(String email) {
-        MemberEntity memberEntity =  memberRepository.findByEmail(email).orElse(null);
-        MemberDto memberDto = MemberDto.from(memberEntity);
-        return memberDto;
-    }// memberfindEmail() end
-
-
-    // 회원관리 관리자 페이지 (개별조회 이름 + 이메일 )
-    @Transactional (readOnly = true)
-    public List<MemberDto> memberfindDetail(String search){
-
-        // 이름으로 찾기
-        List<MemberEntity> list = memberRepository.findByName(search);
-        if(!list.isEmpty()){
-            List<MemberDto> list2 = list.stream().map(MemberDto::from).toList();
-            return list2;
-        }
-
-        // 이름으로 검색결과 없으면 이메일로 찾음 
-        MemberEntity memberEntity = memberRepository.findByEmail(search).orElse(null);
-
-        if(memberEntity != null){
-            List<MemberDto> list2 = new ArrayList<>();
-            list2.add(MemberDto.from(memberEntity));
-            return list2;
-        }
-        return new ArrayList<>();
-    }// memberfindDetail() end
-
-    // 회원등록 (로그인) / 암호화 아직 구현 안함. / 아이디,비번,이름,이메일,연락처만 등록
-    public boolean userSignup(UserDto userDto){
-        MemberEntity memberEntity = memberRepository.save(userDto.toEntity());
-        if(memberEntity.getMemberId() >= 1 ){ return true;}
-        return false;
-    } // userSignup() end
-
-    // 회원정보 수정 
-    @Transactional 
-    public boolean userUpdate(int userid, UserDto userDto){
-        MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
-        if(memberEntity== null){
-            return  false;
-        }
-        memberEntity.setLoginId(userDto.getLoginId());
-        memberEntity.setPassword(userDto.getPassword());
-        memberEntity.setEmail(userDto.getEmail());
-        memberEntity.setName(userDto.getName());
-        memberEntity.setPhone(userDto.getPhone());
-        return true;
-    } // userUpdate() end
-
     // 회원정지 기능
     @Transactional 
-    public boolean userStop(int userid){
+    public boolean userStop(Long userid){
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         if(memberEntity != null){
             memberEntity.setRole("정지");
@@ -137,7 +78,7 @@ public class MemberService {
     } // userStop() end
     // 회원정지 복구
     @Transactional 
-    public boolean userNoStop(int userid){
+    public boolean userNoStop(Long userid){
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
         if(memberEntity != null){
             memberEntity.setRole("정상");
@@ -148,18 +89,43 @@ public class MemberService {
 
 
     // 회원별 상세 페이지
-    public MemberBidHistoryDto userDetailInfo(int userid){
+    public MemberBidHistoryDto userDetailInfo(Long userid){
+
         MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
+
+        if(memberEntity == null){ return null; }
         MemberBidHistoryDto mDto = MemberBidHistoryDto.from(memberEntity);
-        memberEntity.getBidEntities().forEach((aaa)->{
-            BidDto bidDto = BidDto.from(aaa);
-            mDto.getBidDtos().add(bidDto);
+
+
+        // 최근 입찰 내역
+        // 1. 해당 회원이 입찰한 최근 상품 목록 조회
+        List<MproductDto> productList =
+                memberRepository.findRecentBidProducts(userid);
+
+        // 2. 회원번호 + 상품번호로 입찰 상세 조회
+        productList.forEach((product) -> {
+            int productId = product.getProductId();
+            MemberBhistory history =
+                    memberRepository
+                            .findBidHistory(userid, productId)
+                            .orElse(null);
+
+            // 조회된 입찰 내역이 있으면 배열에 추가
+            if(history != null){
+                mDto.getBidHistory().add(history);
+            }
         });
-        memberEntity.getPaymentEntities().forEach((aaa)->{
-            PaymentDto paymentDto = PaymentDto.from(aaa);
-            mDto.getPayDtos().add(paymentDto);
-        });
-        mDto.setNotpay(memberRepository.notPay(mDto.getMemberId())); 
+
+        // 최근 낙찰내역 5개
+        mDto.getPayDtos().addAll(
+            memberRepository.findWinHistory(userid)
+        );
+        // 미결제 개수
+        mDto.setNotpay(
+                memberRepository.notPay(
+                        mDto.getMemberId()
+                )
+        );
         System.out.println(mDto.getNotpay());
         return mDto;
     }
@@ -186,6 +152,96 @@ public class MemberService {
 
         return result.map(MemberDto::from);
     }
+
+
+    // 최근입찰내역 5개 
+    @Transactional (readOnly = true)
+    public List<MemberBhistory> findRecentBidHistory (Long memberId){
+        List<MproductDto> productlist = memberRepository.findRecentBidProducts(memberId);
+
+        return productlist.stream().map(product ->
+             memberRepository.findBidHistory(
+                memberId, 
+                product.getProductId()
+            ).orElse(null)
+    ).filter(Objects::nonNull).toList();
+    } // 최근입찰내역 end
+
+
+    //====================================================================
+    //=======================================================================================================================
+
+     // 회원가입
+    public boolean userSignup(UserDto userDto){
+        MemberEntity memberEntity = userDto.toEntity();
+
+        String password = passwordEncoder.encode(userDto.getPassword());
+        memberEntity.setPassword(password);
+        if( memberEntity.getMemberId() >= 1 )return true;
+        return false;
+    } // userSignup() end
+
+    // 회원정보 수정 
+    @Transactional 
+    public boolean userUpdate(Long userid, UserDto userDto){
+        MemberEntity memberEntity = memberRepository.findById(userid).orElse(null);
+        if(memberEntity== null){
+            return  false;
+        }
+        memberEntity.setLoginId(userDto.getLoginId());
+        memberEntity.setPassword(userDto.getPassword());
+        memberEntity.setEmail(userDto.getEmail());
+        memberEntity.setName(userDto.getName());
+        memberEntity.setPhone(userDto.getPhone());
+        return true;
+    } // userUpdate() end
+
+
+    //====================================================================
+    //=======================================================================================================================
+
+    // 로그인 
+    public UserDto login(UserDto userDto){
+        MemberEntity memberEntity = memberRepository.findByLoginId(userDto.getLoginId());
+        if(memberEntity == null) return null;
+
+        boolean result = passwordEncoder.matches(userDto.getPassword(), memberEntity.getPassword());
+
+        if(result == false) return null;
+
+        return UserDto.from(memberEntity);
+    }
+
+
+    // 내정보 조회 
+    public UserDto getMyInfo(Long mno){
+        Optional<MemberEntity> optional = memberRepository.findById(mno);
+        if(optional.isPresent()){
+            MemberEntity memberEntity = optional.get();
+            return UserDto.from(memberEntity);
+        }
+        return null;
+    }
+
+
+
+    // 관리자 여부 
+    public boolean isAdmin(Long memberId){
+        return memberRepository.findById(memberId)
+                            .map(MemberEntity::isStatus).orElse(false);
+    }
+
+
+
+
+
+
+
+
+
+
+    //====================================================================
+    //=======================================================================================================================
 
 
 }

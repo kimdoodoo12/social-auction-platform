@@ -54,4 +54,10 @@ public class AuctionEntity  {
     @ToString.Exclude
     @Builder.Default
     private List<BidEntity> bidList = new ArrayList<>();
+
+    public void start(LocalDateTime startTime, LocalDateTime endTime){
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.auctionStatus = "진행";
+    }
 }

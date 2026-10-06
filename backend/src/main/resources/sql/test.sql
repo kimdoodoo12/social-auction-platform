@@ -68,3 +68,6 @@ SELECT o.organization_id, o.name, o.manager, o.manager_phone, o.agreement_date, 
     FROM organization as o LEFT JOIN products on o.organization_id = products.organization_id
     WHERE o.name = '햇살공방' AND o.agreement_status = TRUE
     GROUP BY o.organization_id
+
+SELECT * FROM auction LEFT JOIN products on auction.product_id = products.product_id WHERE auction_status = "진행";
+SELECT products.name, COALESCE(MAX(bid.bid_price), products.start_price) AS currentPrice FROM auction LEFT JOIN products on products.product_id = auction.product_id LEFT JOIN bid on bid.auction_id = auction.auction_id WHERE auction_status = "진행" GROUP BY products.product_id;

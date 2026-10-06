@@ -2,6 +2,8 @@ package com.socialauction.backend.organization.dto.admin;
 
 import java.time.LocalDateTime;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 
 import lombok.AllArgsConstructor;
@@ -21,8 +23,8 @@ public class OrganizationInfoResponse {
     private String managerPhone;
     private LocalDateTime agreementDate;
     private Boolean agreementStatus;
-    private String agreementFile;
-    private String organizationImage;
+    private String agreementFileName;
+    private String organizationImageFileName;
     private String agreementInfo;
     private String businessRegistration;
 
@@ -36,8 +38,8 @@ public class OrganizationInfoResponse {
             .managerPhone(this.managerPhone)
             .agreementDate(this.agreementDate)
             .agreementStatus(this.agreementStatus)
-            .agreementFile(this.agreementFile)
-            .organizationImage(this.organizationImage)
+            .agreementFileName(this.agreementFileName)
+            .organizationImageFileName(this.organizationImageFileName)
             .agreementInfo(this.agreementInfo)
             .businessRegistration(this.businessRegistration)
             .build();
@@ -53,8 +55,8 @@ public class OrganizationInfoResponse {
             .managerPhone(entity.getManagerPhone())
             .agreementDate(entity.getAgreementDate())
             .agreementStatus(entity.getAgreementStatus())
-            .agreementFile(entity.getAgreementFile())
-            .organizationImage(entity.getOrganizationImage())
+            .agreementFileName(entity.getAgreementFileName())
+            .organizationImageFileName(entity.getOrganizationImageFileName())
             .agreementInfo(entity.getAgreementInfo())
             .businessRegistration(entity.getBusinessRegistration())
             .build();

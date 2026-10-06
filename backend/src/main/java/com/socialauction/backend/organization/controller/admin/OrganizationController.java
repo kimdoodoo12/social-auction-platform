@@ -1,5 +1,6 @@
 package com.socialauction.backend.organization.controller.admin;
 
+import com.socialauction.backend.organization.service.OFileService;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +26,7 @@ import com.socialauction.backend.organization.dto.admin.OrganizationListResponse
 import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.service.OrganizationService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController 
@@ -32,7 +35,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/ieum/admin/organization")
 public class OrganizationController {
 
+    private final OFileService fileService;
     private final OrganizationService oService;
+
 
     @GetMapping("")
     public Page<OrganizationListResponse> findAll(@PageableDefault(page=0,  size=4, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
@@ -50,13 +55,22 @@ public class OrganizationController {
         return oService.getOrganizationDetailResponse(id);
     }
 
+    @GetMapping("/detail/{id}/download")
+    public void download(@PathVariable("id") int id, HttpServletResponse response){
+        String fileName = oService.getAgreementFileName(id);
+        if(fileName != null){
+            fileService.fileDownload(fileName, response);
+        }
+    }
+
     @PostMapping("")
-    public boolean save(@RequestBody OrganizationInfoRequest oInfoRequest){
+    public boolean save(@ModelAttribute OrganizationInfoRequest oInfoRequest){
         return oService.save(oInfoRequest);
     }
 
     @PutMapping("/detail/{id}")
-    public boolean update(@PathVariable("id") int id, @RequestBody OrganizationInfoRequest oInfoResquest){
+    public boolean update(@PathVariable("id") int id, @ModelAttribute OrganizationInfoRequest oInfoResquest){
         return oService.update(id, oInfoResquest);
     }
+
 }
