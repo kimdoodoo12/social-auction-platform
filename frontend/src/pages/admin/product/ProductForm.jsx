@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { fetchCategoryOptions, fetchOrganizationOptions, PRODUCT_LIMITS } from '../../../api/product'
 import ImageBox from '../../../components/admin/ImageBox'
 import { Button, Callout, Card, Field, FormActionBar, StepList } from '../../../components/admin/ui'
@@ -13,7 +13,7 @@ const MAX_INT = 2147483647
 const AFTER_STEPS = ['등록 완료 → 상태 「경매 대기」', '사용자 최초 입찰 → 경매 자동 시작', '24시간 경과 → 최고가 입찰자 자동 낙찰']
 
 // 백엔드 ProductService.saveProduct / updateProduct 검증과 같은 규칙
-function validate(values) {
+function validate(values, mode) {
   const name = values.name.trim()
   if (!name) return '상품명을 입력해주세요.'
   if (name.length > PRODUCT_LIMITS.name) return `상품명은 ${PRODUCT_LIMITS.name}자 이하로 입력해주세요.`
@@ -24,12 +24,15 @@ function validate(values) {
   }
   if (values.description.length > PRODUCT_LIMITS.text) return `상품 설명은 ${PRODUCT_LIMITS.text}자 이하로 입력해주세요.`
   if (values.background.length > PRODUCT_LIMITS.text) return `제작 배경은 ${PRODUCT_LIMITS.text}자 이하로 입력해주세요.`
+  if (mode === 'create' && !values.images.some((img) => img.sortOrder === 1 && img.file)) {
+    return '1번 대표 이미지를 선택해주세요.'
+  }
   // 기존 이미지(imageId 있음)는 삭제 API가 없어 경로를 비울 수 없다
   if (values.images.some((img) => img.imageId != null && !img.image.trim())) return '기존 이미지의 경로는 비울 수 없습니다.'
   return null
 }
 
-function toProductDto(values) {
+function toProductDto(values, mode) {
   return {
     productId: values.productId,
     name: values.name.trim(),
@@ -39,7 +42,9 @@ function toProductDto(values) {
     description: values.description || null,
     background: values.background || null,
     // 경로가 빈 새 이미지 칸은 보내지 않는다
-    images: values.images
+    images: mode === 'create'
+      ? values.images.filter((img) => img.file).map(({ file, sortOrder }) => ({ file, sortOrder }))
+      : values.images
       .filter((img) => img.imageId != null || img.image.trim())
       .map((img) => ({ imageId: img.imageId ?? null, image: img.image.trim() })),
   }
@@ -89,6 +94,70 @@ function ImageSlots({ images, onChange }) {
   )
 }
 
+// 등록 전 미리보기는 로컬 파일 URL을 사용한다. 서버에 올리기 전에도 선택한 칸에 표시한다.
+function UploadSlots({ images, onChange, disabled }) {
+  const inputs = useRef([])
+  const previews = useRef(new Map())
+  const [error, setError] = useState(null)
+  useEffect(() => {
+    const urls = previews.current
+    return () => { urls.forEach((url) => URL.revokeObjectURL(url)); urls.clear() }
+  }, [])
+
+  const selectFile = (sortOrder, event) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/') || file.size === 0) {
+      setError('비어 있지 않은 이미지 파일을 선택해주세요.')
+      return
+    }
+    setError(null)
+    const oldUrl = previews.current.get(sortOrder)
+    if (oldUrl) URL.revokeObjectURL(oldUrl)
+    const preview = URL.createObjectURL(file)
+    previews.current.set(sortOrder, preview)
+    onChange([...images.filter((img) => img.sortOrder !== sortOrder), { file, sortOrder, preview }]
+      .sort((a, b) => a.sortOrder - b.sortOrder))
+  }
+  const removeFile = (sortOrder) => {
+    const url = previews.current.get(sortOrder)
+    if (url) URL.revokeObjectURL(url)
+    previews.current.delete(sortOrder)
+    onChange(images.filter((img) => img.sortOrder !== sortOrder))
+  }
+  const slot = (sortOrder) => {
+    const image = images.find((img) => img.sortOrder === sortOrder)
+    const label = sortOrder === 1 ? '대표 이미지 (필수)' : `${sortOrder}번 이미지`
+    return (
+      <div key={sortOrder} className="admin-stack">
+        <input type="file" accept="image/*" hidden disabled={disabled}
+          aria-label={`${label} 파일 선택`}
+          ref={(element) => { inputs.current[sortOrder] = element }}
+          onChange={(event) => selectFile(sortOrder, event)} />
+        <button type="button" disabled={disabled} aria-label={`${label} 선택 또는 교체`}
+          className={`product-slot${sortOrder === 1 ? ' product-slot--main' : ''}`}
+          onClick={() => inputs.current[sortOrder]?.click()}>
+          <ImageBox path={image?.preview} alt={label} label={label} />
+        </button>
+        {image && <small style={{ overflowWrap: 'anywhere' }}>{image.file.name}</small>}
+        {image && sortOrder !== 1 && (
+          <button type="button" disabled={disabled} onClick={() => removeFile(sortOrder)}
+            aria-label={`${sortOrder}번 이미지 선택 취소`}>선택 취소</button>
+        )}
+      </div>
+    )
+  }
+  return <div className="product-slots">
+    {slot(1)}
+    <div className="product-slots__row">
+      {Array.from({ length: PRODUCT_LIMITS.images - 1 }, (_, i) => slot(i + 2))}
+    </div>
+    <small>칸을 눌러 사진을 선택하세요. 대표 사진은 필수이며, 다시 누르면 교체할 수 있습니다.</small>
+    {error && <p role="alert" className="product-form-error">{error}</p>}
+  </div>
+}
+
 export default function ProductForm({ initial, mode = 'create', onSubmit, onCancel }) {
   const [values, setValues] = useState(initial)
   const [error, setError] = useState(null)
@@ -101,7 +170,7 @@ export default function ProductForm({ initial, mode = 'create', onSubmit, onCanc
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const message = validate(values)
+    const message = validate(values, mode)
     if (message) {
       setError(message)
       return
@@ -109,7 +178,7 @@ export default function ProductForm({ initial, mode = 'create', onSubmit, onCanc
     setError(null)
     setSubmitting(true)
     try {
-      await onSubmit(toProductDto(values))
+      await onSubmit(toProductDto(values, mode))
     } catch (err) {
       setError(err.message || '저장에 실패했습니다.')
       setSubmitting(false)
@@ -206,7 +275,12 @@ export default function ProductForm({ initial, mode = 'create', onSubmit, onCanc
 
         <div className="admin-stack">
           <Card title="상품 이미지" subtitle={`대표 이미지 1장 · 추가 이미지 최대 ${PRODUCT_LIMITS.images - 1}장`}>
-            <ImageSlots images={values.images} onChange={(images) => setValues((prev) => ({ ...prev, images }))} />
+            {isEdit ? (
+              <ImageSlots images={values.images} onChange={(images) => setValues((prev) => ({ ...prev, images }))} />
+            ) : (
+              <UploadSlots images={values.images} disabled={submitting}
+                onChange={(images) => setValues((prev) => ({ ...prev, images }))} />
+            )}
           </Card>
           {!isEdit && (
             <Card title="등록 후 흐름">
