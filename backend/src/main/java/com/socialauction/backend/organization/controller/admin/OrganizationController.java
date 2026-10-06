@@ -1,6 +1,6 @@
 package com.socialauction.backend.organization.controller.admin;
 
-import com.socialauction.backend.organization.service.FileService;
+import com.socialauction.backend.organization.service.OFileService;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/ieum/admin/organization")
 public class OrganizationController {
 
-    private final FileService fileService;
+    private final OFileService fileService;
     private final OrganizationService oService;
 
 

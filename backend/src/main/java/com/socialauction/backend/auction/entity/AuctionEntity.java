@@ -42,6 +42,9 @@ public class AuctionEntity  {
     @Column 
     private String auctionStatus;
 
+    @Column 
+    private Integer topPrice;
+
     @OneToOne
     @JoinColumn (name = "product_id")
     private ProductEntity productEntity;

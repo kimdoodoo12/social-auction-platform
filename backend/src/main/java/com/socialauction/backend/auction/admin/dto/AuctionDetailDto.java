@@ -1,4 +1,4 @@
-package com.socialauction.backend.auction.dto;
+package com.socialauction.backend.auction.admin.dto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ public class AuctionDetailDto {
 
     //유저정보
     String userName;
+    Integer countUser;
 
     public static AuctionDetailDto from(AuctionEntity auctionEntity){
         return AuctionDetailDto.builder()
@@ -41,6 +42,7 @@ public class AuctionDetailDto {
             .agreementDate(auctionEntity.getProductEntity().getOrganizationEntity().getAgreementDate())
             //이미지는 서비스에서
             // 최고입찰자 이름 서비스에서
+            // 참여입찰자는 서비스에서
             .build();
     }
 

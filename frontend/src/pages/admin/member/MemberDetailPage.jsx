@@ -19,8 +19,8 @@ import { SUSPENDED_ROLE, memberRoleTone } from './memberStatus'
 import './member.css'
 
 // [ADMIN] 12 회원 상세 (Figma 75:387) — GET /user/detail/info/{userid}
-// 응답: MemberBidHistoryDto { memberId, loginId, name, email, createdAt, bcount, pcount, role, lockedAt, notpay, bidDtos, payDtos }
-// 백엔드에 없는 값(관심 상품, 정지 이력, 연락처, 최근 로그인, 마케팅 수신, 표의 상품명 등)은
+// 응답: MemberBidHistoryDto { memberId, loginId, name, email, createdAt, bcount, pcount, role, lockedAt, notpay, bidHistory, payDtos }
+// 백엔드에 없는 값(관심 상품, 정지 이력, 연락처, 최근 로그인, 마케팅 수신)은
 // Figma 틀을 유지하고 '-'로 표시한다(사용자 결정).
 const RECENT_BIDS = 5
 const byTimeDesc = (key) => (a, b) => String(b[key] ?? '').localeCompare(String(a[key] ?? ''))
@@ -48,9 +48,9 @@ export default function MemberDetailPage() {
     detail.reload()
   }
 
-  const allBids = [...(member?.bidDtos ?? [])].sort(byTimeDesc('bidTime'))
+  const allBids = [...(member?.bidHistory ?? [])].sort(byTimeDesc('bidTime'))
   const bids = allBids.slice(0, RECENT_BIDS)
-  const payments = [...(member?.payDtos ?? [])].sort(byTimeDesc('createdAt'))
+  const payments = [...(member?.payDtos ?? [])].sort(byTimeDesc('winningDate'))
   const statusLabel = suspended ? '정지 해제' : '계정 정지'
 
   return (
@@ -100,14 +100,14 @@ export default function MemberDetailPage() {
                   noBody
                 >
                   <DataTable
-                    rowKey="bidId"
+                    rowKey="productId"
                     rows={bids}
                     emptyText="입찰 내역이 없습니다."
                     columns={[
-                      { key: 'product', header: '상품명', render: () => '-' },
-                      { key: 'bidPrice', header: '내 입찰가', align: 'right', render: (r) => formatPrice(r.bidPrice) },
-                      { key: 'current', header: '현재/최종가', align: 'right', render: () => '-' },
-                      { key: 'result', header: '결과', render: () => '-' },
+                      { key: 'productName', header: '상품명', render: (r) => r.productName ?? '-' },
+                      { key: 'myBidPrice', header: '내 입찰가', align: 'right', render: (r) => formatPrice(r.myBidPrice) },
+                      { key: 'finalPrice', header: '현재/최종가', align: 'right', render: (r) => formatPrice(r.finalPrice) },
+                      { key: 'result', header: '결과', render: (r) => r.result ?? '-' },
                       { key: 'bidTime', header: '입찰 시각', align: 'right', render: (r) => formatDateTime(r.bidTime) },
                     ]}
                   />
@@ -115,22 +115,17 @@ export default function MemberDetailPage() {
 
                 <Card title="낙찰 내역" actions={<span className="member-card-meta">총 {formatNumber(payments.length)}건</span>} noBody>
                   <DataTable
-                    rowKey="paymentId"
+                    rowKey="auctionId"
                     rows={payments}
                     emptyText="낙찰 내역이 없습니다."
                     onRowClick={(r) => r.auctionId && navigate(`/admin/auctions/${r.auctionId}`)}
                     columns={[
                       { key: 'auctionId', header: '경매번호', render: (r) => r.auctionId ?? '-' },
-                      { key: 'product', header: '상품명', render: () => '-' },
-                      { key: 'organization', header: '제작기관', render: () => '-' },
+                      { key: 'product', header: '상품명', render: (r) => r.product ?? '-' },
+                      { key: 'organization', header: '제작기관', render: (r) => r.organization ?? '-' },
                       { key: 'paymentPrice', header: '낙찰가', align: 'right', render: (r) => formatPrice(r.paymentPrice) },
-                      { key: 'createdAt', header: '낙찰일', align: 'right', render: (r) => formatDate(r.createdAt) },
-                      {
-                        key: 'paymentStatus',
-                        header: '결제 상태',
-                        align: 'right',
-                        render: (r) => (r.paymentStatus ? '결제 완료' : '결제 대기'),
-                      },
+                      { key: 'winningDate', header: '낙찰일', align: 'right', render: (r) => formatDate(r.winningDate) },
+                      { key: 'paymentStatus', header: '결제 상태', align: 'right', render: (r) => r.paymentStatus ?? '-' },
                     ]}
                   />
                 </Card>

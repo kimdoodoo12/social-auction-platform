@@ -28,7 +28,7 @@ import lombok.ToString;
 public class MemberEntity extends BaseTime{
     @Id 
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer memberId;
+    private Long memberId;
 
     private String loginId;
     private String password;

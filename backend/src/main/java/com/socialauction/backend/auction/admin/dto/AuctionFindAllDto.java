@@ -1,4 +1,4 @@
-package com.socialauction.backend.auction.dto;
+package com.socialauction.backend.auction.admin.dto;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +26,8 @@ public class AuctionFindAllDto {
     //입찰 수량
     private Integer bidCount;
 
+    private String status;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
@@ -38,6 +40,7 @@ public class AuctionFindAllDto {
             .startPrice(auctionEntity.getProductEntity().getStartPrice())
             //최고가는 서비스에서
             //입찰 수는 서비스에서
+            .status(auctionEntity.getAuctionStatus())
             .startTime(auctionEntity.getStartTime())
             .endTime(auctionEntity.getEndTime())
             .build();

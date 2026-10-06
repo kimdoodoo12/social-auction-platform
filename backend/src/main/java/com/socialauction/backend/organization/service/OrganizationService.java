@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class OrganizationService {
     private final OrganizationRepository oRepository;
-    private final FileService fileService;
+    private final OFileService fileService;
 
     @Transactional(readOnly = true)
     public Page<OrganizationListResponse> findAll(Pageable pageable){

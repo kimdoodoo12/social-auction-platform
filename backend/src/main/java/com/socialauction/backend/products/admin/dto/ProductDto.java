@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.socialauction.backend.products.entity.ImageEntity;
 import com.socialauction.backend.products.entity.ProductEntity;
 
@@ -23,6 +25,7 @@ public class ProductDto {
     private String background;      // 배경
     private LocalDateTime createdAt;// 생성 시간
     private LocalDateTime updatedAt;// 수정 시간
+    
 
     @Builder.Default
     private List<ImageDto> images = new ArrayList<>();   // 상품 이미지 정보들

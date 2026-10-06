@@ -6,8 +6,8 @@ import { useAsync } from '../../../hooks/useAsync'
 import ProductForm from './ProductForm'
 import './product.css'
 
-// [ADMIN] 06 상품 수정 (Figma 73:3397) — GET /admin/product/bb/{productId} 로 불러와 PUT /admin/product/dd 로 저장
-// 시작가는 productAuctionInfo.startPrice 를 쓴다(productDto.startPrice 는 비어서 온다).
+// [ADMIN] 06 상품 수정 — GET /ieum/admin/product/detail/{productId} 로 불러와 PUT /ieum/admin/product/update 로 저장
+// TotalDto의 상품 정보와 경매 시작가를 사용하고, 경매 정보가 없으면 목록의 시작가를 보조로 쓴다.
 
 function toFormValues(product, startPrice) {
   return {

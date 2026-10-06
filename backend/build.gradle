@@ -26,7 +26,7 @@ dependencies {
 
 	// 2. JDBC
 	implementation 'org.springframework.boot:spring-boot-starter'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j' // MySQL 사용 시
 
 	// 3. 롬복
 	compileOnly 'org.projectlombok:lombok'
@@ -43,6 +43,17 @@ dependencies {
 
 	// 7. CSV파싱
 	implementation 'com.opencsv:opencsv:5.12.0'
+
+	// 8. 로그인 관련 bcrypt
+	implementation 'org.springframework.security:spring-security-crypto'
+
+	// 9. JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+   	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+   	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+	// // 10. Redis 
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {

@@ -12,7 +12,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service 
-public class FileService {
+public class OFileService {
     
     // 프로젝트 최상위 경로 찾기
     String baseDir = System.getProperty("user.dir");

@@ -1,0 +1,70 @@
+/* 회원 인증 화면의 기본 배경과 글자색. ua 접두어로 관리자 스타일과 구분한다. */
+.user-auth { min-height: 100vh; background: #f8f7f5; color: #34322f; font-size: 13px; }
+.user-auth a:hover { color: #bd633d; }
+/* 공통 헤더: 로고, 검색 표시 영역, 회원 메뉴와 카테고리를 배치한다. */
+.ua-header { background: white; border-bottom: 1px solid #e8e5e1; }
+.ua-header-main { max-width: 1100px; margin: auto; min-height: 78px; display: flex; align-items: center; gap: 48px; padding: 16px 28px; }
+.ua-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; white-space: nowrap; }
+.ua-brand > span { width: 27px; height: 27px; background: #bf653f; border-radius: 7px; }
+.ua-search { margin: auto; width: 450px; padding: 12px 16px; background: #f8f7f5; border: 1px solid #e7e4e0; border-radius: 7px; color: #99958e; display: flex; justify-content: space-between; }
+.ua-header nav { display: flex; gap: 20px; white-space: nowrap; font-size: 12px; color: #77736d; }
+.ua-categories { border-top: 1px solid #efede9; display: flex; gap: 28px; padding: 13px max(28px, calc((100% - 1044px) / 2)); white-space: nowrap; font-size: 12px; overflow-x: auto; }
+/* 본문 여백과 중앙 카드. 로그인 카드는 간결하게, 가입·내 정보 카드는 넓게 표시한다. */
+.ua-main { padding: 58px 20px 80px; min-height: 590px; }
+.ua-card { background: white; border: 1px solid #e6e2dd; border-radius: 13px; margin: 0 auto; padding: 32px; width: 100%; }
+.ua-login { max-width: 400px; }
+.ua-signup { max-width: 470px; }
+.ua-profile { max-width: 470px; }
+.ua-card h1 { font-size: 23px; line-height: 1.4; margin-bottom: 18px; font-weight: 750; }
+.ua-subtitle { color: #99958f; font-size: 12px; margin-bottom: 20px; }
+.ua-notice { background: #f6eae2; color: #796c62; padding: 12px 14px; border-radius: 6px; font-size: 12px; line-height: 1.7; margin-bottom: 18px; }
+/* 입력 필드: 레이블과 입력창을 세로 배치하고 안내 문구를 함께 표시한다. */
+.ua-field { display: flex; flex-direction: column; gap: 7px; font-size: 12px; margin-bottom: 17px; font-weight: 600; }
+.ua-field input { width: 100%; min-height: 46px; padding: 11px 14px; border: 1px solid #dcd8d2; border-radius: 6px; background: white; font-weight: 400; font-size: 13px; }
+.ua-field input::placeholder { color: #aaa69e; }
+/* 키보드로 이동할 때 현재 선택한 입력창·버튼·링크를 테두리로 강조한다. */
+.user-auth :is(input, button, a):focus-visible { outline: 3px solid #ce815b; outline-offset: 3px; }
+.ua-hint { font-size: 10px; color: #938e86; font-weight: 400; }
+.ua-session-note { margin: 0 0 16px; }
+/* 주요 제출 버튼과 요청 진행 중 비활성 상태의 모양이다. */
+.ua-primary { width: 100%; min-height: 46px; border: 0; border-radius: 6px; background: #bf653f; color: white; font-weight: 700; padding: 12px; }
+.ua-primary:hover { background: #a8512e; }
+.ua-primary:disabled { opacity: .65; cursor: wait; }
+/* 로그인·회원가입 전환 링크와 성공·오류 안내 메시지의 모양이다. */
+.ua-switch { text-align: center; color: #979188; font-size: 11px; margin-top: 18px; }
+.ua-switch a { color: #bf653f; font-weight: 700; margin-left: 4px; }
+.ua-error { color: #a22c24; background: #fff1ee; border-radius: 6px; padding: 12px; margin-bottom: 14px; }
+.ua-success { color: #316540; background: #eef6ee; padding: 12px; margin-bottom: 14px; }
+/* 약관 전체 확인과 개별 필수 항목을 구분하고 체크박스 색상을 통일한다. */
+.ua-agreements { border: 0; padding: 0; margin: 20px 0 14px; }
+.ua-agreements label { display: flex; align-items: center; gap: 8px; font-size: 11px; margin: 10px 0; color: #777168; }
+.ua-agreements input { accent-color: #bf653f; width: 15px; height: 15px; margin: 0; }
+.ua-agreements .ua-all { border-block: 1px solid #ede9e4; padding: 15px 0; color: #34322f; font-weight: 700; font-size: 12px; }
+.ua-agreements em { color: #bf653f; font-style: normal; margin-right: 6px; }
+.ua-terms-note { background: #f8f7f5; font-size: 10px; margin-bottom: 14px; }
+/* 공통 푸터: 안내 항목을 열로 배치하며 공간이 부족하면 다음 줄로 넘긴다. */
+.ua-footer { max-width: 1100px; margin: auto; padding: 30px 28px 38px; color: #9d978d; font-size: 11px; }
+.ua-footer-columns { display: flex; flex-wrap: wrap; gap: 65px; }
+.ua-footer-columns > div { display: flex; flex-direction: column; gap: 9px; }
+.ua-footer strong { color: #45413b; font-size: 12px; margin-bottom: 3px; }
+.ua-copyright { font-size: 10px; margin-top: 36px; }
+/* 마이페이지의 항목명과 값을 구분하고 긴 이메일은 줄바꿈한다. */
+.ua-profile dl { margin: 24px 0; }
+.ua-profile dt { color: #938e86; font-size: 12px; }
+.ua-profile dd { margin: 4px 0 18px; overflow-wrap: anywhere; }
+/* 약관 그룹 제목을 시각적으로 숨기되 스크린리더에서는 읽을 수 있게 유지한다. */
+.ua-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+/* 모바일에서는 검색 영역을 다음 줄로 이동하고 카드 여백과 메뉴 간격을 줄인다. */
+@media (max-width: 700px) {
+  .ua-header-main { flex-wrap: wrap; gap: 18px; padding: 18px 20px; }
+  .ua-header nav { margin-left: auto; gap: 12px; font-size: 11px; }
+  .ua-brand { font-size: 18px; }
+  .ua-search { order: 3; width: 100%; }
+  .ua-categories { gap: 22px; padding: 12px 20px; }
+  /* 본문 여백과 중앙 카드. 로그인 카드는 간결하게, 가입·내 정보 카드는 넓게 표시한다. */
+.ua-main { padding: 32px 16px 48px; min-height: 530px; }
+  .ua-card { padding: 26px 22px; }
+  .ua-footer-columns { gap: 28px; }
+  /* 공통 푸터: 안내 항목을 열로 배치하며 공간이 부족하면 다음 줄로 넘긴다. */
+.ua-footer { padding: 24px 22px; }
+}
