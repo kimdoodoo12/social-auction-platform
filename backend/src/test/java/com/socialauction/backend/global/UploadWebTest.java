@@ -9,6 +9,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import com.socialauction.backend.global.upload.UploadFolder;
+import com.socialauction.backend.global.upload.UploadUrls;
+import com.socialauction.backend.global.upload.UploadWebConfig;
+
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

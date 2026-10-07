@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.socialauction.backend.global.UploadFolder;
-import com.socialauction.backend.global.UploadUrls;
+import com.socialauction.backend.global.upload.UploadFolder;
+import com.socialauction.backend.global.upload.UploadUrls;
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 
 import lombok.AllArgsConstructor;

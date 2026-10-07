@@ -1,3 +1,4 @@
+package com.socialauction.backend.global.authority;
 // package com.socialauction.backend.global;
 
 

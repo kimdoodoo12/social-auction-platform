@@ -1,4 +1,4 @@
-package com.socialauction.backend.member.controller;
+package com.socialauction.backend.member.admin.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.socialauction.backend.member.dto.UserDto;
+import com.socialauction.backend.member.admin.dto.UserDto;
 
 import lombok.RequiredArgsConstructor;
 

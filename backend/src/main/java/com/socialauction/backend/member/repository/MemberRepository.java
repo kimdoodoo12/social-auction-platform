@@ -14,9 +14,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.socialauction.backend.member.dto.MBResultDto;
-import com.socialauction.backend.member.dto.MemberBhistory;
-import com.socialauction.backend.member.dto.MproductDto;
+import com.socialauction.backend.member.admin.dto.MemberBidInfo;
+import com.socialauction.backend.member.admin.dto.MemberBuyProduct;
+import com.socialauction.backend.member.admin.dto.MemberPayment;
 import com.socialauction.backend.member.entity.MemberEntity;
 
 
@@ -91,7 +91,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
             """,
         nativeQuery = true
     )
-    List<MproductDto> findRecentBidProducts(
+    List<MemberBuyProduct> findRecentBidProducts(
         @Param("memberId") Long memberId
     );
 
@@ -176,7 +176,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
             """,
         nativeQuery = true
     )
-    Optional<MemberBhistory> findBidHistory(
+    Optional<MemberBidInfo> findBidHistory(
         @Param("memberId") Long memberId,
         @Param("productId") int productId
     );
@@ -218,7 +218,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
             """,
         nativeQuery = true
     )
-    List<MBResultDto> findWinHistory(
+    List<MemberPayment> findWinHistory(
         @Param("memberId") Long memberId
     );
 

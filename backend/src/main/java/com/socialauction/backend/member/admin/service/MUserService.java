@@ -1,11 +1,11 @@
-package com.socialauction.backend.member.service;
+package com.socialauction.backend.member.admin.service;
 
 import org.springframework.stereotype.Service;
 
-import com.socialauction.backend.member.dto.MemberDto;
-import com.socialauction.backend.member.dto.UserDto;
+import com.socialauction.backend.member.admin.dto.MemberDto;
 import com.socialauction.backend.member.entity.MemberEntity;
 import com.socialauction.backend.member.repository.MemberRepository;
+import com.socialauction.backend.member.user.dto.UserDto;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

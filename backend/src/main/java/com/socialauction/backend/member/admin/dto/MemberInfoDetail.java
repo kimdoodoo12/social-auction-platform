@@ -1,21 +1,29 @@
-package com.socialauction.backend.member.dto;
+package com.socialauction.backend.member.admin.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
+
+import com.socialauction.backend.bid.dto.BidDto;
+import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.member.entity.MemberEntity;
+import com.socialauction.backend.payment.dto.PaymentDto;
+import com.socialauction.backend.payment.entity.PaymentEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
-public class MemberDto {
+public class MemberInfoDetail {
     private Long memberId;
     private String loginId;
     private String name;
     private String email;
-    private String phone;
     
     // 가입일
     private LocalDateTime createdAt;
@@ -29,24 +37,30 @@ public class MemberDto {
     private String role;
     private LocalDateTime lockedAt;
 
+    // 미낙찰 번호
+    private Integer notpay;
 
-    public MemberEntity toEntity(){
-        return MemberEntity.builder()
-                        .loginId(this.loginId)
-                        .name(this.name)
-                        .email(this.email)
-                        .phone(this.phone)
-                        .build();
-    }
+    // 입찰내역 전체 조회 
+    // @Builder .Default
+    // // @ToString .Exclude
+    // public  List<BidDto> bidDtos = new ArrayList<>();
+
+    @Builder .Default
+    @ToString .Exclude
+    public  List<MemberPayment> payDtos = new ArrayList<>();
+
+    @Builder .Default
+    @ToString.Exclude
+    private  List<MemberBidInfo> bidHistory = new ArrayList<>();
+
 
     // entity -> dto 
-    public static  MemberDto from(MemberEntity memberEntity){
-        return MemberDto.builder()
+    public static  MemberInfoDetail from(MemberEntity memberEntity){
+        return MemberInfoDetail.builder()
             .memberId(memberEntity.getMemberId())
             .loginId(memberEntity.getLoginId())
             .name(memberEntity.getName())
             .email(memberEntity.getEmail())
-            .phone(memberEntity.getPhone())
             .createdAt(memberEntity.getCreatedAt())
             .role(memberEntity.getRole())
             .lockedAt(memberEntity.getLockedAt())

@@ -22,7 +22,7 @@ import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.global.FileService;
-import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.upload.UploadFolder;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
 import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;

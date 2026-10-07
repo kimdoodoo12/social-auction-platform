@@ -1,4 +1,4 @@
-package com.socialauction.backend.member.dto;
+package com.socialauction.backend.global.jtw;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;

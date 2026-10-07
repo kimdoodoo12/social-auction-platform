@@ -1,8 +1,8 @@
-package com.socialauction.backend.member.dto;
+package com.socialauction.backend.member.admin.dto;
 
 import java.time.LocalDateTime;
 
-public interface MemberBhistory {
+public interface MemberBidInfo {
     Integer getProductId();
 
     String getProductName();

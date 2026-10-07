@@ -1,4 +1,4 @@
-package com.socialauction.backend.global;
+package com.socialauction.backend.global.upload;
 
 import java.nio.charset.StandardCharsets;
 import org.springframework.web.util.UriUtils;

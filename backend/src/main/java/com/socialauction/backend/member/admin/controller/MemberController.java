@@ -1,4 +1,4 @@
-package com.socialauction.backend.member.controller;
+package com.socialauction.backend.member.admin.controller;
 
 
 import java.time.Duration;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.socialauction.backend.member.dto.JWTutil;
-import com.socialauction.backend.member.dto.MemberBidHistoryDto;
-import com.socialauction.backend.member.dto.MemberDto;
-import com.socialauction.backend.member.dto.MemberSearchDto;
-import com.socialauction.backend.member.dto.UserDto;
-import com.socialauction.backend.member.service.MUserService;
-import com.socialauction.backend.member.service.MemberService;
-import com.socialauction.backend.member.service.RedisTokenService;
+import com.socialauction.backend.global.jtw.JWTutil;
+import com.socialauction.backend.member.admin.dto.MemberDto;
+import com.socialauction.backend.member.admin.dto.MemberInfoDetail;
+import com.socialauction.backend.member.admin.dto.MemberSearchDto;
+import com.socialauction.backend.member.admin.service.MUserService;
+import com.socialauction.backend.member.admin.service.MemberService;
+import com.socialauction.backend.member.admin.service.RedisTokenService;
+import com.socialauction.backend.member.user.dto.UserDto;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -77,7 +77,7 @@ public class MemberController {
 
     // 회원 상세 페이지 
     @GetMapping("/detail/info/{userid}")
-    public MemberBidHistoryDto userDetailInfo(@PathVariable ("userid")Long userid){
+    public MemberInfoDetail userDetailInfo(@PathVariable ("userid")Long userid){
         return memberService.userDetailInfo(userid);
     }
     

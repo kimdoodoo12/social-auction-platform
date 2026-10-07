@@ -1,4 +1,4 @@
-package com.socialauction.backend.member.dto;
+package com.socialauction.backend.member.admin.dto;
 
 import java.time.LocalDateTime;
 
@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor @NoArgsConstructor @Data @Builder
-public class MBResultDto {
+public class MemberPayment {
     // 경매번호
     private Integer auctionId;
     // 상품명
