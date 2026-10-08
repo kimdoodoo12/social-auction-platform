@@ -34,8 +34,8 @@ public class ProductController {
     
     // 마감 임박 상품 조회
     @GetMapping("end")
-    public String findEndProduct(@RequestParam String param) {
-        return "bb";
+    public List<ProductDto> findEndProduct( ) {
+        return productService.findEndProduct();
     }
     
     // 인기 상품 조회
