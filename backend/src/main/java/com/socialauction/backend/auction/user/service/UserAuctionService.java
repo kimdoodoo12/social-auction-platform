@@ -102,18 +102,40 @@ public class UserAuctionService {
 
     }
 
-    // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
-    // * 경매 상품,기관 상세정보
-    public ProductDetailProjection findDetailProduct(Integer auctionId){
-        return auctionRepository.findProductDetail(auctionId).orElse(null);
-    }
+    
 
     // * 경매 첫 입찰
-    // public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
+    @Transactional 
+    public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
+        // * 받은 경매 id가 대기상태인지 확인
+        AuctionEntity auctionEntity = auctionRepository.findById(auctionConfirmDto.getAuctionId()).orElseThrow();
+
+        // * 대기상태이면 진행으로 변경 아니면 false
+        if(auctionEntity.getAuctionStatus().equals("대기")){
+            auctionEntity.setAuctionStatus("진행");
+        }else{
+            return false;
+        }
+
+        // * 시작 시간, 종료 시간 지정
+        auctionEntity.setStartTime(LocalDateTime.now());
+        auctionEntity.setEndTime(LocalDateTime.now().plusHours(24));
+
+        boolean result = auctionConfirmed(auctionConfirmDto);
+
+        if (result == true) {
+            return true;
+        }
         
-    // }
+        return false;
+        
+    }
 
-
+    // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
+        // * 경매 상품,기관 상세정보
+        public ProductDetailProjection findDetailProduct(Integer auctionId){
+            return auctionRepository.findProductDetail(auctionId).orElse(null);
+        }
 
 
     

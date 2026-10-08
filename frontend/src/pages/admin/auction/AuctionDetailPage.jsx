@@ -56,9 +56,9 @@ export default function AuctionDetailPage() {
             <div className="auction-stats">
               <StatCard label="시작가" value={formatPrice(auction.startPrice)} />
               <StatCard label="최종 낙찰가" value={hasBids ? formatPrice(auction.topPrice) : null} highlight />
-              <StatCard label="최고 입찰자" value={data.userName ? `${data.userName} (-)` : null} />
+              <StatCard label="최고 입찰자" value={data.userName ? `${data.userName}` : null} />
               <StatCard label="전체 입찰 횟수" value={formatNumber(auction.bidCount ?? 0)} unit="회" />
-              <StatCard label="참여 입찰자" value={null} />
+              <StatCard label="참여 입찰자" value={formatNumber(data.countUser ?? 0)} unit="명" />
             </div>
 
             <section className="admin-card auction-times">
@@ -106,7 +106,7 @@ export default function AuctionDetailPage() {
                 <div className="admin-stack">
                   <InfoRows
                     items={[
-                      { label: '낙찰자', value: winner?.name ? `${winner.name} (-)` : '-' },
+                      { label: '낙찰자', value: winner?.name ? `${winner.name}` : '-' },
                       { label: '연락처', value: maskPhone(winner?.phone) },
                       {
                         label: '최종 낙찰가',

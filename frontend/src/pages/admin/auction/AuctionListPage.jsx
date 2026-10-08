@@ -80,7 +80,7 @@ export default function AuctionListPage() {
     { key: 'bidCount', header: '입찰', align: 'right', render: (r) => formatNumber(r.bidCount ?? 0) },
     { key: 'startTime', header: '시작시간', align: 'right', render: (r) => formatShortDateTime(r.startTime) },
     { key: 'endTime', header: '종료시간', align: 'right', render: (r) => formatShortDateTime(r.endTime) },
-    { key: 'status', header: '상태', render: () => '-' },
+    { key: 'status', header: '상태', render: (r) => r.status ?? '-' },
     {
       key: 'actions',
       header: '관리',

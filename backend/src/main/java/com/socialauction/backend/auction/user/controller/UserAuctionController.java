@@ -59,5 +59,13 @@ public class UserAuctionController {
     public ProductDetailProjection findDetailProduct(@PathVariable (name = "id") Integer auctionId) {
         return userAuctionService.findDetailProduct(auctionId);
     }
+
+    // * 첫입찰 
+    @PostMapping("firstBid")
+    public boolean firstBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+        
+        return entity;
+    }
+    
     
 }
