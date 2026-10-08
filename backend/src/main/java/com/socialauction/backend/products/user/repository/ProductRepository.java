@@ -207,4 +207,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         Pageable pageable );
 
 
+    @Query(value="""
+                SELECT COUNT(product_id) FROM products;
+            """, nativeQuery = true)
+    Integer findProductCount();
 }

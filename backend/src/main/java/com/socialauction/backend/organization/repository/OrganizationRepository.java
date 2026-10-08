@@ -49,4 +49,9 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
     + "WHERE p.organization_id = :id "
     + "LIMIT 10", nativeQuery = true)
     List<OrganizationProductResponse> findOrganizationProduct(@Param("id") int id);
+
+    @Query(value = """
+            SELECT COUNT(organization_id) FROM organization WHERE agreement_status = true
+            """, nativeQuery = true)
+    Integer findOrganizationCount();
 }

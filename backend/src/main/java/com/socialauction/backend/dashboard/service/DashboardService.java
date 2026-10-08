@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.socialauction.backend.auction.repository.AuctionRepository;
+import com.socialauction.backend.dashboard.dto.DashboardResponse;
 import com.socialauction.backend.member.repository.MemberRepository;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.payment.dto.PaymentListResponse;
@@ -26,16 +27,38 @@ public class DashboardService {
     private final OrganizationRepository oRepository;
     private final PaymentRepository paymentRepository;
 
+    // 대시보드 DTO로 조립하여 반환
+    public DashboardResponse findDashboardResponse(){
+        List<ProductDto> productDtos = findNewProduct();
+        List<PaymentListResponse> paymentListResponses = findPaymentListResponses();
+        Integer productCount = findProductCount();
+        Integer auctionWaitingCount = findAuctionCount("대기");
+        Integer auctionBiddingCount = findAuctionCount("진행");
+        Integer auctionEndCount = findAuctionCount("완료");
+        Integer memberCount = findMemberCount();
+        Integer organizationCount = findOrganziationCount();
+
+        return DashboardResponse.builder()
+            .productDtos(productDtos)
+            .paymentListResponses(paymentListResponses)
+            .productCount(productCount)
+            .auctionWatingCount(auctionWaitingCount)
+            .auctionBiddingCount(auctionBiddingCount)
+            .auctionEndCount(auctionEndCount)
+            .memberCount(memberCount)
+            .OrganizationCount(organizationCount)
+            .build();
+    }
     
 
     // 새로등록된 상품은 사용자쪽 상품 쿼리를 재사용
-    List<ProductDto> findNewProduct(){
+    public List<ProductDto> findNewProduct(){
         Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());
         return productRepository.findNewProduct(pageable).getContent();
     }
 
     // 최근 낙찰만
-    List<PaymentListResponse> findPaymentListResponses(){
+    public List<PaymentListResponse> findPaymentListResponses(){
         // 동적으로 개수와 정렬을 위한 Pageable 생성
         Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());
 
@@ -46,16 +69,22 @@ public class DashboardService {
     // 진행중인 경매는 사용자쪽 메인(상품) 쿼리를 재사용
 
     // 전체상품 카운트
-    
+    public Integer findProductCount(){
+        return productRepository.findProductCount();
+    }
 
-    // 경매대기 카운트
-
-    // 진행경매 카운트
-
-    // 경매종료 카운트
+    // 경매대기 카운트 // 진행경매 카운트 // 경매종료 카운트
+    public Integer findAuctionCount(String agreementStatus){
+        return aRepository.findAuctionCount(agreementStatus);
+    }
 
     // 전체회원 카운트
+    public Integer findMemberCount(){
+        return mRepository.findMemberCount();
+    }
 
     // 협약중인 기관 카운트
-
+    public Integer findOrganziationCount(){
+        return oRepository.findOrganizationCount();
+    }
 }

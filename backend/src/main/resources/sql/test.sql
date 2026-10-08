@@ -74,3 +74,6 @@ SELECT products.name, COALESCE(MAX(bid.bid_price), products.start_price) AS curr
 
 
 SELECT a.auction_id, pd.name, o.name, m.name, py.payment_price, py.created_at, py.payment_status FROM payment py LEFT JOIN auction a on py.auction_id = a.auction_id LEFT JOIN products pd on pd.product_id = a.auction_id LEFT JOIN organization o on o.organization_id = pd.organization_id LEFT JOIN member m on py.member_id = m.member_id;
+
+
+SELECT COUNT(product_id) FROM products;

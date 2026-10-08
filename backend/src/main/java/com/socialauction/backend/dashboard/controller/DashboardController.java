@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.socialauction.backend.dashboard.dto.DashboardResponse;
 import com.socialauction.backend.dashboard.service.DashboardService;
 
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 @RequestMapping("/ieum/admin/dashboard")
 public class DashboardController {
-    private final DashboardService dService;
+    private final DashboardService dashboardService;
 
 
+    @GetMapping("")
+    public DashboardResponse findDashboardResponse(){
+        return dashboardService.findDashboardResponse();
+    }
     
 }
