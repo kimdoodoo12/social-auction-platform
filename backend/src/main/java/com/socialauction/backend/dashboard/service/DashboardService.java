@@ -31,7 +31,7 @@ public class DashboardService {
     // 새로등록된 상품은 사용자쪽 상품 쿼리를 재사용
     List<ProductDto> findNewProduct(){
         Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());
-        return productRepository.findNewProduct(pageable).getContent();
+        return productRepository.findProduct("new", pageable).getContent();
     }
 
     // 최근 낙찰만
