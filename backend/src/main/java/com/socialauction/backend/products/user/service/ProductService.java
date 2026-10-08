@@ -66,19 +66,21 @@ public class ProductService {
     }
 
     // 마감 임박 상품 조회
-    public String findEndProduct(@RequestParam String param) {
-        return "bb";
+    public List<ProductDto> findEndProduct( ) {
+        Pageable pageable = PageRequest.of(0, 4, Sort.by("a.end_time"));
+        return productRepository.findProduct("ending", pageable).getContent();
     }
     
     // 인기 상품 조회
     public List<ProductDto> findPopularProduct( ) {
-        return productRepository.findPopularProduct();
+        Pageable pageable = PageRequest.of(0, 4, Sort.by("bs.bid_count").descending());
+        return productRepository.findProduct("popular", pageable).getContent();
     }
     
     // 새로 등록된 상품 조회
     public List<ProductDto> findNewProduct( ) {
-        Pageable pageable = PageRequest.of(0, 4, Sort.by("current_price"));
-        return productRepository.findNewProduct(pageable).getContent();
+        Pageable pageable = PageRequest.of(0, 4, Sort.by("p.created_at").descending());
+        return productRepository.findProduct("new", pageable).getContent();
     }
 
     // 상품 목록 조회
