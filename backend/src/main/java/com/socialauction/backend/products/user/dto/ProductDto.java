@@ -12,7 +12,7 @@ public class ProductDto {
     private String image;       // 저장된 이미지 파일명
     private String organizationName; // 기관 이름
     private String ProductName; // 상품 이름
-    private Long currentPrice; // 현재
+    private Integer currentPrice; // 현재
     // 남은 시간도 추가해야함
     private Long bidCount; // 입찰 횟수
 

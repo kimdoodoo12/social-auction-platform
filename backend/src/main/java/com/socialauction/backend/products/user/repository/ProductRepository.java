@@ -44,8 +44,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 맞추기 위해서 cast ... as signed 사용 */
-            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
         JOIN organization o
             ON o.organization_id = p.organization_id
@@ -80,8 +80,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
-            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
         JOIN organization o
             ON o.organization_id = p.organization_id
@@ -119,8 +119,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
-            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
+            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
         JOIN organization o
             ON o.organization_id = p.organization_id
