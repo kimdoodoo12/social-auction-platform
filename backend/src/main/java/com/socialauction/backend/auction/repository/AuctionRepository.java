@@ -88,12 +88,7 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     );
 
 
-    
-
-    
-
-   
-
+    // * 검색 쿼리
     @Query(value = "SELECT a FROM AuctionEntity a " +
                    "JOIN FETCH a.productEntity p " +
                    "LEFT JOIN FETCH p.organizationEntity o " +

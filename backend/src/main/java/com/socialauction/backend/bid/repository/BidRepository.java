@@ -60,16 +60,14 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
     );
 
     // * 입찰가 가장 높은 사람
-@Query(
-    value = """
-        SELECT b.*
-        FROM bid b
-        WHERE b.auction_id = :auctionId
-        ORDER BY b.bid_price DESC
-        LIMIT 1
-        """,
-    nativeQuery = true
-)
-Optional<BidEntity> findHighestBid(@Param("auctionId") Integer auctionId);
-    
+@Query(value = """
+    SELECT b.member_id
+    FROM bid b
+    WHERE b.auction_id = :auctionId
+    ORDER BY b.bid_price DESC, b.bid_time DESC, b.bid_id DESC
+    LIMIT 1
+    """, nativeQuery = true)
+Optional<Long> findWinningMemberId(@Param("auctionId") Integer auctionId);  
+
+
 }
