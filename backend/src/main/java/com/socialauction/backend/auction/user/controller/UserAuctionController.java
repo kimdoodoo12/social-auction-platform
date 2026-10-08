@@ -60,12 +60,12 @@ public class UserAuctionController {
         return userAuctionService.findDetailProduct(auctionId);
     }
 
-    // * 첫입찰 
-    @PostMapping("firstBid")
-    public boolean firstBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+    // // * 첫입찰 
+    // @PostMapping("firstBid")
+    // public boolean firstBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
         
-        return entity;
-    }
+    //     return entity;
+    // }
     
     
 }
