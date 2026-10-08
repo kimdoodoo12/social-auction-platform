@@ -13,7 +13,7 @@ const MAX_INT = 2147483647
 const AFTER_STEPS = ['등록 완료 → 상태 「경매 대기」', '사용자 최초 입찰 → 경매 자동 시작', '24시간 경과 → 최고가 입찰자 자동 낙찰']
 
 // 백엔드 ProductService.saveProduct / updateProduct 검증과 같은 규칙
-function validate(values, mode) {
+function validate(values) {
   const name = values.name.trim()
   if (!name) return '상품명을 입력해주세요.'
   if (name.length > PRODUCT_LIMITS.name) return `상품명은 ${PRODUCT_LIMITS.name}자 이하로 입력해주세요.`
@@ -24,15 +24,13 @@ function validate(values, mode) {
   }
   if (values.description.length > PRODUCT_LIMITS.text) return `상품 설명은 ${PRODUCT_LIMITS.text}자 이하로 입력해주세요.`
   if (values.background.length > PRODUCT_LIMITS.text) return `제작 배경은 ${PRODUCT_LIMITS.text}자 이하로 입력해주세요.`
-  if (mode === 'create' && !values.images.some((img) => img.sortOrder === 1 && img.file)) {
+  if (!values.images.some((img) => img.sortOrder === 1 && (img.file || img.image))) {
     return '1번 대표 이미지를 선택해주세요.'
   }
-  // 기존 이미지(imageId 있음)는 삭제 API가 없어 경로를 비울 수 없다
-  if (values.images.some((img) => img.imageId != null && !img.image.trim())) return '기존 이미지의 경로는 비울 수 없습니다.'
   return null
 }
 
-function toProductDto(values, mode) {
+function toProductDto(values) {
   return {
     productId: values.productId,
     name: values.name.trim(),
@@ -41,59 +39,12 @@ function toProductDto(values, mode) {
     startPrice: Number(values.startPrice),
     description: values.description || null,
     background: values.background || null,
-    // 경로가 빈 새 이미지 칸은 보내지 않는다
-    images: mode === 'create'
-      ? values.images.filter((img) => img.file).map(({ file, sortOrder }) => ({ file, sortOrder }))
-      : values.images
-      .filter((img) => img.imageId != null || img.image.trim())
-      .map((img) => ({ imageId: img.imageId ?? null, image: img.image.trim(), sortOrder: img.sortOrder })),
+    images: values.images.filter((img) => img.file)
+      .map(({ imageId, file, sortOrder }) => ({ imageId, file, sortOrder })),
   }
 }
 
-// 수정 화면의 대표 1 + 추가 4 박스. 칸 번호가 곧 이미지 위치(sortOrder 1~5)다.
-// 수정 API는 JSON이라 파일 업로드 대신 이미지 경로를 입력한다.
-// 기존 이미지는 원래 칸에서 경로만 바꿀 수 있고, 빈 칸에 경로를 넣으면 그 위치로 새 이미지가 추가된다.
-function ImageSlots({ images, onChange }) {
-  const [selected, setSelected] = useState(1)
-  const current = images.find((img) => img.sortOrder === selected)
-
-  const handlePath = (e) => {
-    const image = e.target.value
-    if (current) {
-      onChange(images.map((img) => (img.sortOrder === selected ? { ...img, image } : img)))
-    } else {
-      onChange([...images, { imageId: null, image, sortOrder: selected }].sort((a, b) => a.sortOrder - b.sortOrder))
-    }
-  }
-
-  const slot = (sortOrder, className, label) => (
-    <button
-      key={sortOrder}
-      type="button"
-      className={`product-slot ${className}${sortOrder === selected ? ' selected' : ''}`}
-      onClick={() => setSelected(sortOrder)}
-    >
-      <ImageBox path={images.find((img) => img.sortOrder === sortOrder)?.image.trim()} label={label} />
-    </button>
-  )
-
-  return (
-    <div className="product-slots">
-      {slot(1, 'product-slot--main', '대표 이미지')}
-      <div className="product-slots__row">
-        {Array.from({ length: PRODUCT_LIMITS.images - 1 }, (_, i) => slot(i + 2, '', ''))}
-      </div>
-      <Field
-        label={`${selected === 1 ? '대표' : `${selected}번`} 이미지 경로`}
-        hint={current?.imageId != null ? '기존 이미지는 경로만 바꿀 수 있습니다.' : '예) /images/product_01_1.png'}
-      >
-        <input className="admin-input" value={current?.image ?? ''} placeholder="/images/파일명.png" onChange={handlePath} />
-      </Field>
-    </div>
-  )
-}
-
-// 등록 전 미리보기는 로컬 파일 URL을 사용한다. 서버에 올리기 전에도 선택한 칸에 표시한다.
+// 등록과 수정에서 같은 위치의 사진을 선택하고 미리보기로 표시한다.
 function UploadSlots({ images, onChange, disabled }) {
   const inputs = useRef([])
   const previews = useRef(new Map())
@@ -116,14 +67,17 @@ function UploadSlots({ images, onChange, disabled }) {
     if (oldUrl) URL.revokeObjectURL(oldUrl)
     const preview = URL.createObjectURL(file)
     previews.current.set(sortOrder, preview)
-    onChange([...images.filter((img) => img.sortOrder !== sortOrder), { file, sortOrder, preview }]
+    onChange([...images.filter((img) => img.sortOrder !== sortOrder), { ...images.find((img) => img.sortOrder === sortOrder), file, sortOrder, preview }]
       .sort((a, b) => a.sortOrder - b.sortOrder))
   }
   const removeFile = (sortOrder) => {
     const url = previews.current.get(sortOrder)
     if (url) URL.revokeObjectURL(url)
     previews.current.delete(sortOrder)
-    onChange(images.filter((img) => img.sortOrder !== sortOrder))
+    onChange(images.flatMap((img) => {
+      if (img.sortOrder !== sortOrder) return [img]
+      return img.imageId != null ? [{ ...img, file: undefined, preview: undefined }] : []
+    }))
   }
   const slot = (sortOrder) => {
     const image = images.find((img) => img.sortOrder === sortOrder)
@@ -137,10 +91,10 @@ function UploadSlots({ images, onChange, disabled }) {
         <button type="button" disabled={disabled} aria-label={`${label} 선택 또는 교체`}
           className={`product-slot${sortOrder === 1 ? ' product-slot--main' : ''}`}
           onClick={() => inputs.current[sortOrder]?.click()}>
-          <ImageBox path={image?.preview} alt={label} label={label} />
+          <ImageBox path={image?.preview ?? image?.image} alt={label} label={label} />
         </button>
-        {image && <small style={{ overflowWrap: 'anywhere' }}>{image.file.name}</small>}
-        {image && sortOrder !== 1 && (
+        {image?.file && <small style={{ overflowWrap: 'anywhere' }}>{image.file.name}</small>}
+        {image?.file && (image.imageId != null || sortOrder !== 1) && (
           <button type="button" disabled={disabled} onClick={() => removeFile(sortOrder)}
             aria-label={`${sortOrder}번 이미지 선택 취소`}>선택 취소</button>
         )}
@@ -169,7 +123,7 @@ export default function ProductForm({ initial, mode = 'create', onSubmit, onCanc
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const message = validate(values, mode)
+    const message = validate(values)
     if (message) {
       setError(message)
       return
@@ -177,7 +131,7 @@ export default function ProductForm({ initial, mode = 'create', onSubmit, onCanc
     setError(null)
     setSubmitting(true)
     try {
-      await onSubmit(toProductDto(values, mode))
+      await onSubmit(toProductDto(values))
     } catch (err) {
       setError(err.message || '저장에 실패했습니다.')
       setSubmitting(false)
@@ -274,12 +228,8 @@ export default function ProductForm({ initial, mode = 'create', onSubmit, onCanc
 
         <div className="admin-stack">
           <Card title="상품 이미지" subtitle={`대표 이미지 1장 · 추가 이미지 최대 ${PRODUCT_LIMITS.images - 1}장`}>
-            {isEdit ? (
-              <ImageSlots images={values.images} onChange={(images) => setValues((prev) => ({ ...prev, images }))} />
-            ) : (
-              <UploadSlots images={values.images} disabled={submitting}
-                onChange={(images) => setValues((prev) => ({ ...prev, images }))} />
-            )}
+            <UploadSlots images={values.images} disabled={submitting}
+              onChange={(images) => setValues((prev) => ({ ...prev, images }))} />
           </Card>
           {!isEdit && (
             <Card title="등록 후 흐름">
