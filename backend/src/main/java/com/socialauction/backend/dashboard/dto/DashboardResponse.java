@@ -12,7 +12,8 @@ import lombok.Data;
 @Data @Builder 
 public class DashboardResponse {
     
-    List<ProductDto> productDtos;
+    List<ProductDto> newProductDtos;
+    List<ProductDto> endProductDtos;
 
     List<PaymentListResponse> paymentListResponses;
 

@@ -29,7 +29,8 @@ public class DashboardService {
 
     // 대시보드 DTO로 조립하여 반환
     public DashboardResponse findDashboardResponse(){
-        List<ProductDto> productDtos = findNewProduct();
+        List<ProductDto> newProductDtos = findNewProduct();
+        List<ProductDto> endProductDtos = findEndProduct();
         List<PaymentListResponse> paymentListResponses = findPaymentListResponses();
         Integer productCount = findProductCount();
         Integer auctionWaitingCount = findAuctionCount("대기");
@@ -39,7 +40,8 @@ public class DashboardService {
         Integer organizationCount = findOrganziationCount();
 
         return DashboardResponse.builder()
-            .productDtos(productDtos)
+            .newProductDtos(newProductDtos)
+            .endProductDtos(endProductDtos)
             .paymentListResponses(paymentListResponses)
             .productCount(productCount)
             .auctionWatingCount(auctionWaitingCount)
@@ -56,6 +58,11 @@ public class DashboardService {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());
         return productRepository.findProduct("new", pageable).getContent();
     }
+    // 진행중인 경매는 사용자쪽 메인(상품) 쿼리를 재사용
+    public List<ProductDto> findEndProduct(){
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("end_time").descending());
+        return productRepository.findProduct("ending", pageable).getContent();
+    }
 
     // 최근 낙찰만
     public List<PaymentListResponse> findPaymentListResponses(){
@@ -65,8 +72,6 @@ public class DashboardService {
         
         return paymentRepository.findAllPayment(pageable).getContent();
     }
-
-    // 진행중인 경매는 사용자쪽 메인(상품) 쿼리를 재사용
 
     // 전체상품 카운트
     public Integer findProductCount(){
