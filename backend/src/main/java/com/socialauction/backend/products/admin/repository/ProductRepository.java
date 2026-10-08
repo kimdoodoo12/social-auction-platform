@@ -3,6 +3,7 @@ package com.socialauction.backend.products.admin.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -14,18 +15,53 @@ import org.springframework.stereotype.Repository;
 import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
 import com.socialauction.backend.products.admin.dto.ProductAuctionSummary;
 import com.socialauction.backend.products.admin.dto.ProductDto;
+import com.socialauction.backend.products.admin.dto.ProductListResponse;
 import com.socialauction.backend.products.admin.dto.ProductManageDto;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.entity.ProductEntity;
 
 @Repository("adminProductRepository")
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
-
-    @Override
-    // organizationEntity가 lazy설정이므로 먼저 정보를 받아올 수 있게 EntityGraph 어노테이션이 필요
-    @EntityGraph(attributePaths = "organizationEntity")
-    Page<ProductEntity> findAll(Pageable pageable);
-
+    @Query(value = """
+        SELECT
+            p.product_id AS productId,
+            i.image AS image,
+            p.name AS productName,
+            o.name AS organizationName,
+            p.start_price AS startPrice,
+            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            a.auction_status AS status,
+            p.created_at AS createdAt
+        FROM products p
+        JOIN organization o
+            ON o.organization_id = p.organization_id
+        JOIN auction a
+            ON a.product_id = p.product_id
+        JOIN image i
+            ON i.product_id = p.product_id
+            AND i.sort_order = 1
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                MAX(bid_price) AS current_price
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        """,
+        countQuery = """
+        SELECT COUNT(*)
+        FROM products p
+        JOIN organization o
+            ON o.organization_id = p.organization_id
+        JOIN auction a
+            ON a.product_id = p.product_id
+        JOIN image i
+            ON i.product_id = p.product_id
+            AND i.sort_order = 1
+        """,
+        nativeQuery = true)
+    Page<ProductListResponse> findProductList(Pageable pageable);
     // productId, 상태,현재가 가져오기
     @Query("""
             select a.productEntity.productId as productId,

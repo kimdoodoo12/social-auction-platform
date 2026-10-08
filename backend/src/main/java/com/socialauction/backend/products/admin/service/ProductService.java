@@ -49,55 +49,9 @@ public class ProductService {
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
-    public Page<ProductListResponse> findAll(Pageable pageable) {
-        // 전체 가져오기
-        Page<ProductEntity> products = productRepository.findAll(pageable);
-        // 비어있으면 빈 배열 반환
-        if (products.isEmpty()) {
-            return new PageImpl<>(List.of(), pageable, products.getTotalElements());
-        }
-
-        // productId만 저장하는 배열
-        List<Integer> productIds = new ArrayList<>();
-        products.getContent().forEach(product -> {
-            productIds.add(product.getProductId());
-        });
-
-        // productId와 image로 맵 구성
-        Map<Integer, String> images = new HashMap<>();
-        imageRepository.findRepresentImg(productIds)
-                .forEach(image -> {
-                    images.put(
-                            image.getProductEntity().getProductId(),
-                            image.getImage()
-                    );
-                });
-        
-        // 경매(상태, 현재가) 정보 가져오기 
-        Map<Integer, ProductAuctionSummary> auctions = new HashMap<>();
-        productRepository.findAuctionSummaries(productIds).forEach(summary -> {
-            auctions.put(summary.getProductId(), summary);
-        });
-
-
-        List<ProductListResponse> responses = new ArrayList<>();
-        // page정보 빼고 product정보만 꺼내오는거
-        products.getContent().forEach(product -> {
-            // id와 맞는 auction 정보
-            ProductAuctionSummary auction = auctions.get(product.getProductId());
-            // 검증 후 현재가 or 시작가 반환
-            Integer currentPrice = auction != null && auction.getCurrentPrice() != null
-                    ? auction.getCurrentPrice() : product.getStartPrice();
-            // 검증 후 현재상태 or "경매대기" 반환
-            String status = auction != null ? auction.getStatus() : "경매 대기";
-            // 각각 넣어서 배열에 추가
-            responses.add(ProductListResponse.from(
-                    product, images.get(product.getProductId()), currentPrice, status));
-        });
-        // 추가한 배열들 반환
-        return new PageImpl<>(responses, pageable, products.getTotalElements());
+    public Page<ProductListResponse> findProductList(Pageable pageable) {
+        return productRepository.findProductList(pageable);
     }
-
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
     @Transactional(readOnly = true)
     public TotalDto findDetail(Integer productId) {
