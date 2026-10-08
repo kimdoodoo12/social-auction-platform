@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor 
 public class OrganizationDetailResponse {
     
+    // 기관 상세정보 응답 dto
     OrganizationInfoResponse organizationInfoResponse;
+
+    // 기관 등록된 상품 dto
     List<OrganizationProductResponse> organizationProductResponse;
 }

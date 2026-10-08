@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.socialauction.backend.global.FileService;
-import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.upload.UploadFolder;
 import com.socialauction.backend.organization.dto.admin.OrganizationDetailResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;

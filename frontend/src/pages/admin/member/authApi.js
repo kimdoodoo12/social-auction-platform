@@ -1,4 +1,5 @@
 import { BASE_URL } from '../../../api/client'
+import { redirectToForbidden } from './forbidden'
 
 // 인증 전용 요청 함수: 본문이 없으면 GET, 있으면 JSON POST로 호출한다.
 // HttpOnly JWT 쿠키는 브라우저가 관리하므로 localStorage 등에 저장하지 않는다.
@@ -9,6 +10,12 @@ async function request(path, body) {
     headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
   })
+  if (response.status === 403) {
+    redirectToForbidden()
+    const error = new Error('관리자가 아닙니다.')
+    error.status = 403
+    throw error
+  }
   // 실패 시 빈 본문이 올 수 있으므로 먼저 문자열로 읽고 JSON 변환을 시도한다.
   const text = await response.text()
   let data = null

@@ -81,20 +81,25 @@ export async function stopSelling(productId) {
   return ensureTrue(await api.post(PRODUCT_API.stop, undefined, { productId }), '판매 중지에 실패했습니다.')
 }
 
-export async function createProduct(productDto) {
+function productFormData(productDto) {
   const body = new FormData()
-  for (const key of ['name', 'organizationId', 'categoryId', 'startPrice', 'description', 'background']) {
-    body.append(key, productDto[key] ?? '')
+  for (const key of ['productId', 'name', 'organizationId', 'categoryId', 'startPrice', 'description', 'background']) {
+    if (key !== 'productId' || productDto[key] != null) body.append(key, productDto[key] ?? '')
   }
-  productDto.images.forEach((image, index) => {
+  productDto.images.filter((image) => image.file).forEach((image, index) => {
+    if (image.imageId != null) body.append(`images[${index}].imageId`, String(image.imageId))
     body.append(`images[${index}].file`, image.file)
     body.append(`images[${index}].sortOrder`, String(image.sortOrder))
   })
-  return ensureTrue(await api.post(PRODUCT_API.create, body), '상품 등록에 실패했습니다.')
+  return body
+}
+
+export async function createProduct(productDto) {
+  return ensureTrue(await api.post(PRODUCT_API.create, productFormData(productDto)), '상품 등록에 실패했습니다.')
 }
 
 export async function updateProduct(productDto) {
-  return ensureTrue(await api.put(PRODUCT_API.update, productDto), '상품 수정에 실패했습니다.')
+  return ensureTrue(await api.put(PRODUCT_API.update, productFormData(productDto)), '상품 수정에 실패했습니다.')
 }
 
 // GET /ieum/admin/category → List<CategoryResponse{categoryId, name, productCount}>

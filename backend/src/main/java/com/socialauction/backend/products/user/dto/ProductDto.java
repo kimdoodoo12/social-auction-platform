@@ -1,7 +1,7 @@
 package com.socialauction.backend.products.user.dto;
 
-import com.socialauction.backend.global.UploadFolder;
-import com.socialauction.backend.global.UploadUrls;
+import com.socialauction.backend.global.upload.UploadFolder;
+import com.socialauction.backend.global.upload.UploadUrls;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

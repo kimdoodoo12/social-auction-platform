@@ -1,7 +1,8 @@
 package com.socialauction.backend.organization.controller.admin;
 
 import com.socialauction.backend.global.FileService;
-import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.upload.UploadFolder;
+
 import java.util.List;
 
 import org.springframework.data.domain.Page;

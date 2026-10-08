@@ -2,11 +2,9 @@ package com.socialauction.backend.products.admin.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,7 +20,7 @@ import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.global.FileService;
-import com.socialauction.backend.global.UploadFolder;
+import com.socialauction.backend.global.upload.UploadFolder;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
 import com.socialauction.backend.products.admin.dto.ProductAuctionInfo;
@@ -233,7 +231,6 @@ public class ProductService {
                         HttpStatus.BAD_REQUEST, "존재하지 않는 상품번호입니다."
                 ));
 
-        validateImageUpdates(savedEntity, productDto.getImages());
 
         // 받아온 Dto를 Entity로 변환
         ProductEntity productEntity = productDto.toEntity();
@@ -261,89 +258,46 @@ public class ProductService {
                 ))
         );
 
-        // 이미지 변경
-        if (productDto.getImages() != null) { // 이미지가 있는지 확인
-            for (ImageDto imageDto : productDto.getImages()) {
-                // 이미지 정보 확인
-                Checks.check(imageDto == null, "이미지 정보를 입력해주세요.");
-                String imagePath = imageDto.getImage();
-                // 이미지 경로 확인
-                Checks.check(imagePath == null || imagePath.isBlank(),
-                        "유효한 이미지 경로가 아닙니다.");
-                // 빈 이미지 변경
-                if (imageDto.getImageId() == null) {
-                    ImageEntity imageEntity = ImageEntity.builder()
-                            .image(imagePath)
-                            .sortOrder(imageDto.getSortOrder())
-                            .productEntity(savedEntity)
-                            .build();
-                    savedEntity.getImageEntity().add(imageEntity);
-                } else { // 기존 이미지 변경
-                    ImageEntity imageEntity = imageRepository.findById(imageDto.getImageId())
-                            .orElseThrow(() -> new ResponseStatusException( // 예외 처리
-                                    HttpStatus.BAD_REQUEST, "존재하지 않는 이미지입니다."));
-                    // imageId가 잘못 왔을 경우를 대비해서 확인            
-                    Checks.check(!savedEntity.getProductId().equals(
-                            imageEntity.getProductEntity().getProductId()),
-                            "해당 상품의 이미지가 아닙니다.");
-                    // 적용    
-                    imageEntity.setImage(imagePath);
-                }
-            }
-        }
+        updateImages(savedEntity, productDto.getImages());
 
         return true;
     }
 
-    // 파일을 쓰기 전에 전체 요청을 검증한다.
+    // 등록 시 대표 이미지 파일만 확인한다.
     private void validateNewImages(List<ImageDto> images) {
-        Checks.check(images == null || images.isEmpty(), "1번 대표 이미지를 등록해주세요.");
-        Checks.check(images.size() > 5, "상품 이미지는 최대 5개까지 등록할 수 있습니다.");
-        Set<Integer> positions = new HashSet<>();
-        for (ImageDto image : images) {
-            validatePosition(image);
-            Checks.check(image.getImageId() != null, "등록할 이미지에는 기존 이미지 ID를 지정할 수 없습니다.");
-            Checks.check(!positions.add(image.getSortOrder()), "이미지 위치가 중복되었습니다.");
-            Checks.check(image.getFile() == null || image.getFile().isEmpty(), "이미지 파일을 선택해주세요.");
-        }
-        Checks.check(!positions.contains(1), "1번 대표 이미지를 등록해주세요.");
+        boolean hasCover = images.stream().anyMatch(img ->
+                Integer.valueOf(1).equals(img.getSortOrder())
+                        && img.getFile() != null && !img.getFile().isEmpty());
+        Checks.check(!hasCover, "1번 대표 이미지를 등록해주세요.");
     }
 
-    private void validatePosition(ImageDto image) {
-        Checks.check(image == null, "이미지 정보를 입력해주세요.");
-        Checks.check(image.getSortOrder() == null || image.getSortOrder() < 1
-                || image.getSortOrder() > 5, "이미지 위치는 1~5여야 합니다.");
-    }
-
-    private void validateImageUpdates(ProductEntity product, List<ImageDto> images) {
-        Map<Integer, ImageEntity> existing = new HashMap<>();
-        Set<Integer> positions = new HashSet<>();
-        for (ImageEntity image : product.getImageEntity()) {
-            Checks.check(image.getSortOrder() == null || image.getSortOrder() < 1
-                    || image.getSortOrder() > 5, "기존 이미지 위치 데이터를 먼저 설정해주세요.");
-            Checks.check(!positions.add(image.getSortOrder()), "기존 이미지 위치가 중복되었습니다.");
-            existing.put(image.getImageId(), image);
-        }
-        Set<Integer> requestedPositions = new HashSet<>();
-        Set<Integer> requestedIds = new HashSet<>();
+    private void updateImages(ProductEntity product, List<ImageDto> images) {
         if (images != null) {
-            Checks.check(images.size() > 5, "상품 이미지는 최대 5개까지 등록할 수 있습니다.");
-            for (ImageDto image : images) {
-                validatePosition(image);
-                Checks.check(!requestedPositions.add(image.getSortOrder()), "이미지 위치가 중복되었습니다.");
-                Checks.check(image.getImage() == null || image.getImage().isBlank(), "유효한 이미지 경로가 아닙니다.");
-                if (image.getImageId() == null) {
-                    Checks.check(!positions.add(image.getSortOrder()), "이미 사용 중인 이미지 위치입니다.");
+            for (ImageDto dto : images) {
+                if (dto == null || dto.getFile() == null || dto.getFile().isEmpty()) continue;
+                ImageEntity target = null;
+                if (dto.getImageId() != null) {
+                    target = product.getImageEntity().stream()
+                            .filter(image -> dto.getImageId().equals(image.getImageId()))
+                            .findFirst()
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.BAD_REQUEST, "해당 상품의 이미지가 아닙니다."));
+                }
+                if (target != null) fileService.delete(UploadFolder.IMAGES, target.getImage());
+                String fileName = fileService.upload(UploadFolder.IMAGES, dto.getFile());
+                if (target == null) {
+                    product.getImageEntity().add(ImageEntity.builder()
+                            .image(fileName).sortOrder(dto.getSortOrder())
+                            .productEntity(product).build());
                 } else {
-                    Checks.check(!requestedIds.add(image.getImageId()), "같은 이미지를 중복 수정할 수 없습니다.");
-                    ImageEntity original = existing.get(image.getImageId());
-                    Checks.check(original == null, "해당 상품의 이미지가 아닙니다.");
-                    Checks.check(!original.getSortOrder().equals(image.getSortOrder()),
-                            "사진 교체 시 기존 위치를 유지해주세요.");
+                    target.setImage(fileName);
                 }
             }
         }
-        Checks.check(!positions.contains(1), "1번 대표 이미지는 비울 수 없습니다.");
+        boolean hasCover = product.getImageEntity().stream()
+                .anyMatch(image -> Integer.valueOf(1).equals(image.getSortOrder())
+                        && image.getImage() != null && !image.getImage().isBlank());
+        Checks.check(!hasCover, "1번 대표 이미지는 비울 수 없습니다.");
     }
 
     // 검색기능
