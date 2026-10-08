@@ -1,5 +1,6 @@
 package com.socialauction.backend.member.admin.dto;
 
+import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,18 +41,16 @@ public class MemberInfoDetail {
     // 미낙찰 번호
     private Integer notpay;
 
-    // 입찰내역 전체 조회 
-    // @Builder .Default
-    // // @ToString .Exclude
-    // public  List<BidDto> bidDtos = new ArrayList<>();
 
+    // 회원별 낙찰 내역
     @Builder .Default
     @ToString .Exclude
     public  List<MemberPayment> payDtos = new ArrayList<>();
 
+    // 회원별 입찰 내역
     @Builder .Default
     @ToString.Exclude
-    private  List<MemberBidInfo> bidHistory = new ArrayList<>();
+    private  List<MemberBidInfoDto> bidHistory = new ArrayList<>();
 
 
     // entity -> dto 

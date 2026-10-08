@@ -12,10 +12,10 @@ USE ieum;
 
 -- ------------------------------------------------------------
 -- 회원 (1번은 관리자, 8~10번은 정지/잠금/탈퇴 케이스)
--- password: 개발용 평문 '1234' (암호화 적용 시 해시값으로 교체)
+-- password: admin은 개발용 'qwer1234'의 bcrypt 해시, 나머지는 개발용 평문 '1234'
 -- ------------------------------------------------------------
 INSERT INTO member (login_id, password, name, email, phone, CREATED_AT, UPDATED_AT, ROLE, status) VALUES
-('admin',      '1234', '관리자', 'admin@ieum.kr',          '010-0000-0000', '2026-01-02 09:00:00', NULL,                  '정상', TRUE),
+('admin',      '$2a$10$YTxdIumHHvY19Ii/2xfc.OHc.vx47zjKBbuNAUKhedisL0.pud1om', '관리자', 'admin@ieum.kr',          '010-0000-0000', '2026-01-02 09:00:00', NULL,                  '정상', 1),
 ('kimminji',   '1234', '김민지', 'minji.kim@example.com',  '010-2345-6789', '2026-01-15 14:22:10', '2026-06-03 11:05:00', '정상', FALSE),
 ('leejunho',   '1234', '이준호', 'junho.lee@example.com',  '010-3456-7890', '2026-02-03 20:11:45', NULL,                  '정상', FALSE),
 ('parksoyeon', '1234', '박소연', 'soyeon.park@example.com','010-4567-8901', '2026-02-20 08:40:33', '2026-08-12 17:30:00', '정상', FALSE),

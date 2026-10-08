@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.member.admin.controller.MemberController;
-import com.socialauction.backend.member.admin.dto.MemberBidInfo;
-import com.socialauction.backend.member.admin.dto.MemberBuyProduct;
+import com.socialauction.backend.member.admin.dto.MemberBidInfoDto;
+import com.socialauction.backend.member.admin.dto.MemberBuyProductDto;
 import com.socialauction.backend.member.admin.dto.MemberDto;
 import com.socialauction.backend.member.admin.dto.MemberInfoDetail;
 import com.socialauction.backend.member.admin.dto.MemberPayment;
@@ -100,20 +100,19 @@ public class MemberService {
 
         // 최근 입찰 내역
         // 1. 해당 회원이 입찰한 최근 상품 목록 조회
-        List<MemberBuyProduct> productList =
+        List<MemberBuyProductDto> productList =
                 memberRepository.findRecentBidProducts(userid);
 
         // 2. 회원번호 + 상품번호로 입찰 상세 조회
         productList.forEach((product) -> {
             int productId = product.getProductId();
-            MemberBidInfo history =
+            List<MemberBidInfoDto> histories =
                     memberRepository
-                            .findBidHistory(userid, productId)
-                            .orElse(null);
+                            .findBidHistory(userid, productId);
 
             // 조회된 입찰 내역이 있으면 배열에 추가
-            if(history != null){
-                mDto.getBidHistory().add(history);
+            if(histories != null){
+                mDto.getBidHistory().addAll(histories);
             }
         });
 
@@ -157,15 +156,16 @@ public class MemberService {
 
     // 최근입찰내역 5개 
     @Transactional (readOnly = true)
-    public List<MemberBidInfo> findRecentBidHistory (Long memberId){
-        List<MemberBuyProduct> productlist = memberRepository.findRecentBidProducts(memberId);
+    public List<MemberBidInfoDto> findRecentBidHistory (Long memberId){
+        List<MemberBuyProductDto> productlist = memberRepository.findRecentBidProducts(memberId);
 
-        return productlist.stream().map(product ->
-             memberRepository.findBidHistory(
-                memberId, 
-                product.getProductId()
-            ).orElse(null)
-    ).filter(Objects::nonNull).toList();
+        return productlist.stream()
+            .flatMap(product ->         // flatmap() : 상품마다 반환되는 입찰 목록들을 하나의 목록으로 합침.
+                    memberRepository
+                            .findBidHistory(memberId, product.getProductId())
+                            .stream()
+            )
+            .toList();
     } // 최근입찰내역 end
 
 

@@ -1,4 +1,4 @@
-package com.socialauction.backend.member.admin.service;
+package com.socialauction.backend.global.redis;
 
 import java.time.Duration;
 

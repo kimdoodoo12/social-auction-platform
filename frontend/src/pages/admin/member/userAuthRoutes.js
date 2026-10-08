@@ -2,6 +2,7 @@ import UserAuthLayout from './UserAuthLayout'
 import UserLoginPage from './UserLoginPage'
 import UserSignupPage from './UserSignupPage'
 import UserMyPage from './UserMyPage'
+import ForbiddenPage from './ForbiddenPage'
 import { requireAuth } from './requireAuth'
 
 // App.jsx에서 최상위 라우트로 등록한다. 파일 위치와 달리 /admin 하위 경로가 아니다.
@@ -9,6 +10,7 @@ import { requireAuth } from './requireAuth'
 export default {
   Component: UserAuthLayout,
   children: [
+    { path: '/forbidden', Component: ForbiddenPage },
     { path: '/login', Component: UserLoginPage },
     { path: '/signup', Component: UserSignupPage },
     // /user 접두어로 접속해도 같은 로그인·회원가입 화면을 제공한다.

@@ -22,7 +22,6 @@ import './member.css'
 // 응답: MemberBidHistoryDto { memberId, loginId, name, email, createdAt, bcount, pcount, role, lockedAt, notpay, bidHistory, payDtos }
 // 백엔드에 없는 값(관심 상품, 정지 이력, 연락처, 최근 로그인, 마케팅 수신)은
 // Figma 틀을 유지하고 '-'로 표시한다(사용자 결정).
-const RECENT_BIDS = 5
 const byTimeDesc = (key) => (a, b) => String(b[key] ?? '').localeCompare(String(a[key] ?? ''))
 
 export default function MemberDetailPage() {
@@ -48,8 +47,7 @@ export default function MemberDetailPage() {
     detail.reload()
   }
 
-  const allBids = [...(member?.bidHistory ?? [])].sort(byTimeDesc('bidTime'))
-  const bids = allBids.slice(0, RECENT_BIDS)
+  const bids = [...(member?.bidHistory ?? [])].sort(byTimeDesc('bidTime'))
   const payments = [...(member?.payDtos ?? [])].sort(byTimeDesc('winningDate'))
   const statusLabel = suspended ? '정지 해제' : '계정 정지'
 
@@ -96,11 +94,11 @@ export default function MemberDetailPage() {
               <div className="admin-stack">
                 <Card
                   title="입찰 내역"
-                  actions={<span className="member-card-meta">총 {formatNumber(allBids.length)}회 · 최신 {bids.length}건</span>}
+                  actions={<span className="member-card-meta">총 {formatNumber(bids.length)}회</span>}
                   noBody
                 >
                   <DataTable
-                    rowKey="productId"
+                    rowKey="bidId"
                     rows={bids}
                     emptyText="입찰 내역이 없습니다."
                     columns={[

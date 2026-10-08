@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.socialauction.backend.member.admin.dto.MemberBidInfo;
-import com.socialauction.backend.member.admin.dto.MemberBuyProduct;
+import com.socialauction.backend.member.admin.dto.MemberBidInfoDto;
+import com.socialauction.backend.member.admin.dto.MemberBuyProductDto;
 import com.socialauction.backend.member.admin.dto.MemberPayment;
 import com.socialauction.backend.member.entity.MemberEntity;
 
@@ -91,7 +91,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
             """,
         nativeQuery = true
     )
-    List<MemberBuyProduct> findRecentBidProducts(
+    List<MemberBuyProductDto> findRecentBidProducts(
         @Param("memberId") Long memberId
     );
 
@@ -102,6 +102,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
     @Query(
         value = """
             SELECT
+                mybid.bid_id AS bidId,
+
                 p.product_id AS productId,
 
                 p.name AS productName,
@@ -158,11 +160,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
                 WHERE b.member_id = :memberId
                   AND a2.product_id = :productId
 
-                ORDER BY
-                    b.bid_time DESC,
-                    b.bid_id DESC
-
-                LIMIT 1
+                
 
             ) mybid
 
@@ -173,10 +171,11 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
                 ON a.product_id = p.product_id
 
             WHERE p.product_id = :productId
+            ORDER BY mybid.bid_time DESC , mybid.bid_id DESC
             """,
         nativeQuery = true
     )
-    Optional<MemberBidInfo> findBidHistory(
+    List<MemberBidInfoDto> findBidHistory(
         @Param("memberId") Long memberId,
         @Param("productId") int productId
     );

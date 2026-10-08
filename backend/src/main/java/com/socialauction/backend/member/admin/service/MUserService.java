@@ -52,4 +52,14 @@ public class MUserService {
     } // 아이디 중복 여부 
 
     // 이메일 인증 
+
+
+
+    // 관리자 여부 확인 
+    public boolean isAdmin(Long memberId){
+        MemberEntity memberEntity = memberRepository.findById(memberId).orElse(null);
+        if(memberEntity == null)return false;
+        if(memberEntity.isStatus() == true ){ return true; }
+        return false;
+    }
 }

@@ -15,6 +15,11 @@
 .ua-login { max-width: 400px; }
 .ua-signup { max-width: 470px; }
 .ua-profile { max-width: 470px; }
+.ua-forbidden { max-width: 470px; text-align: center; }
+.ua-forbidden-code { color: #bf653f; font-weight: 700; margin-bottom: 16px; }
+.ua-forbidden-description { color: #77736d; line-height: 1.8; margin-bottom: 28px; }
+.ua-forbidden-link { display: flex; align-items: center; justify-content: center; }
+.user-auth .ua-forbidden-link:hover { color: white; }
 .ua-card h1 { font-size: 23px; line-height: 1.4; margin-bottom: 18px; font-weight: 750; }
 .ua-subtitle { color: #99958f; font-size: 12px; margin-bottom: 20px; }
 .ua-notice { background: #f6eae2; color: #796c62; padding: 12px 14px; border-radius: 6px; font-size: 12px; line-height: 1.7; margin-bottom: 18px; }

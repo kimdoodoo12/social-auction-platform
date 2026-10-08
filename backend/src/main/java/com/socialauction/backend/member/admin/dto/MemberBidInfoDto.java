@@ -2,7 +2,10 @@ package com.socialauction.backend.member.admin.dto;
 
 import java.time.LocalDateTime;
 
-public interface MemberBidInfo {
+public interface MemberBidInfoDto {
+    // 입찰번호
+    Integer getBidId();
+
     Integer getProductId();
 
     String getProductName();
