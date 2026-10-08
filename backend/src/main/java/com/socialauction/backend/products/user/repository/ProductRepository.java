@@ -111,6 +111,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             )
         """, nativeQuery = true)
     Page<ProductDto> findProduct(@Param ("type") String type, Pageable pageable);
+    // type은 (new, popular, ending)중 하나로 매개변수를 받고, 페이지 객체를 매개변수로 받는다.
+    // 페이지로 받되 동적으로 LIMIT와 ORDER BY를 결정하기 위해 사용
 
     // 상품 목록
     @Query(value = """

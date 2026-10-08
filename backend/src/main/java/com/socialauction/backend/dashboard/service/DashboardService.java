@@ -37,14 +37,14 @@ public class DashboardService {
         Integer auctionBiddingCount = findAuctionCount("진행");
         Integer auctionEndCount = findAuctionCount("완료");
         Integer memberCount = findMemberCount();
-        Integer organizationCount = findOrganziationCount();
+        Integer organizationCount = findOrganizationCount();
 
         return DashboardResponse.builder()
             .newProductDtos(newProductDtos)
             .endProductDtos(endProductDtos)
             .paymentListResponses(paymentListResponses)
             .productCount(productCount)
-            .auctionWatingCount(auctionWaitingCount)
+            .auctionWaitngCount(auctionWaitingCount)
             .auctionBiddingCount(auctionBiddingCount)
             .auctionEndCount(auctionEndCount)
             .memberCount(memberCount)
@@ -55,21 +55,21 @@ public class DashboardService {
 
     // 새로등록된 상품은 사용자쪽 상품 쿼리를 재사용
     public List<ProductDto> findNewProduct(){
+        // 동적으로 5개의 dto와 상품등록 시간이 최근 기준으로 정렬
         Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());
         return productRepository.findProduct("new", pageable).getContent();
     }
     // 진행중인 경매는 사용자쪽 메인(상품) 쿼리를 재사용
     public List<ProductDto> findEndProduct(){
+        // 동적으로 5개의 dto와 상품의 경매 종료시각이 가장 최근 기준으로 정렬
         Pageable pageable = PageRequest.of(0, 5, Sort.by("end_time").descending());
         return productRepository.findProduct("ending", pageable).getContent();
     }
 
     // 최근 낙찰만
     public List<PaymentListResponse> findPaymentListResponses(){
-        // 동적으로 개수와 정렬을 위한 Pageable 생성
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());
-
-        
+        // 동적으로 5개의 dto와 낙찰시간이 가장 최근 기준으로 정렬
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());        
         return paymentRepository.findAllPayment(pageable).getContent();
     }
 
@@ -89,7 +89,7 @@ public class DashboardService {
     }
 
     // 협약중인 기관 카운트
-    public Integer findOrganziationCount(){
+    public Integer findOrganizationCount(){
         return oRepository.findOrganizationCount();
     }
 }

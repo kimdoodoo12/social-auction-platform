@@ -18,7 +18,7 @@ public class DashboardResponse {
     List<PaymentListResponse> paymentListResponses;
 
     Integer productCount;
-    Integer auctionWatingCount;
+    Integer auctionWaitngCount;
     Integer auctionBiddingCount;
     Integer auctionEndCount;
     Integer memberCount;
