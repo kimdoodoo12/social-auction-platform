@@ -64,7 +64,7 @@ public class UserAuctionController {
     @PostMapping("firstBid")
     public boolean firstBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
         
-        return entity;
+        return userAuctionService.firstBid(auctionConfirmDto);
     }
     
     
