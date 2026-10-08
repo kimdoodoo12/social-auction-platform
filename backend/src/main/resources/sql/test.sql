@@ -71,3 +71,6 @@ SELECT o.organization_id, o.name, o.manager, o.manager_phone, o.agreement_date, 
 
 SELECT * FROM auction LEFT JOIN products on auction.product_id = products.product_id WHERE auction_status = "진행";
 SELECT products.name, COALESCE(MAX(bid.bid_price), products.start_price) AS currentPrice FROM auction LEFT JOIN products on products.product_id = auction.product_id LEFT JOIN bid on bid.auction_id = auction.auction_id WHERE auction_status = "진행" GROUP BY products.product_id;
+
+
+SELECT a.auction_id, pd.name, o.name, m.name, py.payment_price, py.created_at, py.payment_status FROM payment py LEFT JOIN auction a on py.auction_id = a.auction_id LEFT JOIN products pd on pd.product_id = a.auction_id LEFT JOIN organization o on o.organization_id = pd.organization_id LEFT JOIN member m on py.member_id = m.member_id;

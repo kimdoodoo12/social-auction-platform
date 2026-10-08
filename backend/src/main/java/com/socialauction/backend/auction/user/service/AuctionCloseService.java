@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
+import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.bid.repository.BidRepository;
 import com.socialauction.backend.member.repository.MemberRepository;
 
@@ -19,7 +20,7 @@ public class AuctionCloseService {
     private final BidRepository bidRepository;
 
 
-    // * 경매 종료 
+    // // * 경매 종료 
     // public boolean closeAucton(Integer auctionId){
 
     //     // ? 종료 넘길때 스케줄 endtime 일때 넘기나? 그렇게 넘기면 시간 검증 할 필요 있나?
@@ -30,6 +31,9 @@ public class AuctionCloseService {
     //     auctionEntity.setAuctionStatus("완료");
 
     //     // * 낙찰자 선정
+    //     Long userId = bidRepository.findWinningMemberId(auctionId).orElseThrow(() -> new IllegalArgumentException("입찰을 찾을 수 없습니다."));
+
+    //     // * 
     // }
         
         

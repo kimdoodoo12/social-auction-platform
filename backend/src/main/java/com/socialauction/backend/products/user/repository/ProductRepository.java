@@ -30,7 +30,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         JOIN products p
             ON p.product_id = a.product_id
         WHERE b.member_id = :memberId
-        AND p.category_id IS NOT NULL
         GROUP BY p.category_id
         """, nativeQuery = true)
     List<ProductRecommendDto> findCount(
@@ -45,12 +44,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 맞추기 위해서 cast ... as signed 사용 */
             CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
-        LEFT JOIN organization o
+        JOIN organization o
             ON o.organization_id = p.organization_id
-        LEFT JOIN auction a
+        JOIN auction a
             ON a.product_id = p.product_id
             /* 입찰횟수 */
         LEFT JOIN (
@@ -62,7 +61,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             GROUP BY auction_id
         ) bs
             ON bs.auction_id = a.auction_id
-        LEFT JOIN image i
+        JOIN image i
             ON i.product_id = p.product_id
             AND i.sort_order = 1
         where (:categoryId is null or p.category_id = :categoryId)
@@ -84,9 +83,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
             CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
-        LEFT JOIN organization o
+        JOIN organization o
             ON o.organization_id = p.organization_id
-        LEFT JOIN auction a
+        JOIN auction a
             ON a.product_id = p.product_id
             /* 입찰횟수 */
         LEFT JOIN (
@@ -98,7 +97,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             GROUP BY auction_id
         ) bs
             ON bs.auction_id = a.auction_id
-        LEFT JOIN image i
+        JOIN image i
             ON i.product_id = p.product_id
             AND i.sort_order = 1
         where bs.bid_count > 1 
@@ -117,9 +116,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
             CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
-        LEFT JOIN organization o
+        JOIN organization o
             ON o.organization_id = p.organization_id
-        LEFT JOIN auction a
+        JOIN auction a
             ON a.product_id = p.product_id
             /* 입찰횟수 */
         LEFT JOIN (
@@ -131,14 +130,14 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             GROUP BY auction_id
         ) bs
             ON bs.auction_id = a.auction_id
-        LEFT JOIN image i
+        JOIN image i
             ON i.product_id = p.product_id
             AND i.sort_order = 1
         where bs.auction_id is null
-        ORDER BY bs.current_price ASC
+        ORDER BY p.created_at DESC
         LIMIT 4
         """, nativeQuery = true)
-    List<ProductDto> findNewProduct();
+    Page<ProductDto> findNewProduct(Pageable pageable);
 
     // 상품 목록
     @Query(value = """
@@ -150,9 +149,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
             CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
         FROM products p
-        LEFT JOIN organization o
+        JOIN organization o
             ON o.organization_id = p.organization_id
-        LEFT JOIN auction a
+        JOIN auction a
             ON a.product_id = p.product_id
             /* 입찰횟수 */
         LEFT JOIN (
@@ -164,7 +163,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             GROUP BY auction_id
         ) bs
             ON bs.auction_id = a.auction_id
-        LEFT JOIN image i
+        JOIN image i
             ON i.product_id = p.product_id
             AND i.sort_order = 1
         where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */

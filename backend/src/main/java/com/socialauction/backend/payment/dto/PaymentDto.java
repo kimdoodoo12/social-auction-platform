@@ -37,5 +37,13 @@ public class PaymentDto {
             .build();
     }
 
+    public PaymentEntity toEntity(){
+        return PaymentEntity.builder()
+                    .paymentPrice(this.paymentPrice)
+                    .paymentStatus(this.paymentStatus)
+                    .build();
+
+    }
+
 }
 

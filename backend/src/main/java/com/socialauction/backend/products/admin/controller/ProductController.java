@@ -64,7 +64,7 @@ public class ProductController {
     
     // 상품 수정
     @PutMapping("update")
-    public boolean updateProduct(@RequestBody ProductDto productDto) {
+    public boolean updateProduct(@ModelAttribute ProductDto productDto) {
         return productService.updateProduct(productDto);
     }
 

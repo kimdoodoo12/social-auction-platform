@@ -36,7 +36,7 @@ public class BidService {
         return bids.map(BidDto::from);
     }
     //최종 낙찰 결과 
-    //조회 쿼리 추후에 바꿀 예정 
+    //! 조회 쿼리 추후에 바꿀 예정 
     @Transactional (readOnly = true)
     public BidResultDto bidResultFind(Integer auctionId){
         BidResultDto bidDto = bidRepository.findResultByid(auctionId).orElse(null);
