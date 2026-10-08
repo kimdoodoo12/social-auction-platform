@@ -3,7 +3,9 @@ package com.socialauction.backend.products.user.service;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,7 +77,8 @@ public class ProductService {
     
     // 새로 등록된 상품 조회
     public List<ProductDto> findNewProduct( ) {
-        return productRepository.findNewProduct();
+        Pageable pageable = PageRequest.of(0, 4, Sort.by("current_price"));
+        return productRepository.findNewProduct(pageable).getContent();
     }
 
     // 상품 목록 조회
