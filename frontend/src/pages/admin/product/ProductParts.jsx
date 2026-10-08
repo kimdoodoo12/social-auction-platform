@@ -1,3 +1,4 @@
+import { resolveImageUrl } from '../../../api/product'
 import ImageBox from '../../../components/admin/ImageBox'
 import { Badge } from '../../../components/admin/ui'
 
@@ -20,5 +21,5 @@ export function ProductStatusBadge({ status }) {
 
 // 목록 썸네일 (Figma 34px 정사각형)
 export function ProductThumb({ path, alt }) {
-  return <ImageBox path={path} alt={alt} className="product-thumb" label="" />
+  return <ImageBox path={resolveImageUrl(path)} alt={alt} className="product-thumb" label="" />
 }

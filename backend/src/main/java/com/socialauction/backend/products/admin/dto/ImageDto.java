@@ -1,7 +1,5 @@
 package com.socialauction.backend.products.admin.dto;
 
-import com.socialauction.backend.global.upload.UploadFolder;
-import com.socialauction.backend.global.upload.UploadUrls;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +22,7 @@ public class ImageDto {
         return ImageDto.builder()
         .imageId(entity.getImageId() )
         .productId(entity.getProductEntity().getProductId() )
-        .image(UploadUrls.from(UploadFolder.IMAGES, entity.getImage()))
+        .image(entity.getImage())
         .sortOrder(entity.getSortOrder())
         .build();
     }

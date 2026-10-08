@@ -1,3 +1,4 @@
+import { resolveImageUrl } from '../../../api/product'
 import { useEffect, useRef, useState } from 'react'
 import { fetchCategoryOptions, fetchOrganizationOptions, PRODUCT_LIMITS } from '../../../api/product'
 import ImageBox from '../../../components/admin/ImageBox'
@@ -91,7 +92,7 @@ function UploadSlots({ images, onChange, disabled }) {
         <button type="button" disabled={disabled} aria-label={`${label} 선택 또는 교체`}
           className={`product-slot${sortOrder === 1 ? ' product-slot--main' : ''}`}
           onClick={() => inputs.current[sortOrder]?.click()}>
-          <ImageBox path={image?.preview ?? image?.image} alt={label} label={label} />
+          <ImageBox path={resolveImageUrl(image?.preview ?? image?.image)} alt={label} label={label} />
         </button>
         {image?.file && <small style={{ overflowWrap: 'anywhere' }}>{image.file.name}</small>}
         {image?.file && (image.imageId != null || sortOrder !== 1) && (

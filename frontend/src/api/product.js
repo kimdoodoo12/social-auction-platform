@@ -29,7 +29,7 @@ function fromListResponse(row, index) {
   return {
     key: `${row.productId}-${index}`,
     productId: row.productId,
-    image: row.imageUrl,
+    image: row.image,
     productName: row.productName,
     organizationName: row.organizationName,
     startPrice: row.startPrice,
@@ -114,11 +114,14 @@ export async function fetchOrganizationOptions() {
   return content.map((o) => ({ id: o.organizationId, name: o.name }))
 }
 
-// 이미지 컬럼에는 경로 문자열만 저장된다. 상대 경로는 백엔드 서버 기준으로 본다.
+// 상품 파일명을 조회 URL로 변환한다. 업로드 미리보기와 기존 경로도 지원한다.
 export function resolveImageUrl(path) {
   if (!path) return null
   try {
-    return new URL(path, BASE_URL).href
+    const imagePath = /^(?:https?:|blob:|data:|\/)/i.test(path)
+      ? path
+      : `/images/${encodeURIComponent(path)}`
+    return new URL(imagePath, BASE_URL).href
   } catch {
     return null
   }
