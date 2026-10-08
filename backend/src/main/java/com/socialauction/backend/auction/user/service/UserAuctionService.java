@@ -121,7 +121,8 @@ public class UserAuctionService {
 
         // * 시작 시간, 종료 시간 지정
         auctionEntity.setStartTime(LocalDateTime.now());
-        auctionEntity.setEndTime(LocalDateTime.now().plusMinutes(1));
+        //! 나중에 시간 바꾸기
+        auctionEntity.setEndTime(LocalDateTime.now().plusSeconds(30));
 
         // * 스케줄러 등록
         auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), auctionEntity.getEndTime());
