@@ -149,10 +149,6 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     Optional<AuctionDetailProjection> UserPageAuctions(@Param("auctionId") Integer auctionId);
 
 
-    // * 마감 시간 확인
-    @Query("SELECT a.endTime FROM AuctionEntity a WHERE a.id = :id")
-    Optional<LocalDateTime> findEndTimeById(@Param("id") Integer auctionid);
-
 
     // * sql 레코드 잠금
     @Query(
@@ -161,6 +157,9 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     )
     Optional<AuctionEntity> findByIdForUpdate(@Param("id") Integer auctionId);
 
+    // * 마감 시간 확인
+    @Query("SELECT a.endTime FROM AuctionEntity a WHERE a.id = :id")
+    Optional<LocalDateTime> findEndTimeById(@Param("id") Integer auctionid);
 
     // * 경매 ID로 상품 설명과 제작 기관 정보를 한 건 조회한다.
     // * 등록 상품 수는 별도 집계해 상품 정보가 중복되지 않도록 한다.
@@ -187,7 +186,12 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     Optional<ProductDetailProjection> findProductDetail(
         @Param("auctionId") Integer auctionId
     );
-    
+
+    @Query(value = """
+                SELECT COUNT(auction_id) FROM auction WHERE auction_status = :auctionStatus
+            """, nativeQuery = true)
+    Integer findAuctionCount(@Param("auctionStatus")String auctionStatus);
+
 }
 
 

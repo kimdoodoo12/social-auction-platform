@@ -72,41 +72,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         @Param ("categoryId") Integer categoryId
     );
     
-
-    // 인기 상품 조회
-    @Query(value = """
-        SELECT
-            a.auction_status AS auctionStatus,
-            i.image AS image,
-            o.name AS organizationName,
-            p.name AS productName,
-            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice,
-            CAST(COALESCE(bs.bid_count, 0) AS SIGNED) AS bidCount
-        FROM products p
-        JOIN organization o
-            ON o.organization_id = p.organization_id
-        JOIN auction a
-            ON a.product_id = p.product_id
-            /* 입찰횟수 */
-        LEFT JOIN (
-            SELECT
-                auction_id,
-                max(bid_price) AS current_price,
-                count(*) AS bid_count
-            FROM bid
-            GROUP BY auction_id
-        ) bs
-            ON bs.auction_id = a.auction_id
-        JOIN image i
-            ON i.product_id = p.product_id
-            AND i.sort_order = 1
-        where bs.bid_count > 1 
-        ORDER BY bs.bid_count DESC
-        LIMIT 4
-        """, nativeQuery = true)
-    List<ProductDto> findPopularProduct();
     
-    // 새로 등록된 상품 조회
+    // 상품 조회
     @Query(value = """
         SELECT
             a.auction_status AS auctionStatus,
@@ -133,11 +100,19 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         JOIN image i
             ON i.product_id = p.product_id
             AND i.sort_order = 1
-        where bs.auction_id is null
-        ORDER BY p.created_at DESC
-        LIMIT 4
+        WHERE
+            (:type = 'new' AND bs.auction_id IS NULL)
+            OR
+            (:type = 'popular' AND bs.bid_count > 1)
+            OR
+            (
+                :type = 'ending'
+                AND a.auction_status = '진행'
+            )
         """, nativeQuery = true)
-    Page<ProductDto> findNewProduct(Pageable pageable);
+    Page<ProductDto> findProduct(@Param ("type") String type, Pageable pageable);
+    // type은 (new, popular, ending)중 하나로 매개변수를 받고, 페이지 객체를 매개변수로 받는다.
+    // 페이지로 받되 동적으로 LIMIT와 ORDER BY를 결정하기 위해 사용
 
     // 상품 목록
     @Query(value = """
@@ -207,4 +182,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         Pageable pageable );
 
 
+    @Query(value="""
+                SELECT COUNT(product_id) FROM products;
+            """, nativeQuery = true)
+    Integer findProductCount();
 }

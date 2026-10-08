@@ -221,6 +221,11 @@ public interface MemberRepository extends JpaRepository<MemberEntity,Long> {
         @Param("memberId") Long memberId
     );
 
+    @Query(value = """
+            SELECT COUNT(member_id) FROM member
+            """, nativeQuery = true)
+    Integer findMemberCount();
+
     
 }
 
