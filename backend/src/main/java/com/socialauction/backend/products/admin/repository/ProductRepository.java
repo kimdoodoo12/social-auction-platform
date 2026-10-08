@@ -81,17 +81,17 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             select p.product_id, i.image, p.name, o.name, p.start_price,
             max(b.bid_price), a.auction_status, p.created_at
             from products p
-            left join auction a                  /* 경매 테이블 조인 */
+            join auction a                  /* 경매 테이블 조인 */
                 on p.product_id = a.product_id
             left join bid b                      /* 입찰 테이블 조인 */
                 on b.auction_id = a.auction_id
-            left join organization o             /* 기관 테이블 조인 */
+            join organization o             /* 기관 테이블 조인 */
                 on p.organization_id = o.organization_id
-            left join image i                    /* 이미지 테이블 조인 */
+            join image i                    /* 이미지 테이블 조인 */
                 on p.product_id = i.product_id
                 /* 이미지 번호가 제일 낮은 이미지 한개만 가져옴 */
                 AND i.sort_order = 1
-            left join category c                 /* 카테고리 테이블 조인 */
+            join category c                 /* 카테고리 테이블 조인 */
                 on p.category_id = c.category_id
             where p.name like concat('%', :productName, '%') /* 검색 결과(상품이름)을 포함하는 정보만 찾음 */
             /* 각종 필터링 적용 */
@@ -117,12 +117,15 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             countQuery = """
                 select count(*)
                 from products p
-                left join organization o
+                join organization o
                     on p.organization_id = o.organization_id
-                left join auction a
+                join auction a
                     on p.product_id = a.product_id
-                left join category c
+                join category c
                     on p.category_id = c.category_id
+                join image i
+                    on i.product_id = p.product_id
+                    and i.sort_order = 1
                 where p.name like concat('%', :productName, '%')
                 and (
                     :organizationName is null or
@@ -185,7 +188,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             b.bid_price AS bidPrice,
             b.bid_time AS bidTime
         FROM bid b
-        LEFT JOIN member m
+        JOIN member m
             ON m.member_id = b.member_id
         WHERE b.auction_id = :auctionId
         ORDER BY b.bid_time DESC, b.bid_id DESC
