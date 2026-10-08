@@ -39,7 +39,7 @@ public class ProductController {
     public Page<ProductListResponse> findAll(
             @PageableDefault(size = 8, sort = {"createdAt", "productId"},
                     direction = Sort.Direction.DESC) Pageable pageable) {
-        return productService.findAll(pageable);
+        return productService.findProductList(pageable);
     }
 
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회

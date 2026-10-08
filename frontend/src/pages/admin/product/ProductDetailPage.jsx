@@ -1,3 +1,4 @@
+import { resolveImageUrl } from '../../../api/product'
 import { useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchCategoryOptions, fetchOrganizationOptions, fetchProduct, stopSelling } from '../../../api/product'
@@ -105,7 +106,7 @@ export default function ProductDetailPage() {
         {product && (
           <>
             <section className="admin-card admin-hero">
-              <ImageBox path={images[0]?.image} alt={product.name} className="admin-hero__thumb" label="" />
+              <ImageBox path={resolveImageUrl(images[0]?.image)} alt={product.name} className="admin-hero__thumb" label="" />
               <div className="admin-hero__body">
                 <div className="admin-hero__meta">
                   <span>
@@ -194,10 +195,10 @@ export default function ProductDetailPage() {
               <div className="admin-stack">
                 <Card title="상품 이미지">
                   <div className="product-gallery">
-                    <ImageBox path={images[0]?.image} alt={product.name} className="product-gallery__main" />
+                    <ImageBox path={resolveImageUrl(images[0]?.image)} alt={product.name} className="product-gallery__main" />
                     <div className="product-gallery__thumbs">
                       {Array.from({ length: IMAGE_SLOTS - 1 }, (_, i) => (
-                        <ImageBox key={i} path={images[i + 1]?.image} alt={product.name} className="product-gallery__thumb" label="" />
+                        <ImageBox key={i} path={resolveImageUrl(images[i + 1]?.image)} alt={product.name} className="product-gallery__thumb" label="" />
                       ))}
                     </div>
                   </div>

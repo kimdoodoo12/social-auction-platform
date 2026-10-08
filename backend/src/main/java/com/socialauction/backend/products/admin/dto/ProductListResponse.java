@@ -1,7 +1,5 @@
 package com.socialauction.backend.products.admin.dto;
 
-import com.socialauction.backend.global.upload.UploadFolder;
-import com.socialauction.backend.global.upload.UploadUrls;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class ProductListResponse {
 
     private Integer productId;          // 상품번호
-    private String imageUrl;            // 대표 이미지 URL
+    private String image;            // 대표 이미지 파일명
     private String productName;         // 상품명
     private String organizationName;    // 제작기관 이름
     private Integer startPrice;         // 시작가
@@ -28,13 +26,13 @@ public class ProductListResponse {
 
     public static ProductListResponse from(
         ProductEntity entity,
-        String imageUrl,
+        String image,
         Integer currentPrice,
         String status
     ){
         return ProductListResponse.builder()
         .productId( entity.getProductId() )
-        .imageUrl( imageUrl ) // 이미지 테이블
+        .image( image ) // 이미지 테이블
         .productName( entity.getName())
         .organizationName( entity.getOrganizationEntity().getName() )
         .startPrice( entity.getStartPrice() )
@@ -45,7 +43,4 @@ public class ProductListResponse {
 
     }
 
-    public String getImageUrl() {
-        return UploadUrls.from(UploadFolder.IMAGES, imageUrl);
-    }
 }
