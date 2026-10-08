@@ -51,7 +51,7 @@ public class MemberDto {
             .role(memberEntity.getRole())
             .lockedAt(memberEntity.getLockedAt())
 
-            // 입찰횟수  
+            // 입찰횟수
             .bcount(memberEntity.getBidEntities().size())
 
             // 낙찰횟수 

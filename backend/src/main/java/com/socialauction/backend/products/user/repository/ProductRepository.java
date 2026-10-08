@@ -135,10 +135,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             ON i.product_id = p.product_id
             AND i.sort_order = 1
         where bs.auction_id is null
-        ORDER BY bs.current_price ASC
-        LIMIT 4
         """, nativeQuery = true)
-    List<ProductDto> findNewProduct();
+    Page<ProductDto> findNewProduct(Pageable pageable);
 
     // 상품 목록
     @Query(value = """
