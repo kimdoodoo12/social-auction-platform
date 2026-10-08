@@ -20,14 +20,14 @@ public class ProductListResponse {
     private String productName;         // 상품명
     private String organizationName;    // 제작기관 이름
     private Integer startPrice;         // 시작가
-    private Integer currentPrice;       // 현재가
+    private Long currentPrice;       // 현재가
     private String status;              // 상태
     private LocalDateTime createdAt;    // 등록일
 
     public static ProductListResponse from(
         ProductEntity entity,
         String image,
-        Integer currentPrice,
+        Long currentPrice,
         String status
     ){
         return ProductListResponse.builder()
