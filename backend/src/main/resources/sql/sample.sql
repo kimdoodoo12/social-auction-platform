@@ -25,11 +25,7 @@ INSERT INTO member (login_id, password, name, email, phone, CREATED_AT, UPDATED_
 ('yoonseoa',   '1234', '윤서아', 'seoa.yoon@example.com',  '010-8901-2345', '2026-06-02 22:30:12', '2026-08-25 15:20:00', '정지', FALSE),
 ('limjaewon',  '1234', '임재원', 'jaewon.lim@example.com', '010-9012-3456', '2026-07-09 07:55:41', '2026-09-10 03:12:00', '잠금', FALSE),
 ('hanyujin',   '1234', '한유진', 'yujin.han@example.com',  '010-1234-5678', '2026-07-21 16:02:09', '2026-09-05 12:00:00', '탈퇴', FALSE),
-<<<<<<< HEAD
-('user',   '$2a$10$YTxdIumHHvY19Ii/2xfc.OHc.vx47zjKBbuNAUKhedisL0.pud1om', '한유진', 'yujin.han@example.com',  '010-1234-5678', '2026-07-21 16:02:09', '2026-09-05 12:00:00', '정상', FALSE);
-=======
 ('user',   '$2a$10$YTxdIumHHvY19Ii/2xfc.OHc.vx47zjKBbuNAUKhedisL0.pud1om', '윤서아', 'seoa.yoon@example.com',  '010-8901-2345', '2026-06-02 22:30:12', '2026-08-25 15:20:00', '정지', FALSE);
->>>>>>> bd050d6e6f9336804a3632a3628dbf109b98841e
 
 -- ------------------------------------------------------------
 -- 카테고리

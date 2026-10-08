@@ -22,6 +22,8 @@ public class WebConfig implements WebMvcConfigurer{
                 .excludePathPatterns("/ieum/admin/member/user/signup",
                                             "/ieum/admin/member/user/signup/findid",
                                             "/ieum/admin/member/user/login",
-                                            "/ieum/admin/member/reissue");
+                                            "/ieum/admin/member/reissue",
+                                            "/ieum/admin/member/user/me",
+                                            "/ieum/admin/member/user/logout");
     }
 }

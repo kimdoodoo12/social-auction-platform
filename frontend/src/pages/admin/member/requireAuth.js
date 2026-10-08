@@ -2,17 +2,58 @@ import { redirect } from 'react-router-dom'
 import { authApi } from './authApi'
 import { FORBIDDEN_PATH } from './forbidden'
 
-// 라우터가 보호된 화면을 렌더링하기 전에 서버 쿠키를 검증한다.
+// 로그인 여부 확인
 export async function requireAuth({ request }) {
-  try {
-    const member = await authApi.me()
-    if (member) return member
-  } catch (error) {
-    if (error.status === 403) throw redirect(FORBIDDEN_PATH)
-    // 서버 연결이 실패한 경우에도 보호된 화면은 열지 않는다.
-    const url = new URL(request.url)
-    throw redirect(`/login?returnTo=${encodeURIComponent(url.pathname + url.search)}&unavailable=1`)
-  }
   const url = new URL(request.url)
-  throw redirect(`/login?returnTo=${encodeURIComponent(url.pathname + url.search)}`)
+  const returnTo = encodeURIComponent(url.pathname + url.search)
+
+  let member
+
+  try {
+    member = await authApi.me()
+  } catch (error) {
+    if (error.status === 403) {
+      throw redirect(FORBIDDEN_PATH)
+    }
+
+    throw redirect(`/login?returnTo=${returnTo}&unavailable=1`)
+  }
+
+  if (!member) {
+    throw redirect(`/login?returnTo=${returnTo}`)
+  }
+
+  return member
+}
+
+// localhost:5173 최초 접속 시 이동할 화면 결정
+export async function redirectHome() {
+  let member
+
+  try {
+    member = await authApi.me()
+  } catch (error) {
+    if (error.status === 403) {
+      throw redirect(FORBIDDEN_PATH)
+    }
+
+    throw redirect('/login?unavailable=1')
+  }
+
+  if (!member) {
+    throw redirect('/login')
+  }
+
+  throw redirect(member.status === true ? '/admin' : '/mypage')
+}
+
+// 관리자 페이지 진입 검사
+export async function requireAdmin(args) {
+  const member = await requireAuth(args)
+
+  if (member.status !== true) {
+    throw redirect(FORBIDDEN_PATH)
+  }
+
+  return member
 }

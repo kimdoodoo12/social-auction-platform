@@ -76,7 +76,7 @@ public class UserAuctionService {
         // * 경매 id에 해당하는 레코드 잠금  
         AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElse(null);
 
-         // * 경매 마감 시간 재 확인 - 잠금되고 대기했다가 마감 시간이 지난 상황 대비
+        // * 경매 마감 시간 재 확인 - 잠금되고 대기했다가 마감 시간이 지난 상황 대비
         if(!chekDeadline(auctionEntity.getEndTime())){
             return false;
         }

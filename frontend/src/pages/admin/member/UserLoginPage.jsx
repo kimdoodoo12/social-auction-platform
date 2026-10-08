@@ -35,11 +35,12 @@ export default function UserLoginPage() {
         setError('비밀번호를 확인해 주세요.')
         return
       }
-      navigate(returnTo, { replace: true }) // 뒤로 가기 기록에서 제출한 로그인 화면을 교체한다.
-    } catch {
-      setError('로그인에 실패했습니다. 서버 연결을 확인하고 다시 시도해 주세요.')
+      navigate(member.status === true ? '/admin' : '/mypage', {
+        replace: true,
+        }) // 뒤로 가기 기록에서 제출한 로그인 화면을 교체한다.
+    }  catch (error) {
+      setError(error.message || '알 수 없는 로그인 오류')
     } finally {
-      // 성공·실패와 관계없이 요청 잠금과 버튼의 로딩 상태를 해제한다.
       pending.current = false
       setBusy(false)
     }

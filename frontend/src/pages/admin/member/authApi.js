@@ -21,7 +21,7 @@ async function request(path, body) {
   let data = null
   try { data = text ? JSON.parse(text) : null } catch { /* JSON이 아닌 서버 오류 본문은 사용자에게 노출하지 않는다. */ }
   if (!response.ok) {
-    const error = new Error('요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.')
+    const error = new Error(`인증 요청 실패: ${path} (HTTP ${response.status})`)
     error.status = response.status
     throw error
   }
@@ -45,7 +45,8 @@ export function refreshSession() {
 
 // MemberController의 엔드포인트와 UserDto 필드에 맞춘 회원 API 모음이다.
 export const authApi = {
-  login: (loginId, password) => request('/user/login', { loginId, password }),
+  login: (loginId, password) =>
+  request('/user/login', { loginId, password, status: false }),
   signup: (values) => request('/user/signup', values),
   exists: (loginId) => request(`/user/signup/findid?newid=${encodeURIComponent(loginId)}`),
   logout: () => request('/user/logout', {}),
@@ -68,3 +69,4 @@ export function safeReturnPath(value) {
   if (/^\/(?:admin\/login|login|signup|user\/(?:login|signup))(?:\/|$)/.test(pathname)) return '/mypage'
   return value
 }
+

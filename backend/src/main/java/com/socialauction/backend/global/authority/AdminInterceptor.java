@@ -43,7 +43,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         }// if end
         Long memberId = token == null ? null : jwtUtil.getMnoFromToken(token);
 
-        if(memberId == null){
+        if(memberId == null){ 
             response.setStatus(401);    // 로그인 필요 or 토큰 만료 
             return false;
         }

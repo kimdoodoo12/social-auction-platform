@@ -18,6 +18,7 @@ public class UserDto {
     private String name;
     private String email;
     private String phone;
+    private boolean status = false;
 
     private LocalDateTime createdAt;
     private Long memberId;
@@ -42,6 +43,7 @@ public class UserDto {
             .phone(memberEntity.getPhone())
             .createdAt(memberEntity.getCreatedAt())
             .memberId(memberEntity.getMemberId())
+            .status(memberEntity.isStatus())
             .build();
     }
 }
