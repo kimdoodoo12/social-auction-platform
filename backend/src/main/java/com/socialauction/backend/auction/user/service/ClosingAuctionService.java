@@ -1,6 +1,7 @@
 package com.socialauction.backend.auction.user.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
@@ -46,6 +47,7 @@ public class ClosingAuctionService {
     }
 
     // * 경매 종료 
+    @Transactional 
     public void closeAuction(int auctionId){
 
 

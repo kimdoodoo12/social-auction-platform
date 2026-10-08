@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
+import com.socialauction.backend.auction.scheduler.AuctionScheduler;
 import com.socialauction.backend.auction.user.dto.AuctionConfirmDto;
 import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
@@ -25,6 +26,7 @@ public class UserAuctionService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
+    private final AuctionScheduler auctionScheduler;
 
     // * 경매 페이지 정보 - 상품
     public AuctionDetailProjection findUserPageAuction(Integer auctionId){
@@ -119,16 +121,19 @@ public class UserAuctionService {
 
         // * 시작 시간, 종료 시간 지정
         auctionEntity.setStartTime(LocalDateTime.now());
-        auctionEntity.setEndTime(LocalDateTime.now().plusHours(24));
+        //! 나중에 시간 바꾸기
+        auctionEntity.setEndTime(LocalDateTime.now().plusSeconds(30));
 
+        // * 스케줄러 등록
+        auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), auctionEntity.getEndTime());
+        
+        // * 입찰 메서드
         boolean result = auctionConfirmed(auctionConfirmDto);
 
         if (result == true) {
             return true;
         }
-        
         return false;
-        
     }
 
     // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
