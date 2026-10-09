@@ -45,6 +45,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             o.name AS organizationName,
             p.name AS productName,
             COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
         JOIN organization o
@@ -81,6 +82,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             o.name AS organizationName,
             p.name AS productName,
             COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
         JOIN organization o
@@ -122,6 +124,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             o.name AS organizationName,
             p.name AS productName,
             COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
         JOIN organization o

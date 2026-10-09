@@ -1,6 +1,8 @@
 package com.socialauction.backend.products.user.dto;
 
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +15,7 @@ public class ProductDto {
     private String organizationName; // 기관 이름
     private String ProductName; // 상품 이름
     private Long currentPrice; // 현재가
-    // 남은 시간도 추가해야함 , endTime을 넣어야 함.
+    private LocalDateTime endTime; // 경매 종료 시간
     private Long bidCount; // 입찰 횟수
 
 }
