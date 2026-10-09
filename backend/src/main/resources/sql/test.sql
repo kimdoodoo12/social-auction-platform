@@ -77,3 +77,5 @@ SELECT a.auction_id, pd.name, o.name, m.name, py.payment_price, py.created_at, p
 
 
 SELECT COUNT(product_id) FROM products;
+
+SELECT * FROM auction WHERE auction_status = '진행';

@@ -192,8 +192,11 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
             """, nativeQuery = true)
     Integer findAuctionCount(@Param("auctionStatus")String auctionStatus);
 
+
+    
+    // 서버 복구에 필요한 경매진행 쿼리
+    @Query(value = """
+            SELECT * FROM auction WHERE auction_status = '진행'
+            """, nativeQuery = true)
+    List<AuctionEntity> findAllBiddingAuction();
 }
-
-
-
-
