@@ -3,6 +3,7 @@ package com.socialauction.backend.auction.user.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class UserAuctionService {
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
     private final AuctionScheduler auctionScheduler;
+    private final ApplicationEventPublisher eventPublisher;
 
     // * 경매 페이지 정보 - 상품
     public AuctionDetailProjection findUserPageAuction(Integer auctionId){
@@ -137,11 +139,39 @@ public class UserAuctionService {
     }
 
     // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
-        // * 경매 상품,기관 상세정보
-        public ProductDetailProjection findDetailProduct(Integer auctionId){
-            return auctionRepository.findProductDetail(auctionId).orElse(null);
+    // * 경매 상품,기관 상세정보
+    public ProductDetailProjection findDetailProduct(Integer auctionId){
+        return auctionRepository.findProductDetail(auctionId).orElse(null);
+    } 
+
+
+    // * 첫 입찰, 경매중 입찰 한곳에서 처리
+    public boolean bidAction(AuctionConfirmDto auctionConfirmDto){
+        AuctionEntity auctionEntity = auctionRepository.findById(auctionConfirmDto.getAuctionId()).orElseThrow();
+        
+        if(auctionEntity.getAuctionStatus().equals("대기")){
+            return firstBid(auctionConfirmDto);
+        }else if (auctionEntity.getAuctionStatus().equals("진행")) {
+            return auctionConfirmed(auctionConfirmDto);
+        }else{
+            return false;
         }
 
+    }
+
+    
+    @Transactional 
+    public void placeBid(AuctionConfirmDto auctionConfirmDto) {
+
+        boolean result = bidAction(auctionConfirmDto);
+        
+        //입찰 성공시 
+        if (result==true) {
+            eventPublisher.publishEvent(new AuctionConfirmDto(auctionConfirmDto.getAuctionId(),auctionConfirmDto.getMemberId(),auctionConfirmDto.getPrice()));
+        }
+        
+        return;
+    }
 
     
 }   

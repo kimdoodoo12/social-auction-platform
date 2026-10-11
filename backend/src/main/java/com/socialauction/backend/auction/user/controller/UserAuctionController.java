@@ -67,5 +67,15 @@ public class UserAuctionController {
         return userAuctionService.firstBid(auctionConfirmDto);
     }
     
+
+    // * sse 적용된 입찰
+    @PostMapping("/sse/Bid")
+    public void placeBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+       
+        userAuctionService.placeBid(auctionConfirmDto);
+
+        return;
+    }
+    
     
 }
