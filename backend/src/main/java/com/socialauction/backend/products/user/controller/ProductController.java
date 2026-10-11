@@ -28,7 +28,7 @@ public class ProductController {
     /* ----------- 메인페이지 ------------------ */
     // 추천 상품 조회
     @GetMapping("recommend")
-    public ProductDto findRecommendProduct(Long memberId ) {
+    public List<ProductDto> findRecommendProduct(Long memberId ) {
         return productService.findRecommendProduct(memberId);
     }
     
