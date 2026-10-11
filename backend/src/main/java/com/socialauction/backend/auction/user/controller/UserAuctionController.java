@@ -47,11 +47,12 @@ public class UserAuctionController {
     }
 
     // * 경매 입찰 
-    @PostMapping ("insert")
-    public boolean auctionConfirmed(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+    // ! 사용종료
+    // @PostMapping ("insert")
+    // public boolean auctionConfirmed(@RequestBody AuctionConfirmDto auctionConfirmDto) {
         
-        return userAuctionService.auctionConfirmed(auctionConfirmDto);
-    }
+    //     return userAuctionService.auctionConfirmed(auctionConfirmDto);
+    // }
     
 
     // * 경매 상품 정보
@@ -61,20 +62,20 @@ public class UserAuctionController {
     }
 
     // * 첫입찰 
-    @PostMapping("firstBid")
-    public boolean firstBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+    // ! 사용종료
+    // @PostMapping("firstBid")
+    // public boolean firstBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
         
-        return userAuctionService.firstBid(auctionConfirmDto);
-    }
+    //     return userAuctionService.firstBid(auctionConfirmDto);
+    // }
+
     
 
     // * sse 적용된 입찰
     @PostMapping("/sse/Bid")
-    public void placeBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
-       
-        userAuctionService.placeBid(auctionConfirmDto);
-
-        return;
+    public boolean placeBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+    
+        return userAuctionService.placeBid(auctionConfirmDto);
     }
     
     

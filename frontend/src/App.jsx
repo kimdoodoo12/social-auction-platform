@@ -9,6 +9,7 @@ import memberRoutes from './pages/admin/member/routes'
 import auctionRoutes from './pages/admin/auction/routes'
 // 일반 회원용 로그인·회원가입·마이페이지 라우트 묶음이다.
 import userAuthRoutes from './pages/admin/member/userAuthRoutes'
+import { AuctionRoutePage } from './pages/user/AuctionDetailPage'
 import {
   requireAdmin,
   redirectHome,
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },
+  { path: '/user/auction/:auctionId', Component: AuctionRoutePage },
 ])
 
 export default function App() {

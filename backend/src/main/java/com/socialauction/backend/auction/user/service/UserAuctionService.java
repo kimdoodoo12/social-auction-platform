@@ -111,8 +111,10 @@ public class UserAuctionService {
     // * 경매 첫 입찰
     @Transactional 
     public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
-        // * 받은 경매 id가 대기상태인지 확인
-        AuctionEntity auctionEntity = auctionRepository.findById(auctionConfirmDto.getAuctionId()).orElseThrow();
+
+
+        // * 받은 경매 id가 대기상태인지 확인 -> 락
+        AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElseThrow();
 
         // * 대기상태이면 진행으로 변경 아니면 false
         if(auctionEntity.getAuctionStatus().equals("대기")){
@@ -124,7 +126,7 @@ public class UserAuctionService {
         // * 시작 시간, 종료 시간 지정
         auctionEntity.setStartTime(LocalDateTime.now());
         //! 나중에 시간 바꾸기
-        auctionEntity.setEndTime(LocalDateTime.now().plusSeconds(30));
+        auctionEntity.setEndTime(LocalDateTime.now().plusMinutes(3));
 
         // * 스케줄러 등록
         auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), auctionEntity.getEndTime());
@@ -161,16 +163,23 @@ public class UserAuctionService {
 
     
     @Transactional 
-    public void placeBid(AuctionConfirmDto auctionConfirmDto) {
+    public Boolean placeBid(AuctionConfirmDto auctionConfirmDto) {
 
         boolean result = bidAction(auctionConfirmDto);
         
         //입찰 성공시 
         if (result==true) {
-            eventPublisher.publishEvent(new AuctionConfirmDto(auctionConfirmDto.getAuctionId(),auctionConfirmDto.getMemberId(),auctionConfirmDto.getPrice()));
+            eventPublisher.publishEvent(new AuctionConfirmDto(
+            auctionConfirmDto.getAuctionId(),
+            auctionConfirmDto.getPrice(),
+            auctionConfirmDto.getMemberId()
+            ));
+            return true;
         }
+
+        return false;
         
-        return;
+       
     }
 
     
