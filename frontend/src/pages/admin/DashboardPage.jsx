@@ -1,111 +1,148 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { fetchDashboard } from '../../api/dashboard'
 import AdminPage from '../../components/admin/AdminPage'
 import DataTable from '../../components/admin/DataTable'
-import { Badge, Card, MockNotice } from '../../components/admin/ui'
-import { formatPrice } from '../../utils/format'
+import { AsyncBoundary, Badge, Card } from '../../components/admin/ui'
+import { useAsync } from '../../hooks/useAsync'
+import { formatDate, formatNumber, formatPrice } from '../../utils/format'
 import './pages.css'
 
-// [ADMIN] 02 Dashboard
-// 백엔드에 대시보드(통계) API가 없어 Figma 기준 mock 데이터를 표시한다.
-const STATS = [
-  { label: '전체 상품', value: 412, unit: '개' },
-  { label: '경매 대기', value: 57, unit: '개' },
-  { label: '진행 중인 경매', value: 38, unit: '건', highlight: true },
-  { label: '종료된 경매', value: 317, unit: '건' },
-  { label: '전체 회원', value: 2840, unit: '명' },
-  { label: '협약 기관', value: 27, unit: '곳' },
-]
+// [ADMIN] 02 Dashboard (Figma 31:4) — GET /ieum/admin/dashboard
 
-const RECENT_PRODUCTS = [
-  { id: 1, name: '편백나무 우드 디퓨저', org: '늘품공방', price: 15000, status: '경매 대기' },
-  { id: 2, name: '수제 대추청 500ml', org: '씨앗농장', price: 18000, status: '경매 대기' },
-  { id: 3, name: '업사이클 캔버스 에코백', org: '온새미로', price: 21000, status: '경매 대기' },
-  { id: 4, name: '손바느질 소가죽 카드지갑', org: '참빛작업장', price: 29000, status: '경매 대기' },
-  { id: 5, name: '라탄 소품 바구니 (중)', org: '소리작업장', price: 25000, status: '경매 진행 중' },
-]
+const STATUS = {
+  대기: { label: '경매 대기', tone: 'outline' },
+  진행: { label: '경매 진행 중', tone: 'primary' },
+  완료: { label: '경매 종료', tone: 'dark' },
+}
 
-const LIVE_AUCTIONS = [
-  { id: 1, name: '손뜨개 울 머플러 (차콜)', price: 46000, remain: '09:31:12' },
-  { id: 2, name: '수제 곶감 정과 선물세트', price: 38000, remain: '02:05:41' },
-  { id: 3, name: '물레 성형 도자 머그 2P', price: 35000, remain: '15:44:02' },
-  { id: 4, name: '참죽나무 원목 도마 (대)', price: 24000, remain: '01:20:55' },
-  { id: 5, name: '리넨 파우치 3종 세트', price: 17000, remain: '06:19:38' },
-]
+function StatusBadge({ status }) {
+  if (!status) return '-'
+  const s = STATUS[status] ?? { label: status, tone: 'outline' }
+  return <Badge tone={s.tone}>{s.label}</Badge>
+}
 
-const RECENT_WINS = [
-  { id: 'A-1042', name: '원목 티스푼 4P 세트', org: '마루공방', winner: '김**', price: 21000, date: '2026-09-16', pay: '결제 완료' },
-  { id: 'A-1041', name: '천연염색 손수건 2P', org: '하랑공방', winner: '이**', price: 19500, date: '2026-09-16', pay: '결제 대기' },
-  { id: 'A-1039', name: '유기농 현미 강정 선물세트', org: '해뜨는집', winner: '박**', price: 31000, date: '2026-09-15', pay: '배송 준비' },
-]
+// Figma처럼 낙찰자 이름은 첫 글자만 보여준다 (김민지 → 김**)
+const maskName = (name) => (name ? name[0] + '*'.repeat(Math.max(name.length - 1, 1)) : '-')
 
-const statusTone = (status) => (status === '경매 진행 중' ? 'primary' : status === '경매 종료' ? 'dark' : 'outline')
+// 종료 시각까지 남은 시간 "HH:MM:SS"
+function remaining(endTime, now) {
+  if (!endTime) return '-'
+  const ms = new Date(endTime).getTime() - now
+  if (ms <= 0) return '종료'
+  const total = Math.floor(ms / 1000)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(Math.floor(total / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`
+}
+
+// 남은 시간 표시용 1초 시계
+function useNow() {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return now
+}
 
 export default function DashboardPage() {
+  const { loading, error, data } = useAsync(fetchDashboard, [])
+  const now = useNow()
+  const counts = data?.counts
+
+  const stats = counts
+    ? [
+        { label: '전체 상품', value: counts.products, unit: '개' },
+        { label: '경매 대기', value: counts.waiting, unit: '개' },
+        { label: '진행 중인 경매', value: counts.bidding, unit: '건', highlight: true },
+        { label: '종료된 경매', value: counts.ended, unit: '건' },
+        { label: '전체 회원', value: counts.members, unit: '명' },
+        { label: '협약 기관', value: counts.organizations, unit: '곳' },
+      ]
+    : []
+
   return (
     <AdminPage title="Dashboard">
-      <MockNotice>대시보드 통계 API가 없어 예시 데이터를 표시합니다.</MockNotice>
+      <AsyncBoundary loading={loading && !data} error={error}>
+        {data && (
+          <>
+            <div className="dash-stats">
+              {stats.map((s) => (
+                <div key={s.label} className="admin-card dash-stat">
+                  <span className="dash-stat__label">{s.label}</span>
+                  <span className={`dash-stat__value${s.highlight ? ' highlight' : ''}`}>
+                    {formatNumber(s.value)}
+                    <small>{s.unit}</small>
+                  </span>
+                </div>
+              ))}
+            </div>
 
-      <div className="dash-stats">
-        {STATS.map((s) => (
-          <div key={s.label} className="admin-card dash-stat">
-            <span className="dash-stat__label">{s.label}</span>
-            <span className={`dash-stat__value${s.highlight ? ' highlight' : ''}`}>
-              {s.value.toLocaleString()}
-              <small>{s.unit}</small>
-            </span>
-          </div>
-        ))}
-      </div>
+            <div className="dash-row">
+              <Card
+                title="최근 등록 상품"
+                actions={<Link to="/admin/products" className="dash-more">상품 관리로 이동 →</Link>}
+                noBody
+              >
+                <DataTable
+                  rowKey={(r) => `${r.productName}-${r.organizationName}`}
+                  rows={data.newProducts}
+                  emptyText="최근 등록된 상품이 없습니다."
+                  columns={[
+                    { key: 'productName', header: '상품명', className: 'strong' },
+                    { key: 'organizationName', header: '제작기관' },
+                    // 입찰이 없는 상품만 내려오므로 currentPrice가 곧 시작가다
+                    { key: 'currentPrice', header: '시작가', align: 'right', render: (r) => formatPrice(r.currentPrice) },
+                    { key: 'auctionStatus', header: '상태', render: (r) => <StatusBadge status={r.auctionStatus} /> },
+                  ]}
+                />
+              </Card>
+              <Card
+                title="진행 중인 경매"
+                actions={<span className="dash-more">전체 {formatNumber(counts.bidding)}건</span>}
+                noBody
+              >
+                <DataTable
+                  rowKey={(r) => `${r.productName}-${r.endTime}`}
+                  rows={data.liveAuctions}
+                  emptyText="진행 중인 경매가 없습니다."
+                  columns={[
+                    { key: 'productName', header: '상품명', className: 'strong' },
+                    { key: 'currentPrice', header: '현재가', align: 'right', render: (r) => formatPrice(r.currentPrice) },
+                    { key: 'endTime', header: '남은 시간', align: 'right', render: (r) => remaining(r.endTime, now) },
+                  ]}
+                />
+              </Card>
+            </div>
 
-      <div className="dash-row">
-        <Card
-          title="최근 등록 상품"
-          actions={<Link to="/admin/products" className="dash-more">상품 관리로 이동 →</Link>}
-          noBody
-        >
-          <DataTable
-            rowKey="id"
-            rows={RECENT_PRODUCTS}
-            columns={[
-              { key: 'name', header: '상품명', className: 'strong' },
-              { key: 'org', header: '제작기관' },
-              { key: 'price', header: '시작가', align: 'right', render: (r) => formatPrice(r.price) },
-              { key: 'status', header: '상태', render: (r) => <Badge tone={statusTone(r.status)}>{r.status}</Badge> },
-            ]}
-          />
-        </Card>
-        <Card title="진행 중인 경매" actions={<span className="dash-more">전체 38건</span>} noBody>
-          <DataTable
-            rowKey="id"
-            rows={LIVE_AUCTIONS}
-            columns={[
-              { key: 'name', header: '상품명', className: 'strong' },
-              { key: 'price', header: '현재가', align: 'right', render: (r) => formatPrice(r.price) },
-              { key: 'remain', header: '남은 시간', align: 'right' },
-            ]}
-          />
-        </Card>
-      </div>
-
-      <Card
-        title="최근 낙찰 내역"
-        actions={<Link to="/admin/auctions" className="dash-more">경매 관리로 이동 →</Link>}
-        noBody
-      >
-        <DataTable
-          rowKey="id"
-          rows={RECENT_WINS}
-          columns={[
-            { key: 'id', header: '경매번호' },
-            { key: 'name', header: '상품명', className: 'strong' },
-            { key: 'org', header: '제작기관' },
-            { key: 'winner', header: '낙찰자' },
-            { key: 'price', header: '낙찰가', align: 'right', render: (r) => formatPrice(r.price) },
-            { key: 'date', header: '낙찰일', align: 'right' },
-            { key: 'pay', header: '결제 상태', align: 'right' },
-          ]}
-        />
-      </Card>
+            <Card
+              title="최근 낙찰 내역"
+              actions={<Link to="/admin/auctions" className="dash-more">경매 관리로 이동 →</Link>}
+              noBody
+            >
+              <DataTable
+                rowKey={(r) => `${r.auctionId}-${r.createdAt}`}
+                rows={data.recentWins}
+                emptyText="최근 낙찰 내역이 없습니다."
+                columns={[
+                  { key: 'auctionId', header: '경매번호' },
+                  { key: 'productName', header: '상품명', className: 'strong' },
+                  { key: 'organizationName', header: '제작기관' },
+                  { key: 'memberName', header: '낙찰자', render: (r) => maskName(r.memberName) },
+                  { key: 'paymentPrice', header: '낙찰가', align: 'right', render: (r) => formatPrice(r.paymentPrice) },
+                  { key: 'createdAt', header: '낙찰일', align: 'right', render: (r) => formatDate(r.createdAt) },
+                  {
+                    key: 'paymentStatus',
+                    header: '결제 상태',
+                    align: 'right',
+                    render: (r) => (r.paymentStatus ? '결제 완료' : '결제 대기'),
+                  },
+                ]}
+              />
+            </Card>
+          </>
+        )}
+      </AsyncBoundary>
     </AdminPage>
   )
 }

@@ -45,7 +45,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
             a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
@@ -82,7 +82,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
             a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
@@ -117,7 +117,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
             a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount,
             COALESCE(it.interest_score, 2.0) AS interestScore,
@@ -157,7 +157,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
             a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
@@ -199,7 +199,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
             i.image AS image,
             o.name AS organizationName,
             p.name AS productName,
-            COALESCE(bs.current_price, p.start_price) AS currentPrice,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
             a.end_time AS endTime,
             COALESCE(bs.bid_count, 0) AS bidCount
         FROM products p
