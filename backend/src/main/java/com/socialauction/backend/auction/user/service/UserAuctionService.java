@@ -161,10 +161,15 @@ public class UserAuctionService {
 
     }
 
-    
+    // * placeBid 입찰을 하고 성공하면
+    // * 이벤트 발행 후 DB 커밋 
+    // * AuctionEventListener 실행
+    // * 해당 경매 구독자들에게 priceUpdate 전송 → 브라우저가 받아 화면 갱신
+     
     @Transactional 
     public Boolean placeBid(AuctionConfirmDto auctionConfirmDto) {
 
+        // * 입찰 로직
         boolean result = bidAction(auctionConfirmDto);
         
         //입찰 성공시 

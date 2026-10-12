@@ -26,8 +26,7 @@ public class AuctionEventListener {
         // 리액트로 보낼 데이터 (Map이나 DTO 사용)
          Integer auctionId = bid.getAuctionId();
 
-        AuctionDetailProjection auction =
-                userAuctionService.findUserPageAuction(auctionId);
+        AuctionDetailProjection auction = userAuctionService.findUserPageAuction(auctionId);
 
         Map<String, Object> data = new HashMap<>();
         data.put("price", auction.getTopPrice());
