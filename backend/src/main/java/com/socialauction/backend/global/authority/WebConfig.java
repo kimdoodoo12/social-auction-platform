@@ -14,7 +14,6 @@ public class WebConfig implements WebMvcConfigurer{
     private final AdminInterceptor adminInterceptor;
 
 
-    // 관리자인지 사용자인이 확인기능 미구현
     @Override
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(adminInterceptor)

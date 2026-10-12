@@ -27,7 +27,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         HttpServletResponse response,
         Object handler
     ) throws Exception {
-        // 브라우저의 CORS 사전 확인 요청 
+        // 브라우저의 CORS 사전 확인 요청 (이때 사용하는 HTTP 메서드가 OPTIONS이다.)
         if("OPTIONS".equals(request.getMethod())){
             return true;
         }
@@ -42,12 +42,13 @@ public class AdminInterceptor implements HandlerInterceptor {
             } // for end
         }// if end
         Long memberId = token == null ? null : jwtUtil.getMnoFromToken(token);
+        boolean authority = jwtUtil.isAdminFromToken(token);
 
         if(memberId == null){ 
             response.setStatus(401);    // 로그인 필요 or 토큰 만료 
             return false;
         }
-        if(!mUserService.isAdmin(memberId)){ 
+        if(!authority){ 
             response.setStatus(403); // 403
             return false; 
         } //controller 실행차단

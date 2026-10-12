@@ -18,7 +18,7 @@ public class UserDto {
     private String name;
     private String email;
     private String phone;
-    private boolean status = false;
+    private Boolean status;
 
     private LocalDateTime createdAt;
     private Long memberId;
