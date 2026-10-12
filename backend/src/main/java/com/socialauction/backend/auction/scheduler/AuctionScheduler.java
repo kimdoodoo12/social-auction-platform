@@ -18,7 +18,7 @@ public class AuctionScheduler {
     private final ClosingAuctionService closingAuctionService;
 
     public void scheduleEnd(int auctionId, LocalDateTime endTime){
-        Instant instant = endTime.atZone(ZoneId.of("Asia/Seoul")).toInstant();
+        Instant instant = endTime.atZone(ZoneId.systemDefault()).toInstant();
         
         taskScheduler.schedule(() -> closingAuctionService.closeAuction(auctionId), instant);
     }

@@ -21,6 +21,7 @@ public class AuctionRecovery {
     private final AuctionScheduler auctionScheduler;
     private final ClosingAuctionService closingAuctionService;
 
+    // Spring Boot가 실행준비를 마쳤을 때 발생시키는 이벤트를 감지하여 실행
     @EventListener(ApplicationReadyEvent.class)
     public void recover(){
 
@@ -30,10 +31,15 @@ public class AuctionRecovery {
         // 모든 진행상태인 경매를 갖고와서 반복문
         for (AuctionEntity auction: auctions){
             // 만약 그 경매가 이미 시간이 지났다면
-            if(auction.getEndTime().isAfter(LocalDateTime.now()) || auction.getEndTime().isEqual(LocalDateTime.now())){
-                closingAuctionService.closeAuction(auction.getAuctionId());
+            if(auction.getEndTime().isBefore(LocalDateTime.now()) || auction.getEndTime().isEqual(LocalDateTime.now())){
+                // 경매 종료 로직을 실행
+                try{
+                    closingAuctionService.closeAuction(auction.getAuctionId());
+                }catch(Exception e){}
+                
                 continue;
             }
+            // 아직 시간이 지나지 않았다면 다시 스케쥴러 등록함
             auctionScheduler.scheduleEnd(auction.getAuctionId(), auction.getEndTime());
             
         }
