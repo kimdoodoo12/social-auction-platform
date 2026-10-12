@@ -15,8 +15,12 @@ import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
 import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 import com.socialauction.backend.bid.repository.BidRepository;
+import com.socialauction.backend.interest.service.InterestService;
+import com.socialauction.backend.member.entity.MemberEntity;
+import com.socialauction.backend.member.repository.MemberRepository;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.admin.repository.ProductRepository;
+import com.socialauction.backend.products.entity.ProductEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +33,8 @@ public class UserAuctionService {
     private final BidRepository bidRepository;
     private final AuctionScheduler auctionScheduler;
     private final ApplicationEventPublisher eventPublisher;
+    private final MemberRepository memberRepository;
+    private final InterestService interestService;
 
     // * 경매 페이지 정보 - 상품
     public AuctionDetailProjection findUserPageAuction(Integer auctionId){
@@ -140,11 +146,11 @@ public class UserAuctionService {
         return false;
     }
 
-    // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
-    // * 경매 상품,기관 상세정보
-    public ProductDetailProjection findDetailProduct(Integer auctionId){
-        return auctionRepository.findProductDetail(auctionId).orElse(null);
-    } 
+    // // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
+    // // * 경매 상품,기관 상세정보
+    // public ProductDetailProjection findDetailProduct(Integer auctionId){
+    //     return auctionRepository.findProductDetail(auctionId).orElse(null);
+    // } 
 
 
     // * 첫 입찰, 경매중 입찰 한곳에서 처리
@@ -186,6 +192,29 @@ public class UserAuctionService {
         
        
     }
+    // * 경매 상품,기관 상세정보
+    public ProductDetailProjection findDetailProduct(
+            Integer auctionId,
+            Long memberId) {
+
+        ProductDetailProjection detail = auctionRepository
+            .findProductDetail(auctionId)
+            .orElse(null);
+
+        // 상세 정보가 있고 로그인한 회원이면 관심 기록 저장
+        if (detail != null && memberId != null) {
+            MemberEntity memberEntity =
+                memberRepository.getReferenceById(memberId);
+
+            ProductEntity productEntity =
+                productRepository.getReferenceById(detail.getProductId());
+
+            interestService.recordView(memberEntity, productEntity);
+        }
+
+        return detail;
+    }
+
 
     
 }   

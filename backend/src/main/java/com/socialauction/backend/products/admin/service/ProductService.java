@@ -147,6 +147,7 @@ public class ProductService {
         AuctionEntity auctionEntity = new AuctionEntity();
         auctionEntity.setProductEntity(savedEntity);
         auctionEntity.setAuctionStatus("대기");
+        auctionEntity.setTopPrice(savedEntity.getStartPrice());
         auctionRepository.save(auctionEntity);
         
         return savedEntity.getProductId() >= 1;
