@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, Field, MockNotice } from '../../components/admin/ui'
 import '../../components/admin/admin.css'
 import './pages.css'
+import BrandLogo from '../../components/BrandLogo'
 
 // [ADMIN] 01 로그인
 // 백엔드에 관리자 로그인 API가 없어 입력값을 검증하지 않고 Dashboard로 이동한다.
@@ -17,7 +18,7 @@ export default function LoginPage() {
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
         <div className="login-card__brand">
-          <span className="admin-logo-mark" />
+          <BrandLogo size={28} />
           이음옥션 관리자
         </div>
         <p className="login-card__desc">협약 기관 상품 등록과 경매 운영을 위한 내부 시스템입니다.</p>

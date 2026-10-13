@@ -4,22 +4,100 @@ import { catalogApi } from './catalogApi'
 import { CatalogState, ProductGrid } from './CatalogParts'
 import UserHeader from './UserHeader'
 import UserFooter from './UserFooter'
+import heroImage from '../../assets/main-hero.png'
+
+// [USER] 01 메인 (Figma 25:2327)
+// 섹션: 추천(recommend) · 마감 임박(end) · 인기(popular) · 신규(new) — 각 4개
+const SECTIONS = [
+  { type: 'recommend', title: '오늘의 추천 상품', description: '협약 기관이 직접 추천한 상품입니다.' },
+  {
+    type: 'end',
+    title: '마감 임박 경매',
+    description: '오늘 안에 종료되는 경매입니다. 놓치기 전에 입찰해 보세요.',
+    to: '/products?auctionStatus=진행&sortType=time',
+  },
+  {
+    type: 'popular',
+    title: '진행 중인 인기 경매',
+    description: '지금 가장 많은 입찰이 몰리고 있는 상품입니다.',
+    to: '/products?sortType=popular',
+  },
+  {
+    type: 'new',
+    title: '새로 등록된 상품',
+    description: '아직 아무도 입찰하지 않았습니다. 첫 입찰과 동시에 24시간 경매가 시작됩니다.',
+    to: '/products?auctionStatus=대기&sortType=new',
+  },
+]
+
+const CARDS_PER_SECTION = 4
 
 function ProductSection({ type, title, description, to }) {
   const { data, loading, error, reload } = useAsync(() => catalogApi.section(type), [type])
-  return <section className="shop-section" aria-label={title}>
-    <div className="shop-section-heading"><div><h2>{title}</h2><p>{description}</p></div><Link to={to}>전체 보기 <span aria-hidden="true">→</span></Link></div>
-    <CatalogState loading={loading} error={error} empty={!data?.length} onRetry={reload}><ProductGrid products={data || []} /></CatalogState>
-  </section>
+  const products = (data || []).slice(0, CARDS_PER_SECTION)
+  return (
+    <section className="shop-section" aria-label={title}>
+      <div className="shop-section-heading">
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+        {to && <Link to={to}>전체보기 →</Link>}
+      </div>
+      <CatalogState loading={loading} error={error} empty={!products.length} onRetry={reload}>
+        <ProductGrid products={products} />
+      </CatalogState>
+    </section>
+  )
 }
 
 export default function HomePage() {
-  return <div className="shop"><UserHeader /><main className="shop-width">
-    <section className="shop-hero"><div><p className="shop-eyebrow">가치를 잇는 경매, 이음옥션</p><h1>좋은 물건을 만나는 일,<br />좋은 변화를 만드는 일.</h1><p className="shop-hero-description">정성으로 만든 상품에 나만의 가치를 더해 보세요.<br />당신의 입찰이 만드는 사람의 내일로 이어집니다.</p><Link className="shop-button" to="/products">상품 둘러보기 <span aria-hidden="true">↗</span></Link></div><div className="shop-hero-art" aria-hidden="true"><span className="shop-orbit one" /><span className="shop-orbit two" /><span className="shop-art-label">만드는 마음<br /><b>이어지는 가치</b></span></div></section>
-    <ProductSection type="recommend" title="당신에게 이어지는 상품" description="관심을 바탕으로 고른 상품과 새로운 발견" to="/products" />
-    <ProductSection type="end" title="곧 마감되는 경매" description="참여할 수 있는 시간이 얼마 남지 않았어요" to="/products?auctionStatus=진행&sortType=time" />
-    <ProductSection type="popular" title="지금 관심받는 상품" description="많은 분들이 입찰로 마음을 전하고 있어요" to="/products?sortType=popular" />
-    <ProductSection type="new" title="첫 입찰을 기다려요" description="아직 입찰이 없는 상품의 첫 주인공이 되어 보세요" to="/products?auctionStatus=대기&sortType=new" />
-    <section className="shop-guide"><h2>처음 참여하시나요?</h2><ol><li><b>01</b><strong>마음에 드는 상품 찾기</strong><p>상품과 제작 기관의 이야기를 살펴보세요.</p></li><li><b>02</b><strong>나의 금액으로 입찰하기</strong><p>상세 화면에서 최소 입찰가와 마감 시간을 확인하세요.</p></li><li><b>03</b><strong>마이페이지에서 결과 확인</strong><p>경매 종료 후 낙찰과 결제 상태를 확인하세요.</p></li></ol></section>
-  </main><UserFooter /></div>
+  return (
+    <div className="shop">
+      <UserHeader />
+      <main>
+        <section className="shop-hero">
+          <div className="shop-width shop-hero-inner">
+            <div className="shop-hero-copy">
+              <p className="shop-eyebrow">사회적 가치 경매</p>
+              <h1>
+                당신의 입찰이
+                <br />
+                누군가의 내일이 됩니다
+              </h1>
+              <p className="shop-hero-description">
+                장애인 및 사회적 약자가 만든 상품을 협약 기관과 함께 엄선했습니다.
+                <br />
+                첫 입찰이 등록되는 순간부터 24시간 동안 경매가 진행됩니다.
+              </p>
+              <div className="shop-hero-cta">
+                <Link className="shop-button" to="/products?auctionStatus=진행">
+                  진행 중인 경매 보기
+                </Link>
+                {/* 서비스 소개 페이지가 없어 비활성 */}
+                <button type="button" className="shop-button secondary" disabled title="준비 중인 기능입니다.">
+                  서비스 소개
+                </button>
+              </div>
+            </div>
+            <img className="shop-hero-image" src={heroImage} alt="이음옥션에 참여한 사람들" />
+          </div>
+        </section>
+
+        <div className="shop-width shop-sections">
+          {SECTIONS.map((section) => (
+            <ProductSection key={section.type} {...section} />
+          ))}
+
+          {/* 협약 기관 안내: 사용자용 기관 API가 없어 개수는 '-'로 두고 틀만 유지한다 (사용자 결정) */}
+          <section className="shop-partners" aria-label="협약 기관">
+            <h2>이음옥션은 -개 기관과 협약을 맺고 있습니다</h2>
+            <p>모든 상품은 협약 기관이 제공하고, 관리자가 직접 검수한 뒤 등록됩니다.</p>
+            <div className="shop-partner-chips" />
+          </section>
+        </div>
+      </main>
+      <UserFooter />
+    </div>
+  )
 }
