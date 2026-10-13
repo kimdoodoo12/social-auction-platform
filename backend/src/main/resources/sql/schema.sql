@@ -75,7 +75,7 @@ CREATE TABLE auction(
     ON UPDATE CASCADE,
     # 상품삭제는 없다.
   # start_price INT, -- 상품테이블에서 시작가격은 JOIN 가능
-  -- current_price INT,
+  current_price INT,
   start_time DATETIME,
   end_time DATETIME,
   auction_status VARCHAR(30) -- 대기상태, 진행상태, 완료상태 -- BOOLEAN으로 처리하고 NULL이면 경매대기상태?
