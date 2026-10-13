@@ -51,8 +51,18 @@ async function list(params) {
   }
 }
 
+// GET /organization → { organizationCount, organzationNameList } (백엔드 필드명 철자 그대로, 바르게 고쳐져도 동작)
+async function organizations() {
+  const data = await api.get(`${root}/organization`)
+  return {
+    count: data?.organizationCount ?? null,
+    names: data?.organizationNameList ?? data?.organzationNameList ?? [],
+  }
+}
+
 export const catalogApi = {
   categories: () => api.get(`${root}/categories`),
+  organizations,
   section: (type) => api.get(`${root}/${type}`),
   list,
 }

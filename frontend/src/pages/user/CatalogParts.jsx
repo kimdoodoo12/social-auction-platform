@@ -77,9 +77,9 @@ export function ProductGrid({ products }) {
   )
 }
 
-export function CatalogState({ loading, error, empty, onRetry, children }) {
+export function CatalogState({ loading, error, empty, onRetry, children, emptyTitle = '아직 표시할 상품이 없어요.', emptyText = '다른 카테고리나 검색 조건을 살펴보세요.' }) {
   if (loading) return <div className="shop-state" role="status">상품을 불러오고 있어요…</div>
   if (error) return <div className="shop-state" role="alert"><strong>정보를 불러오지 못했어요.</strong><p>잠시 후 다시 시도해 주세요.</p><button className="shop-button secondary" onClick={onRetry}>다시 시도</button></div>
-  if (empty) return <div className="shop-state"><strong>아직 표시할 상품이 없어요.</strong><p>다른 카테고리나 검색 조건을 살펴보세요.</p></div>
+  if (empty) return <div className="shop-state"><strong>{emptyTitle}</strong>{emptyText && <p>{emptyText}</p>}</div>
   return children
 }

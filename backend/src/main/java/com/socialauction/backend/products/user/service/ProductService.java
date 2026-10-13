@@ -16,6 +16,8 @@ import com.socialauction.backend.category.entity.CategoryEntity;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.interest.repository.InterestRepository;
 import com.socialauction.backend.interest.service.InterestService;
+import com.socialauction.backend.organization.dto.user.OrganizationMainResponse;
+import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.user.dto.ProductDto;
 import com.socialauction.backend.products.user.dto.ProductRecommendDto;
 import com.socialauction.backend.products.user.dto.RecommendDto;
@@ -30,6 +32,7 @@ public class ProductService {
     private final InterestService interestService;
     private final CategoryRepository categoryRepository;
     private final InterestRepository interestRepository;
+    private final OrganizationRepository organizationRepository;
     
     // 추천 상품 조회
     public List<ProductDto> findRecommendProduct(Long memberId) {
@@ -255,5 +258,13 @@ public class ProductService {
             productName, organizationId, auctionStatus,
             categoryId, lowprice, highprice, sort, pageable);
         return list;
+    }
+
+    // 메인페이지 기관목록과 개수 조회
+    public OrganizationMainResponse findOrganizationMainResponse(){
+        return OrganizationMainResponse.builder()
+            .organzationNameList(organizationRepository.findOrganizationNameList())
+            .organizationCount(organizationRepository.findOrganizationCount())
+            .build();
     }
 }

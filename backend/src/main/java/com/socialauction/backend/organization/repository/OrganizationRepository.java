@@ -19,6 +19,7 @@ import com.socialauction.backend.organization.entity.OrganizationEntity;
 public interface OrganizationRepository extends JpaRepository<OrganizationEntity, Integer>{
     
 
+    // 관리자 전용
     @Query(value = "SELECT "
     + "o.organization_id, o.name, o.manager, o.manager_phone, "
     + "o.agreement_date, o.agreement_status, COUNT(products.product_id) "
@@ -54,4 +55,14 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
             SELECT COUNT(organization_id) FROM organization WHERE agreement_status = true
             """, nativeQuery = true)
     Integer findOrganizationCount();
+
+
+
+
+
+    // ------------------ 사용자 전용 ------------------------------ //
+    @Query(value = """
+                SELECT name FROM organization WHERE agreement_status = true ORDER BY RAND() LIMIT 6
+            """, nativeQuery = true)
+    List<String> findOrganizationNameList();
 }

@@ -71,7 +71,8 @@
 .shop-partners { padding: 36px 24px; border-radius: 12px; background: var(--color-bg); text-align: center; }
 .shop-partners h2 { font-size: 18px; font-weight: 700; color: var(--color-text); }
 .shop-partners p { margin-top: 18px; font-size: 13px; color: var(--color-text-muted); }
-.shop-partner-chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; min-height: 46px; margin-top: 22px; }
+.shop-partner-chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; min-height: 46px; margin: 22px 0 0; padding: 0; list-style: none; }
+.shop-partner-chips li { display: flex; align-items: center; height: 46px; padding: 0 18px; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; font-size: 13px; font-weight: 500; color: var(--color-text-muted); }
 
 /* Footer / User (1440x253, 배경 #f7f6f4) */
 .shop-footer { padding: 48px 0 40px; background: var(--color-bg); }

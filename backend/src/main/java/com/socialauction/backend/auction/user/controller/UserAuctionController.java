@@ -17,6 +17,7 @@ import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 import com.socialauction.backend.auction.user.service.UserAuctionService;
 import com.socialauction.backend.global.jtw.JWTutil;
 import com.socialauction.backend.products.admin.dto.RecentBid;
+import com.socialauction.backend.products.user.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,5 +94,10 @@ public class UserAuctionController {
         return userAuctionService.placeBid(auctionConfirmDto);
     }
     
+    // 연관 상품 조회
+    @GetMapping("/product/{id}/related")
+    public List<ProductDto> findRelatedProducts(@PathVariable("id") Integer productId){
+        return userAuctionService.findRelatedProducts(productId);
+    }
     
 }
