@@ -12,6 +12,7 @@ async function readJson(path, signal) {
 }
 
 export const userAuctionApi = {
+  getImages: (auctionId, signal) => readJson(`${auctionPath}/${auctionId}/images`, signal),
   getAuction: (auctionId, signal) => readJson(`${auctionPath}/${auctionId}`, signal),
   getProduct: (auctionId, signal) => readJson(`${auctionPath}/product/${auctionId}`, signal),
   getBids: (auctionId, signal) => readJson(`${auctionPath}/bid?id=${auctionId}`, signal),

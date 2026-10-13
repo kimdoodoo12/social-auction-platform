@@ -1,6 +1,6 @@
 // 백엔드 API 공통 클라이언트
-// 백엔드 컨트롤러에 @CrossOrigin("http://localhost:5173")이 붙어 있어 8080을 직접 호출한다.
-export const BASE_URL = 'http://localhost:8080'
+// 기본은 같은 출처로 요청한다. 개발 서버 프록시 또는 운영 리버스 프록시를 사용한다.
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || window.location.origin
 
 export class ApiError extends Error {
   constructor(status, message, body) {

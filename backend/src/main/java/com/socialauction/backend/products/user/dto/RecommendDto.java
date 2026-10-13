@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class RecommendDto {
 
     private Integer productId;          // 상품 ID
+    private Integer auctionId;          // 경매 상세 이동용 ID
     private Integer categoryId;         // 카테고리 ID
     private String auctionStatus;       // 경매 상태
     private String image;               // 이미지 파일명

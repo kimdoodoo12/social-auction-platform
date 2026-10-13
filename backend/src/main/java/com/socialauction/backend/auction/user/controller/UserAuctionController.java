@@ -43,6 +43,11 @@ public class UserAuctionController {
         return userAuctionService.findUserPageAuction(auctionId);
     }
 
+    @GetMapping("/{id}/images")
+    public List<String> findImages(@PathVariable("id") Integer auctionId) {
+        return userAuctionService.findProductImages(auctionId);
+    }
+
     // * 입찰 정보 조회
     @GetMapping("/bid")
     public List<RecentBid> findUserPageBid(@RequestParam("id") int auctionId) {

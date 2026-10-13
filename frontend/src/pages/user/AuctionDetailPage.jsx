@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { authApi } from '../admin/member/authApi'
 import { formatDateTime, formatNumber, formatPrice } from '../../utils/format'
 import { userAuctionApi } from './auctionApi'
 import { useAuctionLive } from './useAuctionLive'
 import BidConfirmModal from './BidConfirmModal'
 import './auction-detail.css'
+import UserHeader from './UserHeader'
+import UserFooter from './UserFooter'
+import { ProductImage } from './CatalogParts'
 
 function remainingText(endTime, now) {
   if (!endTime) return '-'
@@ -55,6 +58,15 @@ function PreviewControls({ auctionId, connection, streamError, events }) {
   )
 }
 
+function ProductGallery({ images, title, error }) {
+  const [selected, setSelected] = useState(0)
+  return <div className="ua-auction-gallery">
+    <div className="ua-auction-image"><ProductImage image={images[selected]} alt={title} /></div>
+    {error && <p role="status">{error}</p>}
+    {images.length > 1 && <div className="ua-auction-thumbnails" aria-label="상품 이미지 선택">{images.map((image, index) => <button type="button" key={image} aria-label={'상품 이미지 ' + (index + 1)} aria-pressed={selected === index} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}><ProductImage image={image} alt="" /></button>)}</div>}
+  </div>
+}
+
 function AuctionContent({ auctionId, preview }) {
   const pendingBid = useRef(null)
   const waitTimer = useRef(null)
@@ -83,7 +95,7 @@ function AuctionContent({ auctionId, preview }) {
     }
   }, [])
 
-  const { auction, product, bids, loading, error, connection, streamError, events } =
+  const { auction, product, images, imageError, bids, loading, error, connection, streamError, events } =
     useAuctionLive(auctionId, onPriceUpdate)
 
   useEffect(() => {
@@ -170,26 +182,14 @@ function AuctionContent({ auctionId, preview }) {
 
   return (
     <>
-      <header className="ua-auction-header">
-        <div className="ua-auction-header-main">
-          <strong className="ua-auction-brand"><span aria-hidden="true" /> 이음옥션</strong>
-          <input aria-label="상품 검색" placeholder="상품명 또는 제작 기관을 검색해 보세요" disabled />
-          <nav aria-label="회원 메뉴"><a href="/login">로그인</a><a href="/signup">회원가입</a><a href="/mypage">마이페이지</a></nav>
-        </div>
-        <div className="ua-auction-categories">전체 카테고리 · 수공예 · 식품·가공 · 원예 · 생활잡화 · 의류·패브릭</div>
-      </header>
+
 
       <main className="ua-auction-page">
         {preview && <PreviewControls auctionId={auctionId} connection={connection} streamError={streamError} events={events} />}
-        <p className="ua-auction-breadcrumb">홈 › 경매 상품 › {title}</p>
+        <p className="ua-auction-breadcrumb"><Link to="/">홈</Link> › <Link to="/products">경매 상품</Link> › {title}</p>
 
         <div className="ua-auction-top">
-          <div className="ua-auction-gallery">
-            <div className="ua-auction-image" role="img" aria-label={`${title} 이미지 준비 중`}>▧</div>
-            <div className="ua-auction-thumbnails" aria-label="상품 이미지 준비 중">
-              {[0, 1, 2, 3].map((number) => <span key={number} className={number === 0 ? 'selected' : ''}>▧</span>)}
-            </div>
-          </div>
+          <ProductGallery images={images} title={title} error={imageError} />
 
           <div className="ua-auction-info">
             <div className="ua-auction-meta"><span className={live && !ended ? 'live' : ''}>{ended ? '경매 종료' : statusText(auction.status)}</span> · {product?.organizationName || '제작 기관'}</div>
@@ -218,11 +218,11 @@ function AuctionContent({ auctionId, preview }) {
               <p className="ua-auction-small">{formatPrice(minimumBid)} 이상부터 입찰할 수 있습니다. 입찰 후 취소할 수 없습니다.</p>
               {!validBid && !ended && enteredAmount !== null && <p className="ua-auction-error">현재 최소 입찰가 이상을 입력해 주세요.</p>}
               {ended && <p className="ua-auction-error">경매가 종료되었거나 종료 시각이 지났습니다.</p>}
-              {bidMessage && <p className="ua-auction-feedback" role="status">{bidMessage}</p>}
+              {bidMessage && <p className="ua-auction-feedback" role="status">{preview ? bidMessage : bidMessage.includes('성공') ? (awaitingEvent ? '입찰이 접수되었습니다. 최신 가격을 확인하고 있어요.' : '입찰이 정상적으로 접수되었습니다.') : bidMessage.includes('거절') ? '입찰이 거절되었습니다. 현재 가격과 종료 시각을 확인해 주세요.' : bidMessage}</p>}
             </section>
 
             <section className="ua-auction-history">
-              <div className="ua-auction-history-heading"><strong>입찰 내역</strong><small>최근 5건 · SSE로 갱신</small></div>
+              <div className="ua-auction-history-heading"><strong>입찰 내역</strong><small>최근 5건</small></div>
               {bids.length === 0 ? <p className="ua-auction-empty">아직 입찰 내역이 없습니다.</p> : bids.map((bid, index) => (
                 <div className={`ua-auction-history-row ${index === 0 ? 'highest' : ''}`} key={`${bid.bidNumber}-${bid.memberId}`}>
                   <span>{maskedName(bid.memberName)} {index === 0 && <em>최고가</em>}</span>
@@ -231,11 +231,12 @@ function AuctionContent({ auctionId, preview }) {
                 </div>
               ))}
             </section>
-            <div className="ua-auction-connection" role="status">
+            {preview && <div className="ua-auction-connection" role="status">
               SSE: {connection === 'connected' ? '연결됨' : connection === 'connecting' ? '연결 중' : '재연결 중'} · 최근 수신 {events.length}건
               {events[0] && <span> · 최근 {formatPrice(events[0].price)} / 회원 ID {String(events[0].bidderName)}</span>}
               {streamError && <p>{streamError}</p>}
-            </div>
+            </div>}
+            {!preview && connection === 'reconnecting' && <p role="status" className="ua-auction-feedback">실시간 정보를 다시 연결하고 있습니다. 입찰 전 현재 가격을 확인해 주세요.</p>}
           </div>
         </div>
 
@@ -263,7 +264,7 @@ function AuctionContent({ auctionId, preview }) {
 export default function AuctionDetailPage({ auctionId, preview = false }) {
   const id = Number(auctionId)
   if (!Number.isSafeInteger(id) || id < 1) return <p role="alert">올바른 경매 ID를 입력해 주세요.</p>
-  return <AuctionContent key={id} auctionId={id} preview={preview} />
+  return <div className="shop"><UserHeader /><AuctionContent key={id} auctionId={id} preview={preview} /><UserFooter /></div>
 }
 
 // App.jsx 라우트에 나중에 연결할 때 사용하는 컴포넌트다.

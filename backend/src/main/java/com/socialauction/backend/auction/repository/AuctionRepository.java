@@ -150,6 +150,14 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
 
 
 
+    @Query(value = """
+        SELECT i.image FROM image i
+        JOIN auction a ON a.product_id = i.product_id
+        WHERE a.auction_id = :auctionId
+        ORDER BY i.sort_order ASC, i.image_id ASC
+        """, nativeQuery = true)
+    List<String> findProductImages(@Param("auctionId") Integer auctionId);
+
     // * sql 레코드 잠금
     @Query(
         value = "SELECT * FROM auction WHERE auction_id = :id FOR UPDATE",

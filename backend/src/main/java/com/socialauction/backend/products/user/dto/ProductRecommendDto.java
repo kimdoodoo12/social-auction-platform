@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
 public class ProductRecommendDto {
     private Integer categoryId;
-    private Integer count;
+    private Long count;
 }
