@@ -296,8 +296,9 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         Pageable pageable );
 
 
+    // 상품 전체 개수
     @Query(value="""
-                SELECT COUNT(product_id) FROM products;
+                SELECT COUNT(product_id) FROM products
             """, nativeQuery = true)
     Integer findProductCount();
 }

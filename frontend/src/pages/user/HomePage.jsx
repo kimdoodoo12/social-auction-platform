@@ -31,6 +31,22 @@ const SECTIONS = [
 ]
 
 const CARDS_PER_SECTION = 4
+const PARTNER_CHIPS = 6 // Figma 협약 기관 띠: 기관명 칩 6개
+
+// 협약 기관 띠: 기관 수와 기관명 (불러오지 못하면 '-'와 빈 칩 영역)
+function PartnersBand() {
+  const { data } = useAsync(catalogApi.organizations)
+  const count = data?.count ?? '-'
+  return (
+    <section className="shop-partners" aria-label="협약 기관">
+      <h2>이음옥션은 {count}개 기관과 협약을 맺고 있습니다</h2>
+      <p>모든 상품은 협약 기관이 제공하고, 관리자가 직접 검수한 뒤 등록됩니다.</p>
+      <ul className="shop-partner-chips">
+        {(data?.names || []).slice(0, PARTNER_CHIPS).map((name) => <li key={name}>{name}</li>)}
+      </ul>
+    </section>
+  )
+}
 
 function ProductSection({ type, title, description, to }) {
   const { data, loading, error, reload } = useAsync(() => catalogApi.section(type), [type])
@@ -90,11 +106,7 @@ export default function HomePage() {
           ))}
 
           {/* 협약 기관 안내: 사용자용 기관 API가 없어 개수는 '-'로 두고 틀만 유지한다 (사용자 결정) */}
-          <section className="shop-partners" aria-label="협약 기관">
-            <h2>이음옥션은 -개 기관과 협약을 맺고 있습니다</h2>
-            <p>모든 상품은 협약 기관이 제공하고, 관리자가 직접 검수한 뒤 등록됩니다.</p>
-            <div className="shop-partner-chips" />
-          </section>
+          <PartnersBand />
         </div>
       </main>
       <UserFooter />

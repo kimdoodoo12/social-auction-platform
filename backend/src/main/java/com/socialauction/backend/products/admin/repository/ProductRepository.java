@@ -197,5 +197,44 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
     List<RecentBid> findRecentBids(
         @Param("auctionId") Integer auctionId
     );
-        
+    
+        // 연관된 상품 
+    @Query(value = """
+        SELECT
+            a.auction_status AS auctionStatus,
+            i.image AS image,
+            o.name AS organizationName,
+            p.name AS productName,
+            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
+            a.end_time AS endTime,
+            COALESCE(bs.bid_count, 0) AS bidCount,
+            p.product_id AS productId,
+            a.auction_id AS auctionId
+        FROM products p
+        JOIN organization o
+            ON o.organization_id = p.organization_id
+        JOIN auction a
+            ON a.product_id = p.product_id
+            /* 입찰횟수 */
+        LEFT JOIN (
+            SELECT
+                auction_id,
+                max(bid_price) AS current_price,
+                count(*) AS bid_count
+            FROM bid
+            GROUP BY auction_id
+        ) bs
+            ON bs.auction_id = a.auction_id
+        JOIN image i
+            ON i.product_id = p.product_id
+            AND i.sort_order = 1
+        WHERE
+            (p.organization_id = :organizationId OR p.category_id = :categoryId)
+            AND p.product_id <> :productId          /* 지금 보고 있는 상품 제외 */
+        ORDER BY
+        (p.organization_id = :organizationId AND p.category_id = :categoryId) DESC,  /* 카테고리, 제작기관 둘 다 같은 상품 먼저 */
+        RAND()
+        LIMIT 4
+        """, nativeQuery = true)
+    List<com.socialauction.backend.products.user.dto.ProductDto> findRelatedProduct(@Param("productId")Integer productId, @Param("organizationId") Integer organizationId, @Param("categoryId")Integer categoryId);
 }

@@ -16,6 +16,8 @@ export const userAuctionApi = {
   getAuction: (auctionId, signal) => readJson(`${auctionPath}/${auctionId}`, signal),
   getProduct: (auctionId, signal) => readJson(`${auctionPath}/product/${auctionId}`, signal),
   getBids: (auctionId, signal) => readJson(`${auctionPath}/bid?id=${auctionId}`, signal),
+  // 연관 상품: 경로 값은 경매 ID가 아니라 상품 ID다 → ProductDto[] (최대 4개)
+  getRelated: (productId, signal) => readJson(`${auctionPath}/product/${productId}/related`, signal),
   subscribe(auctionId) {
     // * 이 SSE 경로는 와일드카드 CORS이며 쿠키 인증을 사용하지 않는다.
     return new EventSource(`${BASE_URL}/api/sse/${auctionId}/subscribe`)

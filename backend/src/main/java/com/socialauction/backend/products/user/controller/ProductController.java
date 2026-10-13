@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.socialauction.backend.global.jtw.JWTutil;
+import com.socialauction.backend.organization.dto.user.OrganizationMainResponse;
 import com.socialauction.backend.category.service.CategoryService;
 import com.socialauction.backend.category.admin.CategoryResponse;
 import com.socialauction.backend.products.user.dto.ProductDto;
@@ -90,6 +91,11 @@ public class ProductController {
         );
     }
     
-    
+
+    /* ------------- 기관목록 페이지 ------------------- */
+    @GetMapping("/organization")
+    public OrganizationMainResponse findOrganizationMainResponse(){
+        return productService.findOrganizationMainResponse();
+    }
     
 }

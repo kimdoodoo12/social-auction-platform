@@ -79,3 +79,5 @@ SELECT a.auction_id, pd.name, o.name, m.name, py.payment_price, py.created_at, p
 SELECT COUNT(product_id) FROM products;
 
 SELECT * FROM auction WHERE auction_status = '진행';
+
+SELECT name FROM organization WHERE agreement_status = true ORDER BY RAND() LIMIT 6

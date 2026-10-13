@@ -16,6 +16,8 @@ import com.socialauction.backend.category.entity.CategoryEntity;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.interest.repository.InterestRepository;
 import com.socialauction.backend.interest.service.InterestService;
+import com.socialauction.backend.organization.dto.user.OrganizationMainResponse;
+import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.user.dto.ProductDto;
 import com.socialauction.backend.products.user.dto.ProductRecommendDto;
 import com.socialauction.backend.products.user.dto.RecommendDto;
@@ -30,7 +32,151 @@ public class ProductService {
     private final InterestService interestService;
     private final CategoryRepository categoryRepository;
     private final InterestRepository interestRepository;
-   
+    private final OrganizationRepository organizationRepository;
+    
+    // 추천 상품 조회
+    public List<ProductDto> findRecommendProduct(Long memberId) {
+        if (memberId == null) return productRepository.findRandomProducts();
+        // 카테고리별 입찰 횟수 확인
+        List<ProductRecommendDto> recommendDtos =
+            productRepository.findCount(memberId);
+        // 카테고리 아이디를 모아놓을 빈 리스트
+        List<Integer> selectedCategoryIds;
+
+        if (!recommendDtos.isEmpty()) {
+            // 입찰 이력 있음: 입찰 횟수 기반 카테고리(4개) 추첨
+            selectedCategoryIds = selectCategoryIds(recommendDtos);
+        } else if (interestRepository.existsByMemberEntity_MemberId(memberId)) {
+            // 조회 이력만 있음: 카테고리 동일 확률 추첨
+            selectedCategoryIds = selectRandomCategoryIds();
+        } else {
+            // 둘 다 없음: 전체 추천 가능 상품에서 랜덤 4개
+            return productRepository.findRandomProducts();
+        }
+
+        // DB 조회에 전달할 때만 카테고리 중복 제거
+        List<Integer> categoryIds = selectedCategoryIds.stream()
+            .distinct()
+            .toList();
+
+        if (categoryIds.isEmpty()) return productRepository.findRandomProducts();
+
+        // 상품 후보와 회원 관심 정보 조회
+        List<RecommendDto> candidates =
+            productRepository.findRecommendCandidates(memberId, categoryIds);
+
+        // 카테고리 추첨 순서대로 중복 없는 상품 선택
+        List<RecommendDto> selectedProducts =
+            selectProducts(selectedCategoryIds, candidates);
+
+        List<ProductDto> result = new ArrayList<>();
+
+        for (RecommendDto selected : selectedProducts) {
+            ProductDto product = ProductDto.builder()
+                .productId(selected.getProductId())
+                .auctionId(selected.getAuctionId())
+                .auctionStatus(selected.getAuctionStatus())
+                .image(selected.getImage())
+                .organizationName(selected.getOrganizationName())
+                .productName(selected.getProductName())
+                .currentPrice(selected.getCurrentPrice())
+                .endTime(selected.getEndTime())
+                .bidCount(selected.getBidCount())
+                .build();
+
+            result.add(product);
+        }
+
+        return result;
+    }
+
+    // 전체 카테고리 중 동일 확률로 4번 추첨
+    private List<Integer> selectRandomCategoryIds() {
+        List<CategoryEntity> categories = categoryRepository.findAll();
+        List<Integer> selectedCategoryIds = new ArrayList<>();
+
+        if (categories.isEmpty()) return selectedCategoryIds;
+
+        for (int i = 0; i < 4; i++) {
+            int randomIndex = (int) (Math.random() * categories.size());
+
+            selectedCategoryIds.add(
+                categories.get(randomIndex).getCategoryId()
+            );
+        }
+
+        return selectedCategoryIds;
+    }
+
+    // 입찰 횟수를 가중치로 카테고리 4번 추첨
+    private List<Integer> selectCategoryIds(
+            List<ProductRecommendDto> recommendDtos) {
+
+        List<Integer> selectedCategoryIds = new ArrayList<>();
+
+        long total = 0;
+        for (ProductRecommendDto dto : recommendDtos) {
+            total += dto.getCount();
+        }
+
+        for (int i = 0; i < 4; i++) {
+            long random = (long) (Math.random() * total) + 1;
+            long cumulativeCount = 0;
+
+            for (ProductRecommendDto dto : recommendDtos) {
+                cumulativeCount += dto.getCount();
+
+                if (random <= cumulativeCount) {
+                    selectedCategoryIds.add(dto.getCategoryId());
+                    break;
+                }
+            }
+        }
+
+        return selectedCategoryIds;
+    }
+
+    // 카테고리 추첨 순서대로 중복 없는 상품 선택
+    private List<RecommendDto> selectProducts(
+            List<Integer> selectedCategoryIds,
+            List<RecommendDto> candidates) {
+
+        List<RecommendDto> selectedProducts = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Integer categoryId : selectedCategoryIds) {
+            List<RecommendDto> categoryCandidates = new ArrayList<>();
+
+            for (RecommendDto candidate : candidates) {
+                // 이번에 선택한 카테고리가 아니면 제외
+                if (!categoryId.equals(candidate.getCategoryId())) {
+                    continue;
+                }
+
+                // 이미 선택한 상품인지 ID 비교
+                boolean duplicated = false;
+
+                for (RecommendDto selected : selectedProducts) {
+                    if (candidate.getProductId()
+                            .equals(selected.getProductId())) {
+                        duplicated = true;
+                        break;
+                    }
+                }
+
+                if (!duplicated) {
+                    categoryCandidates.add(candidate);
+                }
+            }
+
+            if (categoryCandidates.isEmpty()) continue;
+            RecommendDto selected = selectProduct(categoryCandidates, now);
+            selectedProducts.add(selected);
+        }
+
+        return selectedProducts;
+    }
+
     // 후보 중 상품 하나를 관심 점수로 추첨
     public List<ProductDto> findRecommendProduct(
             Long memberId,
@@ -143,5 +289,13 @@ public class ProductService {
             productName, organizationId, auctionStatus,
             categoryId, lowprice, highprice, sort, pageable);
         return list;
+    }
+
+    // 메인페이지 기관목록과 개수 조회
+    public OrganizationMainResponse findOrganizationMainResponse(){
+        return OrganizationMainResponse.builder()
+            .organzationNameList(organizationRepository.findOrganizationNameList())
+            .organizationCount(organizationRepository.findOrganizationCount())
+            .build();
     }
 }

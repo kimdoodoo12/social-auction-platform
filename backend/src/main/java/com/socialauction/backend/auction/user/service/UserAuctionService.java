@@ -5,6 +5,8 @@ import com.socialauction.backend.interest.repository.InterestRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.swing.text.html.parser.Entity;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import com.socialauction.backend.member.repository.MemberRepository;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.admin.repository.ProductRepository;
 import com.socialauction.backend.products.entity.ProductEntity;
+import com.socialauction.backend.products.user.dto.ProductDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -266,6 +269,14 @@ public class UserAuctionService {
         return detail;
     }
 
+
+    // 연관된 상품 조회
+    public List<ProductDto> findRelatedProducts(Integer productId){
+        ProductEntity productEntity = productRepository.findById(productId).orElse(null);
+        Integer organizationId = productEntity.getOrganizationEntity().getOrganizationId();
+        Integer categoryId = productEntity.getCategoryEntity().getCategoryId();
+        return productRepository.findRelatedProduct(productId, organizationId, categoryId);
+    }
 
     
 }   

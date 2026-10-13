@@ -12,18 +12,19 @@ import BidConfirmModal from './BidConfirmModal'
 import './auction-detail.css'
 import UserHeader from './UserHeader'
 import UserFooter from './UserFooter'
-import { ProductImage } from './CatalogParts'
+import { CatalogState, ProductGrid, ProductImage } from './CatalogParts'
+import { useAsync } from '../../hooks/useAsync'
 
 // [USER] 04 상세 진행 (Figma 25:2415) / 03 상세 대기 (25:2559) / 05 입찰 모달 (25:2673)
 // 사용자 결정
 // - 첫 입찰도 백엔드 규칙대로 시작가 + 1,000원부터
 // - 경로의 카테고리는 상세 API에 없어 '-'
 // - 배송 · 환불 안내 탭은 데이터가 없어 비활성
-// - 함께 보면 좋은 상품은 API가 없어 틀만 두고 필요한 API를 안내
 // - 관심 상품 담기는 API가 없어 비활성 (찜 버튼과 같은 처리)
 
 const THUMB_SLOTS = 4
 const DETAIL_SHOTS = 2
+const RELATED_CARDS = 4
 
 function PreviewControls({ auctionId, connection, streamError, events }) {
   function changeAuction(event) {
@@ -143,8 +144,14 @@ function DetailTabs({ product, auction, images }) {
   )
 }
 
-// 함께 보면 좋은 상품: 전용 API가 없어 틀만 두고 필요한 API를 화면에 안내한다 (사용자 결정)
-function RelatedSection() {
+// 함께 보면 좋은 상품: GET /ieum/user/auction/product/{productId}/related (최대 4개)
+// 응답에 지금 보고 있는 상품이 섞여 오면 화면에서 뺀다.
+function RelatedSection({ productId, auctionId, organizationId }) {
+  const { data, loading, error, reload } = useAsync(
+    () => (productId ? userAuctionApi.getRelated(productId) : Promise.resolve([])),
+    [productId],
+  )
+  const products = (Array.isArray(data) ? data : []).filter((p) => p.auctionId !== auctionId).slice(0, RELATED_CARDS)
   return (
     <section className="ud-related">
       <div className="shop-width">
@@ -153,13 +160,12 @@ function RelatedSection() {
             <h2>함께 보면 좋은 상품</h2>
             <p>같은 카테고리이거나 같은 기관에서 등록한 상품입니다.</p>
           </div>
-          <span className="ud-disabled-link" title="준비 중인 기능입니다.">전체보기 →</span>
+          {organizationId ? <Link to={`/products?organizationId=${organizationId}`}>전체보기 →</Link> : null}
         </div>
-        <div className="ud-api-needed" role="note">
-          <strong>이 영역에 필요한 API가 아직 없습니다.</strong>
-          <p>현재 경매 상품과 같은 카테고리이거나 같은 기관에서 등록한 상품을 최대 4개 돌려주는 조회 API가 필요합니다.</p>
-          <code>GET /ieum/user/product/related?auctionId={'{auctionId}'}&amp;size=4 → ProductDto[]</code>
-        </div>
+        <CatalogState loading={loading || !productId} error={error} empty={!products.length} onRetry={reload}
+          emptyTitle="함께 보여 드릴 상품이 아직 없어요." emptyText="같은 기관이나 카테고리에 새 상품이 등록되면 이곳에 표시됩니다.">
+          <ProductGrid products={products} />
+        </CatalogState>
       </div>
     </section>
   )
@@ -331,7 +337,7 @@ function AuctionContent({ auctionId, preview }) {
     </section>
   )
 
-  const related = <RelatedSection />
+  const related = <RelatedSection productId={product?.productId} auctionId={auctionId} organizationId={product?.organizationId} />
   const lower = <DetailTabs product={product} auction={auction} images={images} />
 
   return (
