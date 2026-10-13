@@ -51,9 +51,8 @@ public class ClosingAuctionService {
     public void closeAuction(int auctionId){
 
 
-
         // * 경매 상태 변경
-        AuctionEntity auctionEntity =  auctionRepository.findById(auctionId).orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
+        AuctionEntity auctionEntity =  auctionRepository.findByIdForUpdate(auctionId).orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
         auctionEntity.setAuctionStatus("완료");
 
         // * 낙찰자 선정

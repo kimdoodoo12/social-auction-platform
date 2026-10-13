@@ -23,7 +23,7 @@ public class AuctionSseService {
 
     private final Map<Integer, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
-
+    // * 구독
     public SseEmitter subscribe(Integer auctionId ){
         SseEmitter emitter = new SseEmitter(30L * 60 * 1000); // 2-1 : SseEmitter 객체 생성 
         
@@ -43,6 +43,7 @@ public class AuctionSseService {
 
     }
 
+    // * 구독중인 대상에게 데이터 전송
     public void broadcastPrice(Integer auctionId, Object priceData) {
         List<SseEmitter> roomEmitters = emitters.get(auctionId);
         if (roomEmitters == null || roomEmitters.isEmpty()) {

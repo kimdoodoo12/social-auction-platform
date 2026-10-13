@@ -16,7 +16,7 @@ public class AuctionConfirmDto {
 
     private Integer price;
 
-    private Integer memberId;
+    private Long memberId;
 }
 
 // public AuctionEntity toEntity(){

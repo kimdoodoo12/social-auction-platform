@@ -74,27 +74,40 @@ public class UserAuctionService {
 
     // * 경매 입찰 
     @Transactional 
-    public boolean auctionConfirmed(AuctionConfirmDto auctionConfirmDto){
+    public boolean auctionConfirmed(AuctionConfirmDto auctionConfirmDto, AuctionEntity auctionEntity){
         
     
         // * 경매 마감 시간 확인
-        LocalDateTime endtime = auctionRepository.findEndTimeById(auctionConfirmDto.getAuctionId()).orElse(null);
-        if(!chekDeadline(endtime)){
-            return false;
-        }
+        // LocalDateTime endtime = auctionRepository.findEndTimeById(auctionConfirmDto.getAuctionId()).orElse(null);
+        // if(!chekDeadline(endtime)){
+        //     return false;
+        // }
         
         // * 경매 id에 해당하는 레코드 잠금  
-        AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElse(null);
+        // AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElse(null);
 
         // * 경매 마감 시간 재 확인 - 잠금되고 대기했다가 마감 시간이 지난 상황 대비
         if(!chekDeadline(auctionEntity.getEndTime())){
             return false;
         }
 
-        // * 현재 최고가보다 최소 1,000원 높아야 한다
-        if (auctionConfirmDto.getPrice() - auctionEntity.getTopPrice() < 1000) {
-            return false;
+
+        if (auctionEntity.getTopPrice() == null) {
+            // 첫 입찰: 상품 시작가 이상인지 확인
+            if (auctionConfirmDto.getPrice() < auctionEntity.getProductEntity().getStartPrice()) {
+                return false;
+            }
+        } else {
+            // 이후 입찰: 현재 최고가 + 호가 단위(1,000원) 이상인지 확인
+            if (auctionConfirmDto.getPrice() - auctionEntity.getTopPrice() < 1000) {
+                return false;
+            }
         }
+
+        // // * 현재 최고가보다 최소 1,000원 높아야 한다
+        // if (auctionConfirmDto.getPrice() - auctionEntity.getTopPrice() < 1000) {
+        //     return false;
+        // }
 
 
         // * 레코드 추가된 개수로 반환
@@ -116,12 +129,9 @@ public class UserAuctionService {
 
     // * 경매 첫 입찰
     @Transactional 
-    public boolean firstBid(AuctionConfirmDto auctionConfirmDto){
+    public boolean firstBid(AuctionConfirmDto auctionConfirmDto, AuctionEntity auctionEntity){
 
-
-        // * 받은 경매 id가 대기상태인지 확인 -> 락
-        AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElseThrow();
-
+        
         // * 대기상태이면 진행으로 변경 아니면 false
         if(auctionEntity.getAuctionStatus().equals("대기")){
             auctionEntity.setAuctionStatus("진행");
@@ -138,7 +148,7 @@ public class UserAuctionService {
         auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), auctionEntity.getEndTime());
         
         // * 입찰 메서드
-        boolean result = auctionConfirmed(auctionConfirmDto);
+        boolean result = auctionConfirmed(auctionConfirmDto,auctionEntity);
 
         if (result == true) {
             return true;
@@ -154,24 +164,39 @@ public class UserAuctionService {
 
 
     // * 첫 입찰, 경매중 입찰 한곳에서 처리
-    public boolean bidAction(AuctionConfirmDto auctionConfirmDto){
-        AuctionEntity auctionEntity = auctionRepository.findById(auctionConfirmDto.getAuctionId()).orElseThrow();
+    //! 사용종료
+    // public boolean bidAction(AuctionConfirmDto auctionConfirmDto){
+    //     AuctionEntity auctionEntity = auctionRepository.findById(auctionConfirmDto.getAuctionId()).orElseThrow();
         
-        if(auctionEntity.getAuctionStatus().equals("대기")){
-            return firstBid(auctionConfirmDto);
-        }else if (auctionEntity.getAuctionStatus().equals("진행")) {
-            return auctionConfirmed(auctionConfirmDto);
-        }else{
-            return false;
-        }
+    //     if(auctionEntity.getAuctionStatus().equals("대기")){
+    //         return firstBid(auctionConfirmDto);
+    //     }else if (auctionEntity.getAuctionStatus().equals("진행")) {
+    //         return auctionConfirmed(auctionConfirmDto);
+    //     }else{
+    //         return false;
+    //     }
 
-    }
+    // }
 
-    
+    // * placeBid 입찰을 하고 성공하면
+    // * 이벤트 발행 후 DB 커밋 
+    // * AuctionEventListener 실행
+    // * 해당 경매 구독자들에게 priceUpdate 전송 → 브라우저가 받아 화면 갱신
+     
     @Transactional 
     public Boolean placeBid(AuctionConfirmDto auctionConfirmDto) {
 
-        boolean result = bidAction(auctionConfirmDto);
+        AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId())
+            .orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
+
+        boolean result = false;
+
+        // 2. 상태에 따라 바로 분기
+        if ("대기".equals(auctionEntity.getAuctionStatus())) {
+            result = firstBid(auctionConfirmDto, auctionEntity);
+        } else if ("진행".equals(auctionEntity.getAuctionStatus())) {
+            result = auctionConfirmed(auctionConfirmDto, auctionEntity);
+        }
         
         //입찰 성공시 
         if (result==true) {

@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import com.socialauction.backend.auction.queue.AuctionQueue;
 import com.socialauction.backend.auction.user.service.ClosingAuctionService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,11 @@ import lombok.RequiredArgsConstructor;
 public class AuctionScheduler {
     private final TaskScheduler taskScheduler;
     private final ClosingAuctionService closingAuctionService;
+    private final AuctionQueue auctionQueue;
 
     public void scheduleEnd(int auctionId, LocalDateTime endTime){
         Instant instant = endTime.atZone(ZoneId.systemDefault()).toInstant();
         
-        taskScheduler.schedule(() -> closingAuctionService.closeAuction(auctionId), instant);
+        taskScheduler.schedule(() -> auctionQueue.submitClose(auctionId), instant);
     }
 }
