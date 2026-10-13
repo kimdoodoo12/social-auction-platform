@@ -31,7 +31,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final InterestRepository interestRepository;
    
-    // 후보 중 상품 하나를 관심 점수로 추첨
+    // 상품 4개를 관심 점수로 추첨
     public List<ProductDto> findRecommendProduct(
             Long memberId,
             LocalDateTime now) {
@@ -59,7 +59,7 @@ public class ProductService {
                     now
                 );
             }
-
+            weight = Math.max(2.0, weight); // 가중치가 2점 미만으로 내려가는 것을 방지
             weights.add(weight);
             totalWeight += weight;
         }
@@ -80,17 +80,14 @@ public class ProductService {
             // 랜덤으로 1개 뽑기
             for (int i = 0; i < candidates.size(); i++) {
                 cumulativeWeight += weights.get(i);
-                boolean exist = false;
                 if (random < cumulativeWeight) {
-                    // 현재 리스트에 선택된 상품이 있는지 확인
-                    for(ProductDto dto : list) {
-                        if(dto.getProductId().equals(candidates.get(i).getProductId( ) ) ) {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    // 리스트에 없으면 
-                    if( exist == false) { selected = candidates.get(i); }
+                    // 선택한 상품을 가져오면서 후보에서 제거
+                    selected = candidates.remove(i);
+
+                    // 해당 상품의 가중치도 제거하고 총합에서 차감
+                    double selectedWeight = weights.remove(i);
+                    totalWeight -= selectedWeight;
+
                     break;
                 }
             }
