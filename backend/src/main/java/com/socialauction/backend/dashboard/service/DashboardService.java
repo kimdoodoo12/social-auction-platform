@@ -62,7 +62,7 @@ public class DashboardService {
     // 진행중인 경매는 사용자쪽 메인(상품) 쿼리를 재사용
     public List<ProductDto> findEndProduct(){
         // 동적으로 5개의 dto와 상품의 경매 종료시각이 가장 최근 기준으로 정렬
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("end_time").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("a.end_time").ascending());
         return productRepository.findProduct("ending", pageable).getContent();
     }
 

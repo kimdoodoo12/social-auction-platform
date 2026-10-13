@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.socialauction.backend.global.jtw.JWTutil;
+import com.socialauction.backend.category.service.CategoryService;
+import com.socialauction.backend.category.admin.CategoryResponse;
 import com.socialauction.backend.products.user.dto.ProductDto;
 import com.socialauction.backend.products.user.service.ProductService;
 
@@ -28,6 +30,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ProductController {
     private final ProductService productService;
     private final JWTutil jwtUtil;
+    private final CategoryService categoryService;
+
+    @GetMapping("categories")
+    public List<CategoryResponse> categories() {
+        return categoryService.findAllCategoryWithProductCount();
+    }
     /* ----------- 메인페이지 ------------------ */
     // 추천 상품 조회
     @GetMapping("recommend")

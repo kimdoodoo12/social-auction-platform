@@ -33,13 +33,15 @@ public class ProductService {
     
     // 추천 상품 조회
     public List<ProductDto> findRecommendProduct(Long memberId) {
+        if (memberId == null) return productRepository.findRandomProducts();
+        // 카테고리별 입찰 횟수 확인
         List<ProductRecommendDto> recommendDtos =
             productRepository.findCount(memberId);
-
+        // 카테고리 아이디를 모아놓을 빈 리스트
         List<Integer> selectedCategoryIds;
 
         if (!recommendDtos.isEmpty()) {
-            // 입찰 이력 있음: 입찰 횟수 기반 카테고리 추첨
+            // 입찰 이력 있음: 입찰 횟수 기반 카테고리(4개) 추첨
             selectedCategoryIds = selectCategoryIds(recommendDtos);
         } else if (interestRepository.existsByMemberEntity_MemberId(memberId)) {
             // 조회 이력만 있음: 카테고리 동일 확률 추첨
@@ -54,6 +56,8 @@ public class ProductService {
             .distinct()
             .toList();
 
+        if (categoryIds.isEmpty()) return productRepository.findRandomProducts();
+
         // 상품 후보와 회원 관심 정보 조회
         List<RecommendDto> candidates =
             productRepository.findRecommendCandidates(memberId, categoryIds);
@@ -66,10 +70,12 @@ public class ProductService {
 
         for (RecommendDto selected : selectedProducts) {
             ProductDto product = ProductDto.builder()
+                .productId(selected.getProductId())
+                .auctionId(selected.getAuctionId())
                 .auctionStatus(selected.getAuctionStatus())
                 .image(selected.getImage())
                 .organizationName(selected.getOrganizationName())
-                .ProductName(selected.getProductName())
+                .productName(selected.getProductName())
                 .currentPrice(selected.getCurrentPrice())
                 .endTime(selected.getEndTime())
                 .bidCount(selected.getBidCount())
@@ -85,6 +91,8 @@ public class ProductService {
     private List<Integer> selectRandomCategoryIds() {
         List<CategoryEntity> categories = categoryRepository.findAll();
         List<Integer> selectedCategoryIds = new ArrayList<>();
+
+        if (categories.isEmpty()) return selectedCategoryIds;
 
         for (int i = 0; i < 4; i++) {
             int randomIndex = (int) (Math.random() * categories.size());
@@ -103,14 +111,14 @@ public class ProductService {
 
         List<Integer> selectedCategoryIds = new ArrayList<>();
 
-        int total = 0;
+        long total = 0;
         for (ProductRecommendDto dto : recommendDtos) {
             total += dto.getCount();
         }
 
         for (int i = 0; i < 4; i++) {
-            int random = (int) (Math.random() * total) + 1;
-            int cumulativeCount = 0;
+            long random = (long) (Math.random() * total) + 1;
+            long cumulativeCount = 0;
 
             for (ProductRecommendDto dto : recommendDtos) {
                 cumulativeCount += dto.getCount();
@@ -158,6 +166,7 @@ public class ProductService {
                 }
             }
 
+            if (categoryCandidates.isEmpty()) continue;
             RecommendDto selected = selectProduct(categoryCandidates, now);
             selectedProducts.add(selected);
         }
@@ -232,7 +241,7 @@ public class ProductService {
     
     // 새로 등록된 상품 조회
     public List<ProductDto> findNewProduct( ) {
-        Pageable pageable = PageRequest.of(0, 4, Sort.by("p.created_at").descending());
+        Pageable pageable = PageRequest.of(0, 4, Sort.by("created_at").descending());
         return productRepository.findProduct("new", pageable).getContent();
     }
 

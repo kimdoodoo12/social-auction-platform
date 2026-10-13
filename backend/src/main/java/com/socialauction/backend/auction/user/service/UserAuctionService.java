@@ -36,6 +36,10 @@ public class UserAuctionService {
     private final MemberRepository memberRepository;
     private final InterestService interestService;
 
+    public List<String> findProductImages(Integer auctionId) {
+        return auctionRepository.findProductImages(auctionId);
+    }
+
     // * 경매 페이지 정보 - 상품
     public AuctionDetailProjection findUserPageAuction(Integer auctionId){
         AuctionDetailProjection dto =  auctionRepository.UserPageAuctions(auctionId).orElse(null);
