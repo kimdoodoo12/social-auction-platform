@@ -4,11 +4,20 @@ import UserSignupPage from './UserSignupPage'
 import UserMyPage from './UserMyPage'
 import ForbiddenPage from './ForbiddenPage'
 import { requireAuth } from './requireAuth'
+import { authApi } from './authApi'
 
 // App.jsx에서 최상위 라우트로 등록한다. 파일 위치와 달리 /admin 하위 경로가 아니다.
 // 경로 없는 부모가 공통 레이아웃을 제공하고 자식 화면은 Outlet에 표시된다.
 export default {
   Component: UserAuthLayout,
+  loader: async () => {
+    try {
+      return { member: await authApi.me(), authError: false }
+    } catch {
+      return { member: null, authError: true }
+    }
+  },
+  shouldRevalidate: () => true,
   children: [
     { path: '/forbidden', Component: ForbiddenPage },
     { path: '/login', Component: UserLoginPage },

@@ -2,6 +2,25 @@
 .user-auth { min-height: 100vh; background: #f8f7f5; color: #34322f; font-size: 13px; }
 .user-auth a:hover { color: #bd633d; }
 /* 공통 헤더: 로고, 검색 표시 영역, 회원 메뉴와 카테고리를 배치한다. */
+/*  긴급 추가 로그아웃 버튼 */
+.ua-header-logout {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ua-header-logout:hover {
+  color: #bd633d;
+}
+
+.ua-header-logout:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+/**/
 .ua-header { background: white; border-bottom: 1px solid #e8e5e1; }
 .ua-header-main { max-width: 1100px; margin: auto; min-height: 78px; display: flex; align-items: center; gap: 48px; padding: 16px 28px; }
 .ua-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; white-space: nowrap; }
