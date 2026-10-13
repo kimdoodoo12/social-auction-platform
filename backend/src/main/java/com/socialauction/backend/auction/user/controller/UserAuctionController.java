@@ -1,6 +1,7 @@
 package com.socialauction.backend.auction.user.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.socialauction.backend.auction.queue.AuctionQueue;
 import com.socialauction.backend.auction.user.dto.AuctionConfirmDto;
 import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
@@ -33,6 +35,7 @@ public class UserAuctionController {
 
     private final UserAuctionService userAuctionService;
     private final JWTutil jwtUtil;
+    private final AuctionQueue auctionQueue;
 
     // * ---사용자------------------------------------------------------------------------------------
     
@@ -83,9 +86,9 @@ public class UserAuctionController {
 
     // * sse 적용된 입찰
     @PostMapping("/sse/Bid")
-    public boolean placeBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+    public CompletableFuture<Boolean> placeBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
     
-        return userAuctionService.placeBid(auctionConfirmDto);
+        return auctionQueue.submitBid(auctionConfirmDto, () -> userAuctionService.placeBid(auctionConfirmDto));
     }
     
     

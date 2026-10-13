@@ -9,6 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.socialauction.backend.auction.entity.AuctionEntity;
+import com.socialauction.backend.auction.queue.AuctionQueue;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.auction.user.service.ClosingAuctionService;
 
@@ -20,6 +21,7 @@ public class AuctionRecovery {
     private final AuctionRepository auctionRepository;
     private final AuctionScheduler auctionScheduler;
     private final ClosingAuctionService closingAuctionService;
+    private final AuctionQueue auctionQueue;
 
     // Spring Boot가 실행준비를 마쳤을 때 발생시키는 이벤트를 감지하여 실행
     @EventListener(ApplicationReadyEvent.class)
@@ -34,7 +36,7 @@ public class AuctionRecovery {
             if(auction.getEndTime().isBefore(LocalDateTime.now()) || auction.getEndTime().isEqual(LocalDateTime.now())){
                 // 경매 종료 로직을 실행
                 try{
-                    closingAuctionService.closeAuction(auction.getAuctionId());
+                    auctionQueue.submitClose(auction.getAuctionId()).join();
                 }catch(Exception e){}
                 
                 continue;

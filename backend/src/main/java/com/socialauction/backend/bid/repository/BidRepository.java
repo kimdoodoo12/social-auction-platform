@@ -55,7 +55,7 @@ public interface  BidRepository extends JpaRepository<BidEntity,Integer> {
     )
     int insertBid(
         @Param("auctionId") Integer auctionId,
-        @Param("memberId") Integer memberId,
+        @Param("memberId") Long memberId,
         @Param("bidPrice") Integer bidPrice
     );
 
