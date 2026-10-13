@@ -9,15 +9,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.socialauction.backend.category.entity.CategoryEntity;
-import com.socialauction.backend.category.repository.CategoryRepository;
-import com.socialauction.backend.interest.repository.InterestRepository;
 import com.socialauction.backend.interest.service.InterestService;
 import com.socialauction.backend.products.user.dto.ProductDto;
-import com.socialauction.backend.products.user.dto.ProductRecommendDto;
 import com.socialauction.backend.products.user.dto.RecommendDto;
 import com.socialauction.backend.products.user.repository.ProductRepository;
 
@@ -28,8 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
     private final ProductRepository productRepository;
     private final InterestService interestService;
-    private final CategoryRepository categoryRepository;
-    private final InterestRepository interestRepository;
    
     // 상품 4개를 관심 점수로 추첨
     public List<ProductDto> findRecommendProduct(
