@@ -37,6 +37,8 @@ function applySnapshot(auction, snapshot) {
 export function useAuctionLive(auctionId, onPriceUpdate) {
   const [auction, setAuction] = useState(null)
   const [product, setProduct] = useState(null)
+  const [images, setImages] = useState([])
+  const [imageError, setImageError] = useState('')
   const [bids, setBids] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -52,10 +54,11 @@ export function useAuctionLive(auctionId, onPriceUpdate) {
 
     // * 경매, 상품, 입찰 내역을 병렬로 불러와 화면의 첫 상태를 준비한다.
     async function loadInitialData() {
-      const [auctionResult, productResult, bidsResult] = await Promise.allSettled([
+      const [auctionResult, productResult, bidsResult, imagesResult] = await Promise.allSettled([
         userAuctionApi.getAuction(auctionId, controller.signal),
         userAuctionApi.getProduct(auctionId, controller.signal),
         userAuctionApi.getBids(auctionId, controller.signal),
+        userAuctionApi.getImages(auctionId, controller.signal),
       ])
       if (!active) return
 
@@ -76,6 +79,8 @@ export function useAuctionLive(auctionId, onPriceUpdate) {
           (!latestSnapshot || latestSnapshot.price < Number(auctionResult.value?.topPrice ?? auctionResult.value?.startPrice ?? 0))) {
         setBids(bidsResult.value)
       }
+      if (imagesResult.status === 'fulfilled' && Array.isArray(imagesResult.value)) setImages(imagesResult.value)
+      else setImageError('상품 이미지를 불러오지 못했습니다.')
       setLoading(false)
     }
 
@@ -142,6 +147,8 @@ export function useAuctionLive(auctionId, onPriceUpdate) {
   return {
     auction,
     product,
+    images,
+    imageError,
     bids,
     loading,
     error,

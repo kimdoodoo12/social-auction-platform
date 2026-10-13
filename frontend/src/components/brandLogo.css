@@ -1,0 +1,3 @@
+/* 원본 1254px 중 그림 영역(x 284~1031, y 264~984)이 칸을 채우도록 확대한다 */
+.brand-logo { flex: none; display: inline-block; overflow: hidden; border-radius: 8px; background: #fff; }
+.brand-logo img { display: block; width: 100%; height: 100%; transform: scale(1.62) translate(-1.5%, -0.2%); }

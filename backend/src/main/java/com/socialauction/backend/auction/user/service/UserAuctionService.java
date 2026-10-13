@@ -1,5 +1,7 @@
 package com.socialauction.backend.auction.user.service;
 
+import com.socialauction.backend.interest.entity.InterestEntity;
+import com.socialauction.backend.interest.repository.InterestRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserAuctionService {
 
+    private final InterestRepository interestRepository;
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
@@ -35,6 +38,10 @@ public class UserAuctionService {
     private final ApplicationEventPublisher eventPublisher;
     private final MemberRepository memberRepository;
     private final InterestService interestService;
+
+    public List<String> findProductImages(Integer auctionId) {
+        return auctionRepository.findProductImages(auctionId);
+    }
 
     // * 경매 페이지 정보 - 상품
     public AuctionDetailProjection findUserPageAuction(Integer auctionId){
@@ -119,7 +126,31 @@ public class UserAuctionService {
         }
 
         // * 경매 현재가 가격 변경
-        auctionEntity.setTopPrice(auctionConfirmDto.getPrice());
+        Long memberId = auctionConfirmDto.getMemberId();
+        Integer productId = auctionEntity.getProductEntity().getProductId();
+
+        InterestEntity interestEntity = interestRepository
+                .findByMemberEntity_MemberIdAndProductEntity_ProductId(memberId, productId)
+                .orElse(null);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (interestEntity != null) {
+            // 2-A. 기존 관심 기록이 있는 경우: 점수 +2 증가
+            interestEntity.setInterestScore(interestEntity.getInterestScore() + 2.0);
+            interestEntity.setLastViewedAt(now);
+        } else {
+            // 2-B. 관심 기록이 없던 경우: 새 관심 엔티티 생성 후 저장
+            interestEntity = InterestEntity.builder()
+                    .memberEntity(memberRepository.findById(memberId).orElse(null))// 입찰한 MemberEntity 객체
+                    .productEntity(auctionEntity.getProductEntity())
+                    .interestScore(7.0) // 조회 5점 + 입찰 가산 2점 = 7점
+                    .viewCount(1)
+                    .lastViewedAt(now)
+                    .build();
+            
+            interestRepository.save(interestEntity);
+        }
 
         return  true;
 

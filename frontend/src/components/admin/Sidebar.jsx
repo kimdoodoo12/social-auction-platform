@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { authApi } from '../../pages/admin/member/authApi'
 import { NavLink, useNavigate } from 'react-router-dom'
+import BrandLogo from '../BrandLogo'
 
 const MENUS = [
   { to: '/admin', label: 'Dashboard', end: true },
@@ -30,7 +31,7 @@ export default function Sidebar() {
   return (
     <aside className="admin-sidebar">
       <div className="admin-sidebar__brand">
-        <span className="admin-logo-mark" />
+        <BrandLogo size={28} />
         이음옥션
         <span className="admin-sidebar__badge">ADMIN</span>
       </div>
