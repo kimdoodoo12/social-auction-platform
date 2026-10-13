@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.socialauction.backend.interest.entity.InterestEntity;
+import com.socialauction.backend.member.entity.MemberEntity;
+
 
 public interface InterestRepository
         extends JpaRepository<InterestEntity, Integer> {

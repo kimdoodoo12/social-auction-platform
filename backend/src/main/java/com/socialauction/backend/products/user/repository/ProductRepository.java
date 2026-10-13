@@ -147,12 +147,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         LEFT JOIN interest it
             ON it.product_id = p.product_id
             AND it.member_id = :memberId
-        WHERE p.category_id IN (:categoryIds)
-            AND a.auction_status IN ('대기', '진행')
+            WHERE a.auction_status IN ('대기', '진행')
         """, nativeQuery = true)
     List<RecommendDto> findRecommendCandidates(
-        @Param("memberId") Long memberId,
-        @Param("categoryIds") List<Integer> categoryIds
+        @Param("memberId") Long memberId
     );
 
     // 상품 조회
