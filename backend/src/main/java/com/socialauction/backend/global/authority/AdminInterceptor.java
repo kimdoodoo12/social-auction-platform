@@ -5,7 +5,7 @@ package com.socialauction.backend.global.authority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.socialauction.backend.global.jtw.JWTutil;
+import com.socialauction.backend.global.jwt.JWTutil;
 import com.socialauction.backend.member.admin.service.MUserService;
 import com.socialauction.backend.member.admin.service.MemberService;
 
