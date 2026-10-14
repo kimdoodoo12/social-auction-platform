@@ -9,10 +9,12 @@ import UserFooter from './UserFooter'
 
 // [USER] 02 상품 목록 (Figma 53:2579)
 // - 카테고리·경매 상태는 여러 개 선택 (같은 쿼리 키 반복)
-// - 상태별 개수는 API가 없어 '-' / 제작 기관 필터는 기관 목록 API가 없어 비활성 (사용자 결정)
+// - 상태별 개수는 API가 없어 '-'
+// - 제작 기관은 목록 API가 organizationId 하나만 받아서 하나만 고른다 (다시 누르면 해제)
 
 const PRICE_MAX = 500000 // 슬라이더 범위(최대 50만 원). 입력칸에는 더 큰 값도 넣을 수 있다.
 const PRICE_STEP = 1000
+const ORG_PREVIEW = 5 // 접힌 상태에서 보이는 기관 수
 
 function Check({ checked, onChange, label, count, disabled }) {
   return (
@@ -99,6 +101,9 @@ export default function CatalogPage() {
   const result = useAsync(() => catalogApi.list(params), [key])
   const categories = useAsync(catalogApi.categories)
   const categoryList = categories.data || []
+  const organizations = useAsync(catalogApi.organizations)
+  const organizationList = [...(organizations.data?.list || [])].sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+  const [showAllOrgs, setShowAllOrgs] = useState(false)
 
   // 쿼리 갱신. 배열 값은 같은 키를 반복해서 넣는다. 필터가 바뀌면 1페이지로 돌아간다.
   const update = (changes, { keepPage = false } = {}) => {
@@ -122,7 +127,9 @@ export default function CatalogPage() {
     ...params.auctionStatuses.map((s) => STATUS_OPTIONS.find(([v]) => v === s)?.[1]),
     params.lowprice !== '' || params.highprice !== '' ? '가격' : null,
     params.productName ? `'${params.productName}'` : null,
-    params.organizationId !== '' ? (result.data?.content?.[0]?.organizationName ?? '제작 기관') : null,
+    params.organizationId !== ''
+      ? (organizationList.find((o) => o.organizationId === params.organizationId)?.name ?? result.data?.content?.[0]?.organizationName ?? '제작 기관')
+      : null,
   ].filter(Boolean)
 
   return (
@@ -165,11 +172,22 @@ export default function CatalogPage() {
                 onApply={(v) => update(v)} />
             </section>
 
-            {/* 사용자용 기관 목록 API가 없어 틀만 두고 비활성 (사용자 결정) */}
-            <section className="shop-filter-group" title="준비 중인 기능입니다.">
+            <section className="shop-filter-group">
               <h2>제작 기관</h2>
-              <p className="shop-filter-pending">기관 목록을 불러올 수 없어 준비 중입니다.</p>
-              <button type="button" className="shop-more-link" disabled>기관 더 보기 →</button>
+              <Check label="전체" count="-" checked={params.organizationId === ''} onChange={() => update({ organizationId: '' })} />
+              {(showAllOrgs ? organizationList : organizationList.slice(0, ORG_PREVIEW)).map((o) => (
+                <Check key={o.organizationId} label={o.name} count="-"
+                  checked={params.organizationId === o.organizationId}
+                  onChange={() => update({ organizationId: params.organizationId === o.organizationId ? '' : o.organizationId })} />
+              ))}
+              {organizations.error && (
+                <p className="shop-error">기관 목록을 불러오지 못했습니다. <button type="button" onClick={organizations.reload}>다시 시도</button></p>
+              )}
+              {organizationList.length > ORG_PREVIEW && (
+                <button type="button" className="shop-more-link" onClick={() => setShowAllOrgs((v) => !v)}>
+                  {showAllOrgs ? '접기 ↑' : `기관 더 보기 (${organizationList.length - ORG_PREVIEW}) →`}
+                </button>
+              )}
             </section>
 
             <button type="button" className="shop-button secondary shop-filter-reset" onClick={() => setSearch(new URLSearchParams())}>

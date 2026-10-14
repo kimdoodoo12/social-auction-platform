@@ -51,13 +51,16 @@ async function list(params) {
   }
 }
 
-// GET /organization → { organizationCount, organzationNameList } (백엔드 필드명 철자 그대로, 바르게 고쳐져도 동작)
+// GET /organization → { organizationCount, organzationList: [{ organizationId, organizationName, organizationImageFileName }] }
+// (백엔드 필드명 철자 그대로. organizationList로 바르게 고쳐져도 동작)
 async function organizations() {
   const data = await api.get(`${root}/organization`)
-  return {
-    count: data?.organizationCount ?? null,
-    names: data?.organizationNameList ?? data?.organzationNameList ?? [],
-  }
+  const list = (data?.organizationList ?? data?.organzationList ?? []).map((o) => ({
+    organizationId: o.organizationId,
+    name: o.organizationName,
+    image: o.organizationImageFileName,
+  }))
+  return { count: data?.organizationCount ?? null, list }
 }
 
 export const catalogApi = {

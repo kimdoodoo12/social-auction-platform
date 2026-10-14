@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor @Data @Builder 
 public class OrganizationMainResponse {
     Integer organizationCount;
-    List<String> organzationNameList;
+    List<OrganizationListResponse> organzationList;
 }

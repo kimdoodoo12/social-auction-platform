@@ -58,3 +58,13 @@ export function remainingClock(endTime, now) {
   const pad = (n) => String(n).padStart(2, '0')
   return `${pad(Math.floor(total / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`
 }
+
+// 배열에서 무작위로 count개를 뽑는다 (Fisher–Yates, 원본은 그대로 둔다)
+export function pickRandom(items, count) {
+  const copy = [...items]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy.slice(0, count)
+}
