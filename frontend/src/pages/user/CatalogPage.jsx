@@ -11,7 +11,7 @@ import UserFooter from './UserFooter'
 // - 카테고리·경매 상태는 여러 개 선택 (같은 쿼리 키 반복)
 // - 상태별 개수는 API가 없어 '-' / 제작 기관 필터는 기관 목록 API가 없어 비활성 (사용자 결정)
 
-const PRICE_MAX = 1000000 // 슬라이더 범위. 입력칸에는 더 큰 값도 넣을 수 있다.
+const PRICE_MAX = 500000 // 슬라이더 범위(최대 50만 원). 입력칸에는 더 큰 값도 넣을 수 있다.
 const PRICE_STEP = 1000
 
 function Check({ checked, onChange, label, count, disabled }) {
