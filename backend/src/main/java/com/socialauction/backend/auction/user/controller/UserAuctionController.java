@@ -17,7 +17,7 @@ import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
 import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 import com.socialauction.backend.auction.user.service.UserAuctionService;
-import com.socialauction.backend.global.jtw.JWTutil;
+import com.socialauction.backend.global.jwt.JWTutil;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.user.dto.ProductDto;
 

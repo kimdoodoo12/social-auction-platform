@@ -31,7 +31,7 @@ public class DashboardService {
     public DashboardResponse findDashboardResponse(){
         List<ProductDto> newProductDtos = findNewProduct();
         List<ProductDto> endProductDtos = findEndProduct();
-        List<PaymentListResponse> paymentListResponses = findPaymentListResponses();
+        List<PaymentListResponse> paymentListResponses = findPaymentListResponse();
         Integer productCount = findProductCount();
         Integer auctionWaitingCount = findAuctionCount("대기");
         Integer auctionBiddingCount = findAuctionCount("진행");
@@ -66,8 +66,8 @@ public class DashboardService {
         return productRepository.findProduct("ending", pageable).getContent();
     }
 
-    // 최근 낙찰만
-    public List<PaymentListResponse> findPaymentListResponses(){
+    // 최근 낙찰은 결제쪽 쿼리를 재사용
+    public List<PaymentListResponse> findPaymentListResponse(){
         // 동적으로 5개의 dto와 낙찰시간이 가장 최근 기준으로 정렬
         Pageable pageable = PageRequest.of(0, 5, Sort.by("created_at").descending());        
         return paymentRepository.findAllPayment(pageable).getContent();

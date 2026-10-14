@@ -14,6 +14,9 @@
 .shop-search button { display: grid; place-items: center; width: 46px; height: 100%; border: 0; background: transparent; color: var(--color-text-muted); }
 .shop-member-nav { display: flex; gap: 22px; white-space: nowrap; font-size: 14px; color: var(--color-text-muted); }
 .shop-member-nav .strong { color: var(--color-text-body); font-weight: 500; }
+.shop-logout { border: 0; padding: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.shop-logout:hover { color: var(--color-text-body); }
+.shop-logout:disabled { opacity: .6; cursor: wait; }
 .shop-category-nav { border-top: 1px solid var(--color-border); }
 .shop-category-nav .shop-width { display: flex; gap: 30px; height: 50px; align-items: center; overflow-x: auto; white-space: nowrap; }
 .shop-category-nav a { color: var(--color-text-body); font-size: 14px; }
@@ -72,7 +75,7 @@
 .shop-partners h2 { font-size: 18px; font-weight: 700; color: var(--color-text); }
 .shop-partners p { margin-top: 18px; font-size: 13px; color: var(--color-text-muted); }
 .shop-partner-chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; min-height: 46px; margin: 22px 0 0; padding: 0; list-style: none; }
-.shop-partner-chips li { display: flex; align-items: center; height: 46px; padding: 0 18px; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; font-size: 13px; font-weight: 500; color: var(--color-text-muted); }
+.shop-partner-chips li { display: flex; align-items: center; height: 46px; padding: 0; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; font-size: 13px; font-weight: 500; color: var(--color-text-muted); }
 
 /* Footer / User (1440x253, 배경 #f7f6f4) */
 .shop-footer { padding: 48px 0 40px; background: var(--color-bg); }
@@ -102,8 +105,9 @@
 .shop-check-label { flex: 1; min-width: 0; }
 .shop-check-count { font-size: 11px; color: var(--color-text-muted); }
 .shop-check.disabled { cursor: not-allowed; opacity: .55; }
-.shop-filter-pending { font-size: 12px; color: var(--color-text-subtle); }
-.shop-more-link { align-self: flex-start; padding: 0; border: 0; background: none; font-size: 12px; color: var(--color-text-muted); }
+.shop-partner-chips a { display: flex; align-items: center; height: 100%; padding: 0 18px; color: inherit; }
+.shop-partner-chips a:hover { color: var(--color-text-body); }
+.shop-more-link { align-self: flex-start; padding: 0; border: 0; background: none; font-size: 12px; color: var(--color-text-muted); cursor: pointer; }
 .shop-more-link:disabled { cursor: not-allowed; color: var(--color-text-disabled); }
 .shop-filter-reset { width: 100%; }
 

@@ -23,12 +23,13 @@ export default function AuctionDetailPage() {
 
   const detail = useAsync(() => fetchAuctionDetail(auctionId), [auctionId])
   const bids = useAsync(() => fetchBids({ auctionId, page: bidPage, size: BID_PAGE_SIZE }), [auctionId, bidPage])
-  const result = useAsync(() => fetchBidResult(auctionId), [auctionId])
 
   const data = detail.data
   const auction = data?.auctionFindAllDto
   const hasBids = Boolean(auction?.bidCount)
   const ended = Boolean(auction?.endTime) && new Date(auction.endTime) <= new Date()
+  // 낙찰 결과는 경매가 끝난 뒤에만 의미가 있다. 대기(종료 시각 없음)·진행 중에는 요청하지 않는다.
+  const result = useAsync(() => (ended ? fetchBidResult(auctionId) : Promise.resolve(null)), [auctionId, ended])
   const winner = result.data
 
   return (

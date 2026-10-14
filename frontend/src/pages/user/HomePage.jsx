@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAsync } from '../../hooks/useAsync'
 import { catalogApi } from './catalogApi'
+import { pickRandom } from './catalogHelpers'
 import { CatalogState, ProductGrid } from './CatalogParts'
 import UserHeader from './UserHeader'
 import UserFooter from './UserFooter'
@@ -34,15 +35,23 @@ const CARDS_PER_SECTION = 4
 const PARTNER_CHIPS = 6 // Figma 협약 기관 띠: 기관명 칩 6개
 
 // 협약 기관 띠: 기관 수와 기관명 (불러오지 못하면 '-'와 빈 칩 영역)
+// 백엔드는 기관 전체를 주므로, 받을 때 한 번 무작위로 6곳을 뽑는다(다시 그려도 순서가 안 바뀜).
+const loadPartners = async () => {
+  const data = await catalogApi.organizations()
+  return { ...data, list: pickRandom(data.list, PARTNER_CHIPS) }
+}
+
 function PartnersBand() {
-  const { data } = useAsync(catalogApi.organizations)
+  const { data } = useAsync(loadPartners)
   const count = data?.count ?? '-'
   return (
     <section className="shop-partners" aria-label="협약 기관">
       <h2>이음옥션은 {count}개 기관과 협약을 맺고 있습니다</h2>
       <p>모든 상품은 협약 기관이 제공하고, 관리자가 직접 검수한 뒤 등록됩니다.</p>
       <ul className="shop-partner-chips">
-        {(data?.names || []).slice(0, PARTNER_CHIPS).map((name) => <li key={name}>{name}</li>)}
+        {(data?.list || []).map((o) => (
+          <li key={o.organizationId}><Link to={`/products?organizationId=${o.organizationId}`}>{o.name}</Link></li>
+        ))}
       </ul>
     </section>
   )

@@ -62,7 +62,7 @@ public interface OrganizationRepository extends JpaRepository<OrganizationEntity
 
     // ------------------ 사용자 전용 ------------------------------ //
     @Query(value = """
-                SELECT name FROM organization WHERE agreement_status = true ORDER BY RAND() LIMIT 6
+                SELECT organization_id, name, organization_image_file_name FROM organization WHERE agreement_status = true
             """, nativeQuery = true)
-    List<String> findOrganizationNameList();
+    List<com.socialauction.backend.organization.dto.user.OrganizationListResponse> findOrganizationNameList();
 }

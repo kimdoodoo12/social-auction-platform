@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: Object.fromEntries(['/ieum', '/api', '/images', '/organization'].map(path => [path, { target: 'http://localhost:8080', changeOrigin: true }])),
+    // 백엔드로 넘길 경로. '^/bid/'는 입찰 API(BidController)만 잡도록 정규식으로 쓴다.
+    proxy: Object.fromEntries(['/ieum', '/api', '/images', '/organization', '^/bid/'].map(path => [path, { target: 'http://localhost:8080', changeOrigin: true }])),
   },
   plugins: [
     react(),

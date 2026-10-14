@@ -140,7 +140,7 @@ public class ProductService {
     // 메인페이지 기관목록과 개수 조회
     public OrganizationMainResponse findOrganizationMainResponse(){
         return OrganizationMainResponse.builder()
-            .organzationNameList(organizationRepository.findOrganizationNameList())
+            .organzationList(organizationRepository.findOrganizationNameList())
             .organizationCount(organizationRepository.findOrganizationCount())
             .build();
     }

@@ -1,4 +1,4 @@
-package com.socialauction.backend.global.jtw;
+package com.socialauction.backend.global.jwt;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;

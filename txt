@@ -1,0 +1,15 @@
+관리자 경매관리에서 경매가 진행중일 때 낙찰테이블이 없을 경우 요청실패 500
+프론트에서 경매 진행 또는 대기인경우 api 요청하지 않는 것으로 수정
+
+대시보드에서 최근 등록된 상품 findProduct // ProductRepository, 최근 낙찰 findPaymentListResponse //PaymentRepository 재사용을 위해 Pageable로 매개변수로 받고 
+각자의 서비스쪽에서 Pageable을 만들어 PageRequest.of()로 각자 필요한 개수, 정렬을 직접 정하고 Page로 반환받게 수정
+
+상품등록과 기관등록에서의 필요한 파일서비스는 하나로 만들어 통합
+
+UserAuctionService 사용자쪽 경매를 담당하는 서비스에서 TaskScheduler 등록을 위해 AuctionScheduler 참조
+스케쥴러가 할 경매 닫고 낙찰자 정하는 로직을 AuctionScheduler에서 하는 AuctionQueue참조
+이 경우에는 AuctionQueue가 또 다시 UserAuctionService를 참조해서 함수를 사용하기 때문에
+UserAuctionSerivce -> AuctionScheduler, AuctionScheduler -> AuctionQueue, AuctionQueue -> UserAuctionService
+서로가 서로를 참조하는 순환참조가 걸릴 수 있기에 새로운 서비스 ClosingAuctionService로 따로 분리
+
+운영 중 서버가 꺼졌을 때 TaskScheduler의 메모리가 날아가기 때문에 시작할때 경매 진행중이였던 스케줄러를 복구하는 AuctionRecovery생성

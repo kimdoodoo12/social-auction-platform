@@ -10,8 +10,8 @@ export default function UserLoginPage() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const pending = useRef(false) // 재렌더링 전에 발생하는 연속 제출도 즉시 차단한다.
-  // 상품 화면 등에서 전달한 returnTo가 없거나 안전하지 않으면 마이페이지로 이동한다.
-  const returnTo = safeReturnPath(params.get('returnTo') || (location.pathname === '/admin/login' ? '/admin' : '/mypage'))
+  // 상품 화면 등에서 전달한 returnTo가 없거나 안전하지 않으면 메인 화면으로 이동한다.
+  const returnTo = safeReturnPath(params.get('returnTo') || (location.pathname === '/admin/login' ? '/admin' : '/'))
 
   async function submit(event) {
     // 기본 폼 새로고침을 막고 현재 입력값으로 비동기 요청을 보낸다.
@@ -35,7 +35,8 @@ export default function UserLoginPage() {
         setError('비밀번호를 확인해 주세요.')
         return
       }
-      navigate(member.status === true ? '/admin' : '/mypage', {
+      // 관리자는 관리자 화면, 일반 회원은 보던 화면(없으면 메인)으로 간다.
+      navigate(member.status === true ? '/admin' : (returnTo.startsWith('/admin') ? '/' : returnTo), {
         replace: true,
         }) // 뒤로 가기 기록에서 제출한 로그인 화면을 교체한다.
     }  catch (error) {

@@ -63,10 +63,10 @@ export const authApi = {
 
 export function safeReturnPath(value) {
   // 외부 주소, 역슬래시, 공백이 있는 값은 기본 목적지로 대체한다.
-  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || /[\\\s]/.test(value)) return '/mypage'
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || /[\\\s]/.test(value)) return '/'
   const pathname = value.split(/[?#]/)[0]
   // 인증 화면으로 다시 돌아오는 순환 이동을 막는다.
-  if (/^\/(?:admin\/login|login|signup|user\/(?:login|signup))(?:\/|$)/.test(pathname)) return '/mypage'
+  if (/^\/(?:admin\/login|login|signup|user\/(?:login|signup))(?:\/|$)/.test(pathname)) return '/'
   return value
 }
 

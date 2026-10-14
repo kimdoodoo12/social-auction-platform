@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAsync } from '../../hooks/useAsync'
 import { authApi } from '../admin/member/authApi'
 import { catalogApi } from './catalogApi'
@@ -8,10 +9,26 @@ import './catalog.css'
 // Figma 00 Foundation · Header / User (1440×135: 상단 84 + 카테고리 51)
 export default function UserHeader() {
   const location = useLocation()
-  const { data: member } = useAsync(() => authApi.me(), [location.pathname])
+  const navigate = useNavigate()
+  const { data: member, reload: reloadMember } = useAsync(() => authApi.me(), [location.pathname])
+  const [loggingOut, setLoggingOut] = useState(false)
   const { data: categories } = useAsync(catalogApi.categories)
   const params = new URLSearchParams(location.search)
   const active = params.get('categoryId') || ''
+  // HttpOnly 쿠키는 서버가 지워야 하므로 로그아웃 API 성공을 확인한 뒤 메인으로 보낸다.
+  async function logout() {
+    if (loggingOut) return
+    setLoggingOut(true)
+    try {
+      if ((await authApi.logout()) !== true) throw new Error('logout failed')
+      navigate('/', { replace: true })
+      reloadMember() // 이미 메인에 있으면 경로가 안 바뀌므로 회원 정보를 직접 다시 읽는다.
+    } catch {
+      window.alert('로그아웃하지 못했습니다. 다시 시도해 주세요.')
+    } finally {
+      setLoggingOut(false)
+    }
+  }
   const loginTo = `/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`
 
   return (
@@ -42,6 +59,9 @@ export default function UserHeader() {
             <>
               <Link to="/mypage" className="strong">마이페이지</Link>
               {member.status === true && <Link to="/admin">관리자</Link>}
+              <button type="button" className="shop-logout" onClick={logout} disabled={loggingOut}>
+                {loggingOut ? '로그아웃 중…' : '로그아웃'}
+              </button>
             </>
           ) : (
             <>

@@ -22,6 +22,7 @@ import com.socialauction.backend.products.entity.ProductEntity;
 
 @Repository("adminProductRepository")
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
+    // 상품 첫 화면 조회
     @Query(value = """
         SELECT
             p.product_id AS productId,
@@ -62,6 +63,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         """,
         nativeQuery = true)
     Page<ProductListResponse> findProductList(Pageable pageable);
+    
     // productId, 상태,현재가 가져오기
     @Query("""
             select a.productEntity.productId as productId,
