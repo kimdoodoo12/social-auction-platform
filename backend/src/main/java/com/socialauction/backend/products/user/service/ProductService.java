@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
     private final ProductRepository productRepository;
     private final InterestService interestService;
+    private final OrganizationRepository organizationRepository;
    
     // 상품 4개를 관심 점수로 추첨
     public List<ProductDto> findRecommendProduct(
