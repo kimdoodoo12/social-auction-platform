@@ -55,7 +55,7 @@ public class AuctionSseService {
                 emitter.send(SseEmitter.event()
                         .name("priceUpdate") // 리액트에서 들을 이벤트 이름
                         .data(priceData));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 removeEmitter(auctionId, emitter);
             }
         }

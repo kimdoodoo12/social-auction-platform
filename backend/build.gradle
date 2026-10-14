@@ -57,6 +57,9 @@ dependencies {
 
 	//웹소켓
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	//유효성 검사 의존성  Bean Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

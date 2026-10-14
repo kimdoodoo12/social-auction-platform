@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class AuctionScheduler {
     private final TaskScheduler taskScheduler;
-    private final ClosingAuctionService closingAuctionService;
     private final AuctionQueue auctionQueue;
 
     public void scheduleEnd(int auctionId, LocalDateTime endTime){
