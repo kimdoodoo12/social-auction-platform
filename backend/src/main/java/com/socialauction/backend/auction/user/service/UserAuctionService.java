@@ -138,22 +138,10 @@ public class UserAuctionService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        if (interestEntity != null) {
-            // 2-A. 기존 관심 기록이 있는 경우: 점수 +2 증가
-            interestEntity.setInterestScore(interestEntity.getInterestScore() + 2.0);
-            interestEntity.setLastViewedAt(now);
-        } else {
-            // 2-B. 관심 기록이 없던 경우: 새 관심 엔티티 생성 후 저장
-            interestEntity = InterestEntity.builder()
-                    .memberEntity(memberRepository.findById(memberId).orElse(null))// 입찰한 MemberEntity 객체
-                    .productEntity(auctionEntity.getProductEntity())
-                    .interestScore(7.0) // 조회 5점 + 입찰 가산 2점 = 7점
-                    .viewCount(1)
-                    .lastViewedAt(now)
-                    .build();
+        interestEntity.setInterestScore(interestEntity.getInterestScore() + 3.0);
+        interestEntity.setLastViewedAt(now);
             
             interestRepository.save(interestEntity);
-        }
 
         return  true;
 
