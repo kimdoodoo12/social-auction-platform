@@ -60,8 +60,8 @@ public class InterestService {
             now
         );
 
-        // 5분 이상 지난 경우에만 추가 점수 부여
-        if (elapsedMinutes >= 5) {
+        // 1분 이상 지난 경우에만 추가 점수 부여
+        if (elapsedMinutes >= 1) {
             int nextViewCount = interest.getViewCount() + 1;
 
             score += getAdditionalScore(nextViewCount);
