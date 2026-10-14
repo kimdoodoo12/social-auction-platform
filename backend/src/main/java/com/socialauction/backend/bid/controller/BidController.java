@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 @RequestMapping ("/bid")
 public class BidController {
     
@@ -43,3 +43,4 @@ public class BidController {
     }
     
 }
+ 
