@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import com.socialauction.backend.global.jtw.JWTutil;
+import com.socialauction.backend.global.jwt.JWTutil;
 import com.socialauction.backend.global.redis.RedisTokenService;
 import com.socialauction.backend.member.admin.dto.MemberDto;
 import com.socialauction.backend.member.admin.dto.MemberInfoDetail;
