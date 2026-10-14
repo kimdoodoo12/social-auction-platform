@@ -125,7 +125,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
         WHERE
             (:type = 'new' AND bs.auction_id IS NULL)
             OR
-            (:type = 'popular' AND bs.bid_count > 1)
+            (:type = 'popular' AND bs.bid_count > 1 AND a.auction_status IN ('대기', '진행') )
             OR
             (
                 :type = 'ending'
