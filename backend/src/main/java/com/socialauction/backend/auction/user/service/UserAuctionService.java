@@ -48,8 +48,16 @@ public class UserAuctionService {
 
     // * 경매 페이지 정보 - 상품
     public AuctionDetailProjection findUserPageAuction(Integer auctionId){
-        AuctionDetailProjection dto =  auctionRepository.UserPageAuctions(auctionId).orElse(null);
+        AuctionDetailProjection dto =  auctionRepository.UserPageAuctions(auctionId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 경매를 찾을 수 없습니다."));
     
+
+        // ! 주의: UserPageAuctions 쿼리에 COUNT()가 들어있어서, 없는 경매 번호를 조회해도
+        // 빈 객체가 아니라 내용물(productName 등)이 전부 null인 줄이 반환
+        if (dto.getProductName() == null) {
+            throw new IllegalArgumentException("해당 경매를 찾을 수 없습니다.");
+        }
+
         return dto;
     }
 
@@ -87,48 +95,37 @@ public class UserAuctionService {
     public boolean auctionConfirmed(AuctionConfirmDto auctionConfirmDto, AuctionEntity auctionEntity){
         
     
-        // * 경매 마감 시간 확인
-        // LocalDateTime endtime = auctionRepository.findEndTimeById(auctionConfirmDto.getAuctionId()).orElse(null);
-        // if(!chekDeadline(endtime)){
-        //     return false;
-        // }
         
         // * 경매 id에 해당하는 레코드 잠금  
         // AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElse(null);
 
         // * 경매 마감 시간 재 확인 - 잠금되고 대기했다가 마감 시간이 지난 상황 대비
-        if(!chekDeadline(auctionEntity.getEndTime())){
-            return false;
+        if (auctionEntity.getEndTime() == null || !chekDeadline(auctionEntity.getEndTime())) {
+            throw new IllegalStateException("경매 마감 시간이 지났습니다.");
         }
-
 
         if (auctionEntity.getTopPrice() == null) {
-            // 첫 입찰: 상품 시작가 이상인지 확인
             if (auctionConfirmDto.getPrice() < auctionEntity.getProductEntity().getStartPrice()) {
-                return false;
+                throw new IllegalArgumentException("첫 입찰 금액은 상품 시작가 이상이어야 합니다.");
             }
         } else {
-            // 이후 입찰: 현재 최고가 + 호가 단위(1,000원) 이상인지 확인
             if (auctionConfirmDto.getPrice() - auctionEntity.getTopPrice() < 1000) {
-                return false;
+                throw new IllegalArgumentException("입찰 금액은 현재 최고가보다 최소 1,000원 이상 높아야 합니다.");
             }
         }
-
-        // // * 현재 최고가보다 최소 1,000원 높아야 한다
-        // if (auctionConfirmDto.getPrice() - auctionEntity.getTopPrice() < 1000) {
-        //     return false;
-        // }
 
 
         // * 레코드 추가된 개수로 반환
         int count = insertBid(auctionConfirmDto);
         
         // * 추가된 레코드 1개가 아니면
-        if(count != 1 ){
-            return false;
-        }
+        if (count != 1) {
+        throw new IllegalStateException("입찰 내역 저장에 실패했습니다.");
+    }
 
         // * 경매 현재가 가격 변경
+        auctionEntity.setTopPrice(auctionConfirmDto.getPrice());
+
         Long memberId = auctionConfirmDto.getMemberId();
         Integer productId = auctionEntity.getProductEntity().getProductId();
 
@@ -166,28 +163,25 @@ public class UserAuctionService {
     public boolean firstBid(AuctionConfirmDto auctionConfirmDto, AuctionEntity auctionEntity){
 
         
-        // * 대기상태이면 진행으로 변경 아니면 false
-        if(auctionEntity.getAuctionStatus().equals("대기")){
-            auctionEntity.setAuctionStatus("진행");
-        }else{
-            return false;
+        if (!auctionEntity.isWaiting()) {
+        throw new IllegalStateException("대기 상태인 경매만 첫 입찰이 가능합니다.");
         }
+        
 
         // * 시작 시간, 종료 시간 지정
-        auctionEntity.setStartTime(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
         //! 나중에 시간 바꾸기
-        auctionEntity.setEndTime(LocalDateTime.now().plusMinutes(3));
+        LocalDateTime endTime = LocalDateTime.now().plusMinutes(3);
+        auctionEntity.start(now, endTime);
+
+        // * 입찰 메서드
+        auctionConfirmed(auctionConfirmDto,auctionEntity);
 
         // * 스케줄러 등록
-        auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), auctionEntity.getEndTime());
+        auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), endTime);
         
-        // * 입찰 메서드
-        boolean result = auctionConfirmed(auctionConfirmDto,auctionEntity);
-
-        if (result == true) {
-            return true;
-        }
-        return false;
+        return true;
+       
     }
 
     // // ! 탈란드 해봐야함, orElse로만 처리하는게 맞나
@@ -220,29 +214,30 @@ public class UserAuctionService {
     @Transactional 
     public Boolean placeBid(AuctionConfirmDto auctionConfirmDto) {
 
+        if (auctionConfirmDto.getAuctionId() == null || auctionConfirmDto.getPrice() == null || auctionConfirmDto.getMemberId() == null) {
+        throw new IllegalArgumentException("경매 번호, 입찰 금액, 회원 번호는 필수입니다.");
+    }
+
         AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId())
             .orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
 
-        boolean result = false;
 
         // 2. 상태에 따라 바로 분기
         if ("대기".equals(auctionEntity.getAuctionStatus())) {
-            result = firstBid(auctionConfirmDto, auctionEntity);
+            firstBid(auctionConfirmDto, auctionEntity);
         } else if ("진행".equals(auctionEntity.getAuctionStatus())) {
-            result = auctionConfirmed(auctionConfirmDto, auctionEntity);
+            auctionConfirmed(auctionConfirmDto, auctionEntity);
+        } else {
+            throw new IllegalStateException("이미 종료된 경매입니다.");
         }
-        
-        //입찰 성공시 
-        if (result==true) {
-            eventPublisher.publishEvent(new AuctionConfirmDto(
+
+        eventPublisher.publishEvent(new AuctionConfirmDto(
             auctionConfirmDto.getAuctionId(),
             auctionConfirmDto.getPrice(),
             auctionConfirmDto.getMemberId()
-            ));
-            return true;
-        }
+        ));
 
-        return false;
+        return true;
         
        
     }

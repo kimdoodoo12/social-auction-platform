@@ -59,7 +59,10 @@ public class AdminAuctionService {
     //경매 상세 조회
     @Transactional (readOnly = true)
     public AuctionDetailDto auctionDetailFind(Integer auctionId){
-        AuctionEntity auctioneEntity = auctionRepository.findById(auctionId).orElse(null);
+
+        AuctionEntity auctioneEntity = auctionRepository.findById(auctionId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 경매를 찾을 수 없습니다. id=" + auctionId));
+        
         
         AuctionDetailDto auctionDetailDto = AuctionDetailDto.from(auctioneEntity);
         

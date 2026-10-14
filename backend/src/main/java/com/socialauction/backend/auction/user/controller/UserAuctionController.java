@@ -21,6 +21,7 @@ import com.socialauction.backend.global.jtw.JWTutil;
 import com.socialauction.backend.products.admin.dto.RecentBid;
 import com.socialauction.backend.products.user.dto.ProductDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -92,7 +93,7 @@ public class UserAuctionController {
 
     // * sse 적용된 입찰
     @PostMapping("/sse/Bid")
-    public CompletableFuture<Boolean> placeBid(@RequestBody AuctionConfirmDto auctionConfirmDto) {
+    public CompletableFuture<Boolean> placeBid(@Valid @RequestBody AuctionConfirmDto auctionConfirmDto) {
     
         return auctionQueue.submitBid(auctionConfirmDto, () -> userAuctionService.placeBid(auctionConfirmDto));
     }
