@@ -129,6 +129,7 @@ public class UserAuctionService {
         }
 
         // * 경매 현재가 가격 변경
+        auctionEntity.setTopPrice(auctionConfirmDto.getPrice());
         Long memberId = auctionConfirmDto.getMemberId();
         Integer productId = auctionEntity.getProductEntity().getProductId();
 
