@@ -13,7 +13,6 @@ import com.socialauction.backend.organization.dto.user.OrganizationMainResponse;
 import com.socialauction.backend.category.service.CategoryService;
 import com.socialauction.backend.category.admin.CategoryResponse;
 import com.socialauction.backend.products.user.dto.ProductDto;
-import com.socialauction.backend.products.user.dto.RecommendDto;
 import com.socialauction.backend.products.user.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
