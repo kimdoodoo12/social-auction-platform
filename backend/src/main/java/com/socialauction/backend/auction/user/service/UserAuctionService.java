@@ -248,7 +248,7 @@ public class UserAuctionService {
 
         ProductDetailProjection detail = auctionRepository
             .findProductDetail(auctionId)
-            .orElse(null);
+            .orElseThrow(() -> new IllegalArgumentException("해당 경매의 상품 정보를 찾을 수 없습니다."));
 
         // 상세 정보가 있고 로그인한 회원이면 관심 기록 저장
         if (detail != null && memberId != null) {
