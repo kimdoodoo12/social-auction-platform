@@ -11,7 +11,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor @AllArgsConstructor @Data @Builder 
+// * 인증된 입찰 정보를 큐·서비스·커밋 후 이벤트에 전달하는 내부 DTO다.
+// ! HTTP 요청 바인딩에는 회원 ID가 없는 AuctionBidRequest를 사용한다.
+@NoArgsConstructor @AllArgsConstructor @Data @Builder
 public class AuctionConfirmDto {
     
     @NotNull 

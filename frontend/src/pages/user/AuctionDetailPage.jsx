@@ -17,7 +17,7 @@ import { useAsync } from '../../hooks/useAsync'
 
 // [USER] 04 상세 진행 (Figma 25:2415) / 03 상세 대기 (25:2559) / 05 입찰 모달 (25:2673)
 // 사용자 결정
-// - 첫 입찰도 백엔드 규칙대로 시작가 + 1,000원부터
+// * 첫 입찰은 시작가부터, 진행 중 입찰은 현재 최고가 + 1,000원부터 가능하다.
 // - 경로의 카테고리는 상세 API에 없어 '-'
 // - 배송 · 환불 안내 탭은 데이터가 없어 비활성
 // - 관심 상품 담기는 API가 없어 비활성 (찜 버튼과 같은 처리)
@@ -218,7 +218,7 @@ function AuctionContent({ auctionId, preview }) {
   const ended = auction.status === '완료' || (live && auction.endTime && new Date(auction.endTime).getTime() <= now)
   const badge = ended ? STATUS_BADGE.완료 : STATUS_BADGE[auction.status] ?? { label: auction.status || '상태 확인 중', tone: 'waiting' }
   const currentPrice = Number(auction.topPrice ?? auction.startPrice ?? 0)
-  const minimumBid = currentPrice + BID_UNIT
+  const minimumBid = waiting ? Number(auction.startPrice) : currentPrice + BID_UNIT
   const amount = enteredAmount === null ? minimumBid : Number(enteredAmount)
   const validBid = (waiting || live) && !ended && enteredAmount !== '' && Number.isSafeInteger(amount) && amount >= minimumBid
   const title = product?.productName || auction.productName || `경매 #${auctionId}`
@@ -236,7 +236,8 @@ function AuctionContent({ auctionId, preview }) {
       }
       const pending = { price: amount, memberId: Number(member.memberId), accepted: null, sseReceived: false, eventCountAtSubmit: receivedEventCount.current }
       pendingBid.current = pending
-      const accepted = await userAuctionApi.placeBid({ auctionId, memberId: pending.memberId, price: amount })
+      // * 회원 ID는 내 SSE 이벤트 확인에만 사용하며, 입찰자는 서버가 쿠키로 확정한다.
+      const accepted = await userAuctionApi.placeBid({ auctionId, price: amount })
       setModalOpen(false)
       pending.accepted = accepted
       if (accepted === false) {
@@ -324,7 +325,8 @@ function AuctionContent({ auctionId, preview }) {
         <p className="ud-bid-error">경매가 종료되어 더 이상 입찰할 수 없습니다.</p>
       ) : (
         <p className="ud-bid-rule">
-          {formatPrice(minimumBid)} 이상부터 입찰할 수 있습니다.  ({waiting ? '시작가' : '현재가'} {formatPrice(currentPrice)} + 최소 입찰 단위 {formatPrice(BID_UNIT)})
+          {formatPrice(minimumBid)} 이상부터 입찰할 수 있습니다.
+          {waiting ? ' (첫 입찰은 시작가로 가능합니다.)' : ` (현재가 ${formatPrice(currentPrice)} + 최소 입찰 단위 ${formatPrice(BID_UNIT)})`}
         </p>
       )}
       {!ended && enteredAmount !== null && !validBid && <p className="ud-bid-error">{formatPrice(minimumBid)} 이상 입력해 주세요.</p>}

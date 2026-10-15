@@ -100,11 +100,13 @@ public class UserAuctionService {
         // AuctionEntity auctionEntity = auctionRepository.findByIdForUpdate(auctionConfirmDto.getAuctionId()).orElse(null);
 
         // * 경매 마감 시간 재 확인 - 잠금되고 대기했다가 마감 시간이 지난 상황 대비
-        if (auctionEntity.getEndTime() == null || !chekDeadline(auctionEntity.getEndTime())) {
+        if (!auctionEntity.isWaiting()
+                && (auctionEntity.getEndTime() == null || !chekDeadline(auctionEntity.getEndTime()))) {
             throw new IllegalStateException("경매 마감 시간이 지났습니다.");
         }
 
-        if (auctionEntity.getTopPrice() == null) {
+        // * 대기 경매의 topPrice에는 시작가가 들어 있을 수 있어 상태로 첫 입찰을 판단한다.
+        if (auctionEntity.isWaiting()) {
             if (auctionConfirmDto.getPrice() < auctionEntity.getProductEntity().getStartPrice()) {
                 throw new IllegalArgumentException("첫 입찰 금액은 상품 시작가 이상이어야 합니다.");
             }
@@ -123,7 +125,10 @@ public class UserAuctionService {
         throw new IllegalStateException("입찰 내역 저장에 실패했습니다.");
     }
 
-        // * 경매 현재가 가격 변경
+        // ! 입찰 저장과 같은 트랜잭션에서 최고가를 갱신해 다음 요청의 중복 가격을 차단한다.
+        auctionEntity.setTopPrice(auctionConfirmDto.getPrice());
+
+        // * 입찰 회원의 관심 점수를 갱신한다.
         Long memberId = auctionConfirmDto.getMemberId();
         Integer productId = auctionEntity.getProductEntity().getProductId();
 
@@ -154,14 +159,14 @@ public class UserAuctionService {
         }
         
 
+        // * 대기 상태에서 시작가 기준으로 검증·저장한 뒤 진행 상태로 전환한다.
+        auctionConfirmed(auctionConfirmDto, auctionEntity);
+
         // * 시작 시간, 종료 시간 지정
         LocalDateTime now = LocalDateTime.now();
         //! 나중에 시간 바꾸기
         LocalDateTime endTime = LocalDateTime.now().plusMinutes(3);
         auctionEntity.start(now, endTime);
-
-        // * 입찰 메서드
-        auctionConfirmed(auctionConfirmDto,auctionEntity);
 
         // * 스케줄러 등록
         auctionScheduler.scheduleEnd(auctionConfirmDto.getAuctionId(), endTime);
