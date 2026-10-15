@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.interest.service.InterestService;
 import com.socialauction.backend.organization.dto.user.OrganizationMainResponse;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
@@ -126,7 +127,7 @@ public class ProductService {
     }
 
     // 상품 목록 조회
-    public Page<ProductDto> findList(
+    public PageResponse<ProductDto> findList(
         Pageable pageable,
         String productName, Integer organizationId, String auctionStatus,
         Integer categoryId, Integer lowprice, Integer highprice, String sort
@@ -134,7 +135,8 @@ public class ProductService {
         Page<ProductDto> list = productRepository.findProductList(
             productName, organizationId, auctionStatus,
             categoryId, lowprice, highprice, sort, pageable);
-        return list;
+        Page<ProductDto> response = list;
+        return new PageResponse<>(response);
     }
 
     // 메인페이지 기관목록과 개수 조회

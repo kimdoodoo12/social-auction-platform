@@ -20,6 +20,7 @@ import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.global.upload.UploadFolder;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.products.admin.dto.ImageDto;
@@ -49,8 +50,9 @@ public class ProductService {
 
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
-    public Page<ProductListResponse> findProductList(Pageable pageable) {
-        return productRepository.findProductList(pageable);
+    public PageResponse<ProductListResponse> findProductList(Pageable pageable) {
+        Page<ProductListResponse> response = productRepository.findProductList(pageable);
+        return new PageResponse<>(response);
     }
     // 상품 상세 - 기본정보,상품설명, 상품이미지 조회
     @Transactional(readOnly = true)
@@ -256,9 +258,10 @@ public class ProductService {
     }
 
     // 검색기능
-    public Page<ProductManageDto> findProductManage(
+    public PageResponse<ProductManageDto> findProductManage(
         String productName, String organizationName, String auctionStatus, String categoryName, int page) {
         Pageable pageable = PageRequest.of(page, 8); // 페이징 조건을 객체로 만듦 (page: 조회할 페이지 번호, pagesize: 출력할 개수)
-        return productRepository.findProductManage(productName, organizationName, auctionStatus, categoryName, pageable);
+        Page<ProductManageDto> response = productRepository.findProductManage(productName, organizationName, auctionStatus, categoryName, pageable);
+        return new PageResponse<>(response);
     }
 } // service end
