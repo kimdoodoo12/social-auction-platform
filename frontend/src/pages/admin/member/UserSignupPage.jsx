@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { authApi, safeReturnPath } from './authApi'
+import { exceedsMemberByteLimit, limitMemberInput } from './memberInputLimit'
 
 // 정식 약관 및 동의 이력 저장 API가 제공되면 서버 기반 약관으로 교체한다.
 const agreements = ['이용약관', '개인정보 수집·이용', '입찰 및 낙찰 규정']
@@ -30,6 +31,8 @@ export default function UserSignupPage() {
     // BCrypt 입력 제한을 고려해 문자 수와 별도로 UTF-8 기준 72바이트도 확인한다.
     if (!name) return setError('이름을 입력해 주세요.')
     if (!loginId) return setError('아이디를 입력해 주세요.')
+    if (exceedsMemberByteLimit(loginId)) return setError('아이디는 UTF-8 기준 15바이트 이하로 입력해 주세요.')
+    if (exceedsMemberByteLimit(name)) return setError('이름은 UTF-8 기준 15바이트 이하로 입력해 주세요.')
     if (!/^(?=.*[A-Za-z])(?=.*\d).{8,72}$/.test(password) || new TextEncoder().encode(password).length > 72) return setError('비밀번호는 영문과 숫자를 포함한 8자 이상, 72바이트 이하로 입력해 주세요.')
     if (password !== form.get('confirmation')) return setError('비밀번호가 일치하지 않습니다.')
     if (!/^01[016789]\d{7,8}$/.test(phone)) return setError('휴대전화 번호를 확인해 주세요.')
@@ -62,8 +65,8 @@ export default function UserSignupPage() {
       <p className="ua-subtitle">가입 후 바로 입찰에 참여할 수 있습니다.</p>
       <form onSubmit={submit} aria-busy={busy}>
         {/* required, type, minLength로 브라우저 기본 검증을 적용하고 submit에서 추가 검증한다. */}
-        <label className="ua-field">아이디<input name="loginId" autoComplete="username" defaultValue={location.state?.loginId || ''} required maxLength={30} /></label>
-        <label className="ua-field">이름<input name="name" autoComplete="name" placeholder="실명을 입력해 주세요" required maxLength={30} /></label>
+        <label className="ua-field">아이디<input name="loginId" autoComplete="username" defaultValue={location.state?.loginId || ''} required onInput={limitMemberInput} onCompositionEnd={limitMemberInput} aria-describedby="signup-id-limit" /><span id="signup-id-limit" className="ua-hint">최대 15바이트 (영문·숫자 15자, 한글 5자)</span></label>
+        <label className="ua-field">이름<input name="name" autoComplete="name" placeholder="실명을 입력해 주세요" required onInput={limitMemberInput} onCompositionEnd={limitMemberInput} aria-describedby="signup-name-limit" /><span id="signup-name-limit" className="ua-hint">최대 15바이트 (한글 5자, 공백 포함)</span></label>
         <label className="ua-field">이메일<input name="email" type="email" autoComplete="email" placeholder="example@email.com" required maxLength={255} /><span className="ua-hint">낙찰 안내 주소로 사용합니다.</span></label>
         <label className="ua-field">비밀번호<input name="password" type="password" autoComplete="new-password" placeholder="영문·숫자 조합 8자 이상" required minLength={8} maxLength={72} /></label>
         <label className="ua-field">비밀번호 확인<input name="confirmation" type="password" autoComplete="new-password" placeholder="비밀번호를 한 번 더 입력해 주세요" required /></label>

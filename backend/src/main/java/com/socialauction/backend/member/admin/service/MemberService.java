@@ -1,5 +1,9 @@
 package com.socialauction.backend.member.admin.service;
 
+import com.socialauction.backend.global.encryption.AESencryption;
+import com.socialauction.backend.global.encryption.AESdecryption;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.socialauction.backend.bid.repository.BidRepository;
 
 import java.lang.reflect.Member;
@@ -44,6 +48,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService { 
     private final MemberRepository memberRepository;
+
+    // AES 암호화 키
+    @Value("${aes.secret}")
+    private String key;
     
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -64,7 +72,12 @@ public class MemberService {
             Page<MemberEntity> members =
                 memberRepository.findAll(pageable);
 
-            return members.map(MemberDto::from);
+            return members.map(member -> {
+                MemberDto dto = MemberDto.from(member);
+                dto.setLoginId(AESdecryption.AESDecryption(dto.getLoginId(), key));
+                dto.setName(AESdecryption.AESDecryption(dto.getName(), key));
+                return dto;
+            });
         } // memberfindall end
 
     // 회원정지 기능
@@ -96,6 +109,8 @@ public class MemberService {
 
         if(memberEntity == null){ return null; }
         MemberInfoDetail mDto = MemberInfoDetail.from(memberEntity);
+        mDto.setLoginId(AESdecryption.AESDecryption(mDto.getLoginId(), key));
+        mDto.setName(AESdecryption.AESDecryption(mDto.getName(), key));
 
 
         // 최근 입찰 내역
@@ -142,7 +157,7 @@ public class MemberService {
 
         Page<MemberEntity> result =
             memberRepository.userSearch(
-                    dto.getName(),
+                    dto.getName() == null ? null : AESencryption.AES(dto.getName(), key),
                     dto.getEmail(),
                     dto.getRole(),
                     dto.getStartDate(),
@@ -150,7 +165,12 @@ public class MemberService {
                     pageable
             );
 
-        return result.map(MemberDto::from);
+        return result.map(member -> {
+            MemberDto memberDto = MemberDto.from(member);
+            memberDto.setLoginId(AESdecryption.AESDecryption(memberDto.getLoginId(), key));
+            memberDto.setName(AESdecryption.AESDecryption(memberDto.getName(), key));
+            return memberDto;
+        });
     }
 
 
@@ -175,6 +195,9 @@ public class MemberService {
      // 회원가입
     public boolean userSignup(UserDto userDto){
         MemberEntity memberEntity = userDto.toEntity();
+        // DB에 저장할 아이디와 이름을 암호화한다.
+        memberEntity.setLoginId(AESencryption.AES(memberEntity.getLoginId(), key));
+        memberEntity.setName(AESencryption.AES(memberEntity.getName(), key));
 
         String password = passwordEncoder.encode(userDto.getPassword());
         memberEntity.setPassword(password);
@@ -189,10 +212,10 @@ public class MemberService {
         if(memberEntity== null){
             return  false;
         }
-        memberEntity.setLoginId(userDto.getLoginId());
+        memberEntity.setLoginId(AESencryption.AES(userDto.getLoginId(), key));
         memberEntity.setPassword(userDto.getPassword());
         memberEntity.setEmail(userDto.getEmail());
-        memberEntity.setName(userDto.getName());
+        memberEntity.setName(AESencryption.AES(userDto.getName(), key));
         memberEntity.setPhone(userDto.getPhone());
         return true;
     } // userUpdate() end
@@ -203,14 +226,17 @@ public class MemberService {
 
     // 로그인 
     public UserDto login(UserDto userDto){
-        MemberEntity memberEntity = memberRepository.findByLoginId(userDto.getLoginId());
+        MemberEntity memberEntity = memberRepository.findByLoginId(AESencryption.AES(userDto.getLoginId(), key));
         if(memberEntity == null) return null;
 
         boolean result = passwordEncoder.matches(userDto.getPassword(), memberEntity.getPassword());
 
         if(result == false) return null;
 
-        return UserDto.from(memberEntity);
+        UserDto dto = UserDto.from(memberEntity);
+        dto.setLoginId(AESdecryption.AESDecryption(dto.getLoginId(), key));
+        dto.setName(AESdecryption.AESDecryption(dto.getName(), key));
+        return dto;
     }
 
 
@@ -219,7 +245,10 @@ public class MemberService {
         Optional<MemberEntity> optional = memberRepository.findById(mno);
         if(optional.isPresent()){
             MemberEntity memberEntity = optional.get();
-            return UserDto.from(memberEntity);
+            UserDto dto = UserDto.from(memberEntity);
+            dto.setLoginId(AESdecryption.AESDecryption(dto.getLoginId(), key));
+            dto.setName(AESdecryption.AESDecryption(dto.getName(), key));
+            return dto;
         }
         return null;
     }
