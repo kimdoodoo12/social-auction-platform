@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.global.upload.UploadFolder;
 import com.socialauction.backend.organization.dto.admin.OrganizationDetailResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
@@ -28,13 +29,15 @@ public class OrganizationService {
     private final FileService fileService;
 
     @Transactional(readOnly = true)
-    public Page<OrganizationListResponse> findAll(Pageable pageable){
-        return oRepository.findAllOrganizationWithCounts(pageable);
+    public PageResponse<OrganizationListResponse> findAll(Pageable pageable){
+        Page<OrganizationListResponse> response =  oRepository.findAllOrganizationWithCounts(pageable);
+        return new PageResponse<>(response);
     }
 
     @Transactional(readOnly = true)
-    public Page<OrganizationListResponse> findAll(String name, Boolean agreementStatus, Pageable pageable){
-        return oRepository.findAllOrganizationWithCounts(name, agreementStatus, pageable);
+    public PageResponse<OrganizationListResponse> findAll(String name, Boolean agreementStatus, Pageable pageable){
+        Page<OrganizationListResponse> response = oRepository.findAllOrganizationWithCounts(name, agreementStatus, pageable);
+        return new PageResponse<>(response);
     }
 
     @Transactional(readOnly = true)

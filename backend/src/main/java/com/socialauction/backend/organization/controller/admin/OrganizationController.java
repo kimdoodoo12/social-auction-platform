@@ -1,6 +1,7 @@
 package com.socialauction.backend.organization.controller.admin;
 
 import com.socialauction.backend.global.FileService;
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.global.upload.UploadFolder;
 
 import java.util.List;
@@ -42,13 +43,13 @@ public class OrganizationController {
 
 
     @GetMapping("")
-    public Page<OrganizationListResponse> findAll(@PageableDefault(page=0,  size=4, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
-        Page<OrganizationListResponse> organizations = oService.findAll(pageable);
+    public PageResponse<OrganizationListResponse> findAll(@PageableDefault(page=0,  size=4, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
+        PageResponse<OrganizationListResponse> organizations = oService.findAll(pageable);
         return organizations;
     }
     @GetMapping("/search")
-    public Page<OrganizationListResponse> findAll(@RequestParam(name = "name", required = false)String name, @RequestParam(name = "agreementStatus", required = false) Boolean agreementStatus, @PageableDefault(page=0, size=10, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
-        Page<OrganizationListResponse> organizations = oService.findAll(name, agreementStatus, pageable);
+    public PageResponse<OrganizationListResponse> findAll(@RequestParam(name = "name", required = false)String name, @RequestParam(name = "agreementStatus", required = false) Boolean agreementStatus, @PageableDefault(page=0, size=10, sort = "organization_id", direction = Sort.Direction.ASC)Pageable pageable){
+        PageResponse<OrganizationListResponse> organizations = oService.findAll(name, agreementStatus, pageable);
         return organizations;
     }
 
