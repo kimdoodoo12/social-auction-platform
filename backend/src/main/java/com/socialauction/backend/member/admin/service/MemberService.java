@@ -1,6 +1,7 @@
 package com.socialauction.backend.member.admin.service;
 
 import com.socialauction.backend.global.encryption.AESencryption;
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.global.encryption.AESdecryption;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -61,7 +62,7 @@ public class MemberService {
 
     // 회원관리 관리자 페이지 (전체 조회)
     @Transactional 
-    public Page<MemberDto> memberfindAll(int page, int size){
+    public PageResponse<MemberDto> memberfindAll(int page, int size){
 
             Pageable pageable = PageRequest.of(
                 page,
@@ -72,12 +73,23 @@ public class MemberService {
             Page<MemberEntity> members =
                 memberRepository.findAll(pageable);
 
-            return members.map(member -> {
+             // ③ Entity를 DTO로 변환하고 복호화
+            Page<MemberDto> response = members.map(member -> {
                 MemberDto dto = MemberDto.from(member);
-                dto.setLoginId(AESdecryption.AESDecryption(dto.getLoginId(), key));
-                dto.setName(AESdecryption.AESDecryption(dto.getName(), key));
+
+                dto.setLoginId(
+                    AESdecryption.AESDecryption(dto.getLoginId(), key)
+                );
+
+                dto.setName(
+                    AESdecryption.AESDecryption(dto.getName(), key)
+                );
+
                 return dto;
             });
+
+            // ④ 최종 반환할 때 PageResponse로 감싸기
+            return new PageResponse<>(response);
         } // memberfindall end
 
     // 회원정지 기능
@@ -145,32 +157,48 @@ public class MemberService {
         return mDto;
     }
 
-    // 회원조회 이름 + 아이디 + 상태 + 가입일 
     @Transactional(readOnly = true)
-    public Page<MemberDto> userSearch(
+    public PageResponse<MemberDto> userSearch(
             MemberSearchDto dto,
             int page,
             int size
     ) {
+        Pageable pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by("memberId").ascending()
+        );
 
-        Pageable pageable = PageRequest.of(page, size);
-
+        // Repository 결과는 Page로 받기
         Page<MemberEntity> result =
-            memberRepository.userSearch(
-                    dto.getName() == null ? null : AESencryption.AES(dto.getName(), key),
+                memberRepository.userSearch(
+                    dto.getName() == null
+                        ? null
+                        : AESencryption.AES(dto.getName(), key),
                     dto.getEmail(),
                     dto.getRole(),
                     dto.getStartDate(),
                     dto.getEndDate(),
                     pageable
+                );
+
+        // DTO 변환 및 복호화
+        Page<MemberDto> response = result.map(member -> {
+            MemberDto memberDto = MemberDto.from(member);
+
+            memberDto.setLoginId(
+                AESdecryption.AESDecryption(memberDto.getLoginId(), key)
             );
 
-        return result.map(member -> {
-            MemberDto memberDto = MemberDto.from(member);
-            memberDto.setLoginId(AESdecryption.AESDecryption(memberDto.getLoginId(), key));
-            memberDto.setName(AESdecryption.AESDecryption(memberDto.getName(), key));
+            memberDto.setName(
+                AESdecryption.AESDecryption(memberDto.getName(), key)
+            );
+
             return memberDto;
         });
+
+        // API 응답 형태로 변환
+        return new PageResponse<>(response);
     }
 
 

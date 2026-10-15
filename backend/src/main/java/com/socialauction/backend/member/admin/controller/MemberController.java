@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.global.jwt.JWTutil;
 import com.socialauction.backend.global.redis.RedisTokenService;
 import com.socialauction.backend.member.admin.dto.MemberDto;
@@ -50,7 +51,7 @@ public class MemberController {
 
     // 회원관리 관리자 페이지 (전체 조회)
     @GetMapping("/manage")
-    public Page<MemberDto> memberfindAll(
+    public PageResponse<MemberDto> memberfindAll(
         @RequestParam(name="page", defaultValue = "0") int page,
         @RequestParam(name="size", defaultValue = "4") int size
     ) {
@@ -83,7 +84,7 @@ public class MemberController {
     
     // 이름 + 아이디 + 가입일 + 전체 상태 
     @GetMapping("/search")
-    public Page<MemberDto> userSearch(
+    public PageResponse<MemberDto> userSearch(
         @ModelAttribute MemberSearchDto dto,
         @RequestParam(name = "page") int page,
         @RequestParam(name = "size") int size

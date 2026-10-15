@@ -136,7 +136,7 @@ public class AESdecryption {
         return newtext;
     } // invmixColumns 연산 end 
 
-    // 블록제거 함수 
+    // 패딩제거 함수 
     public static byte[] invaddPadding(byte[] block){
         int plaintextsize = (int)block[15];
         byte[] plaintext =new byte[16-plaintextsize];
@@ -144,6 +144,6 @@ public class AESdecryption {
             plaintext[i] = block[i];
         }
         return plaintext;
-    } // 블록제거 함수
+    } // 패딩제거 함수
 
 }
