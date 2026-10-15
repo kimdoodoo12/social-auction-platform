@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.text.html.parser.Entity;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
 import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
 import com.socialauction.backend.bid.repository.BidRepository;
+import com.socialauction.backend.global.encryption.AESdecryption;
 import com.socialauction.backend.interest.service.InterestService;
 import com.socialauction.backend.member.entity.MemberEntity;
 import com.socialauction.backend.member.repository.MemberRepository;
@@ -41,6 +43,10 @@ public class UserAuctionService {
     private final ApplicationEventPublisher eventPublisher;
     private final MemberRepository memberRepository;
     private final InterestService interestService;
+
+
+    @Value ("${aes.secret}") 
+    private String key;
 
     public List<String> findProductImages(Integer auctionId) {
         return auctionRepository.findProductImages(auctionId);
@@ -66,6 +72,8 @@ public class UserAuctionService {
     public List<RecentBid> findUserPageBid(int auctionId){
         
         List<RecentBid> dto = productRepository.findRecentBids(auctionId);
+        dto.forEach((user)->{user.setMemberName(AESdecryption.AESDecryption(user.getMemberName(), key));});
+        
         return dto;
     }
 
