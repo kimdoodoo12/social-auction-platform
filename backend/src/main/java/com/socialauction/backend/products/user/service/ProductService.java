@@ -60,15 +60,11 @@ public class ProductService {
             totalWeight += weight;
         }
 
-        // 모든 가중치가 0이면 동일 확률로 추첨
-        if (totalWeight == 0) {
-            return productRepository.findRandomProducts();
-        }
 
         // 반환할 리스트 선언
         List<ProductDto> list = new ArrayList<>();
         // 4개 뽑을때까지 반복
-        while (list.size() < 4 ) {
+        while (list.size() < 4 && !candidates.isEmpty()) {
             RecommendDto selected = null;
             double random = Math.random() * totalWeight;
             double cumulativeWeight = 0;
