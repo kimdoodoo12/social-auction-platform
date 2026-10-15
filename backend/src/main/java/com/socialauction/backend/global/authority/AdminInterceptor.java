@@ -23,8 +23,8 @@ public class AdminInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(
-        HttpServletRequest request,
-        HttpServletResponse response,
+        HttpServletRequest request,     // 사용자에 요청
+        HttpServletResponse response,   // 사용자 요청에 대한 내 응답 
         Object handler
     ) throws Exception {
         // 브라우저의 CORS 사전 확인 요청 (이때 사용하는 HTTP 메서드가 OPTIONS이다.)

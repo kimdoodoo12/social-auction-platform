@@ -1,5 +1,9 @@
 package com.socialauction.backend.member.admin.service;
 
+import com.socialauction.backend.global.encryption.AESencryption;
+import com.socialauction.backend.global.encryption.AESdecryption;
+import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Service;
 
 import com.socialauction.backend.member.admin.dto.MemberDto;
@@ -15,12 +19,19 @@ import lombok.RequiredArgsConstructor;
 @Service @RequiredArgsConstructor
 public class MUserService {
     private final MemberRepository memberRepository;
+
+    // AES 암호화 키
+    @Value("${aes.secret}")
+    private String key;
     // 비크립트(암호화 사용) 라이브러리 객체주입
      private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // 회원가입 
     public boolean signup(UserDto userDto){
         MemberEntity memberEntity = userDto.toEntity();
+        // DB에 저장할 아이디와 이름을 암호화한다.
+        memberEntity.setLoginId(AESencryption.AES(memberEntity.getLoginId(), key));
+        memberEntity.setName(AESencryption.AES(memberEntity.getName(), key));
 
         // 암호화
         String password = passwordEncoder.encode(userDto.getPassword());
@@ -33,20 +44,23 @@ public class MUserService {
 
     // 로그인 
     public MemberDto login(UserDto userDto){
-        MemberEntity memberEntity = memberRepository.findByLoginId(userDto.getLoginId());
+        MemberEntity memberEntity = memberRepository.findByLoginId(AESencryption.AES(userDto.getLoginId(), key));
         if(memberEntity == null) return null;
 
         boolean result = passwordEncoder.matches(userDto.getPassword(), memberEntity.getPassword());
 
         if(result == false) return null; // 로그인 실패 
 
-        return MemberDto.from(memberEntity);
+        MemberDto dto = MemberDto.from(memberEntity);
+        dto.setLoginId(AESdecryption.AESDecryption(dto.getLoginId(), key));
+        dto.setName(AESdecryption.AESDecryption(dto.getName(), key));
+        return dto;
     } // 로그인 end
 
 
     // 아이디 중복 여부
     public boolean userfindid(String newid){
-        MemberEntity memberEntity = memberRepository.findByLoginId(newid);
+        MemberEntity memberEntity = memberRepository.findByLoginId(AESencryption.AES(newid, key));
         if(memberEntity == null)return false;
         return true;
     } // 아이디 중복 여부 

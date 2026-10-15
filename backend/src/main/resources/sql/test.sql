@@ -81,3 +81,5 @@ SELECT COUNT(product_id) FROM products;
 SELECT * FROM auction WHERE auction_status = '진행';
 
 SELECT name FROM organization WHERE agreement_status = true ORDER BY RAND() LIMIT 6
+
+SELECT COUNT(*) AS member_count FROM member;

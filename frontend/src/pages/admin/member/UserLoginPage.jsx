@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { authApi, isMember, safeReturnPath } from './authApi'
+import { exceedsMemberByteLimit, limitMemberInput } from './memberInputLimit'
 
 // 일반 회원 로그인 화면: 서버 쿠키 발급 후 검증한 목적지로 이동한다.
 export default function UserLoginPage() {
@@ -23,6 +24,8 @@ export default function UserLoginPage() {
     setError('')
     try {
       const loginId = form.get('loginId').trim()
+      if (!loginId) return setError('아이디를 입력해 주세요.')
+      if (exceedsMemberByteLimit(loginId)) return setError('아이디는 UTF-8 기준 15바이트 이하로 입력해 주세요.')
       const exists = await authApi.exists(loginId)
       if (exists === false) {
         navigate(`/signup?returnTo=${encodeURIComponent(returnTo)}`, { state: { loginId, accountMissing: true } })
@@ -56,7 +59,7 @@ export default function UserLoginPage() {
       {params.get('unavailable') && <p className="ua-error" role="alert">로그인 상태를 확인하지 못했습니다. 서버 연결을 확인한 뒤 다시 로그인해 주세요.</p>}
       <form onSubmit={submit} aria-busy={busy}>
         {/* name은 FormData 키이며 autoComplete는 브라우저의 계정 자동완성을 돕는다. */}
-        <label className="ua-field">아이디<input name="loginId" autoComplete="username" placeholder="아이디를 입력해 주세요" defaultValue={location.state?.email || ''} required maxLength={30} /></label>
+        <label className="ua-field">아이디<input name="loginId" autoComplete="username" placeholder="아이디를 입력해 주세요" defaultValue={location.state?.email || ''} required onInput={limitMemberInput} onCompositionEnd={limitMemberInput} aria-describedby="login-id-limit" /><span id="login-id-limit" className="ua-hint">최대 15바이트 (영문·숫자 15자, 한글 5자)</span></label>
         <label className="ua-field">비밀번호<input name="password" type="password" autoComplete="current-password" placeholder="비밀번호를 입력해 주세요" required /></label>
         <p className="ua-hint ua-session-note">로그인 상태는 보안 쿠키로 유지됩니다.</p>
         {error && <p className="ua-error" role="alert">{error}</p>}

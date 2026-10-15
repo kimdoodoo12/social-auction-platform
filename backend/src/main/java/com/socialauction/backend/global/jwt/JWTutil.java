@@ -38,7 +38,7 @@ public class JWTutil {
     // jwt access 토큰 생성 
     public String createAccessToken(Long mno){
         String jwt = Jwts.builder()
-                        .claim("type", "ACCESS")
+                        .claim("type", "ACCESS")  // claim = 쓰기
                         .claim("authority", mUserService.isAdmin(mno) ? "ADMIN" : "USER" ) // 권한 확인후 권한 등록
                         .subject(mno+"")
                         .issuedAt(new Date())
