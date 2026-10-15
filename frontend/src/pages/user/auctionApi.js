@@ -22,12 +22,12 @@ export const userAuctionApi = {
     // * 이 SSE 경로는 와일드카드 CORS이며 쿠키 인증을 사용하지 않는다.
     return new EventSource(`${BASE_URL}/api/sse/${auctionId}/subscribe`)
   },
-  async placeBid({ auctionId, memberId, price }) {
+  async placeBid({ auctionId, price }) {
     const response = await fetch(`${BASE_URL}${auctionPath}/sse/Bid`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ auctionId, memberId, price }),
+      body: JSON.stringify({ auctionId, price }),
     })
     if (!response.ok) throw new Error(`입찰 요청 실패 (HTTP ${response.status})`)
     const body = await response.text()

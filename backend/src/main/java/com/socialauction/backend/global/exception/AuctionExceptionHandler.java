@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,6 +23,19 @@ import lombok.extern.slf4j.Slf4j;
     "com.socialauction.backend.global.sse"
 })
 public class AuctionExceptionHandler {
+
+    @ExceptionHandler(LoginRequiredException.class)
+    public ResponseEntity<ErrorResponse> handleLoginRequired(LoginRequiredException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "LOGIN_REQUIRED", "로그인이 필요합니다."));
+    }
+
+    // ! 입력값이나 내부 검증 상세 대신 고정된 메시지를 반환한다.
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "요청 입력값을 확인해 주세요."));
+    }
     
     // * [공통 응답 객체] 프론트엔드로 내려줄 JSON 모양 정의 (별도 파일 없이 내부 record로 선언)
     public record ErrorResponse(
