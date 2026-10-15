@@ -27,6 +27,8 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     AuctionEntity findByProductEntity_ProductId(Integer productId);
 
 
+    
+
     // * 경매 조회 - 현재 최고가
     @Query(
         value = """
@@ -88,28 +90,89 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
     );
 
 
-    // * 검색 쿼리
-    @Query(value = "SELECT a FROM AuctionEntity a " +
-                   "JOIN FETCH a.productEntity p " +
-                   "LEFT JOIN FETCH p.organizationEntity o " +
-                   "WHERE (:keyword IS NULL " +
-                   "   OR p.name LIKE CONCAT('%', :keyword, '%') " +
-                   "   OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%')) " +
-                   "AND (:status IS NULL OR a.auctionStatus = :status) " +
-                   "AND (:organization IS NULL OR o.name = :organization) " +
-                   "AND (:startDate IS NULL OR a.startTime >= :startDate) " +
-                   "AND (:endDate IS NULL OR a.endTime <= :endDate)",
-           countQuery = "SELECT COUNT(a) FROM AuctionEntity a " +
-                   "JOIN a.productEntity p " +
-                   "LEFT JOIN p.organizationEntity o " +
-                   "WHERE (:keyword IS NULL " +
-                   "   OR p.name LIKE CONCAT('%', :keyword, '%') " +
-                   "   OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%')) " +
-                   "AND (:status IS NULL OR a.auctionStatus = :status) " +
-                   "AND (:organization IS NULL OR o.name = :organization) " +
-                   "AND (:startDate IS NULL OR a.startTime >= :startDate) " +
-                   "AND (:endDate IS NULL OR a.endTime <= :endDate)")
-    Page<AuctionEntity> searchAuctions(
+    public interface AdminBidStatsProjection {
+        Integer getTopPrice();
+        Integer getBidCount();
+        Integer getCountUser();
+        String getTopBidUserName();
+    }
+
+    // 2. [상세 조회용 엔티티 한 방 쿼리] Auction + Product + Category + Organization + Image를 쿼리 1번으로 조회
+    @Query("""
+        SELECT DISTINCT a
+        FROM AuctionEntity a
+        JOIN FETCH a.productEntity p
+        LEFT JOIN FETCH p.categoryEntity c
+        LEFT JOIN FETCH p.organizationEntity o
+        LEFT JOIN FETCH p.imageEntity i
+        WHERE a.auctionId = :auctionId
+        """)
+    Optional<AuctionEntity> findDetailById(@Param("auctionId") Integer auctionId);
+
+    // 3. [상세 조회용 입찰 통계 한 방 쿼리] 최고가, 입찰수, 참여자수, 최고입찰자 이름을 쿼리 1번으로 조회
+    @Query(
+        value = """
+            SELECT 
+                COALESCE(MAX(b.bid_price), 0) AS topPrice,
+                COUNT(b.bid_id) AS bidCount,
+                COUNT(DISTINCT b.member_id) AS countUser,
+                (SELECT m.name
+                FROM bid b2
+                JOIN member m ON b2.member_id = m.member_id
+                WHERE b2.auction_id = :auctionId
+                ORDER BY b2.bid_price DESC, b2.bid_time DESC, b2.bid_id DESC
+                LIMIT 1) AS topBidUserName
+            FROM bid b
+            WHERE b.auction_id = :auctionId
+            """,
+        nativeQuery = true
+    )
+    AdminBidStatsProjection findBidStatsByAuctionId(@Param("auctionId") Integer auctionId);
+
+
+
+    // 4. [전체 조회 & 검색 겸용 한 방 쿼리] 기존 searchAuctions(92~119라인)를 아래 코드로 교체
+    @Query(
+        value = """
+            SELECT new com.socialauction.backend.auction.admin.dto.AuctionFindAllDto(
+                a.auctionId,
+                p.name,
+                o.name,
+                p.startPrice,
+                COALESCE(MAX(b.bidPrice), 0),
+                COUNT(b),
+                a.auctionStatus,
+                a.startTime,
+                a.endTime
+            )
+            FROM AuctionEntity a
+            JOIN a.productEntity p
+            LEFT JOIN p.organizationEntity o
+            LEFT JOIN a.bidList b
+            WHERE (:keyword IS NULL
+                OR p.name LIKE CONCAT('%', :keyword, '%')
+                OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%'))
+            AND (:status IS NULL OR a.auctionStatus = :status)
+            AND (:organization IS NULL OR o.name = :organization)
+            AND (:startDate IS NULL OR a.startTime >= :startDate)
+            AND (:endDate IS NULL OR a.endTime <= :endDate)
+            GROUP BY a.auctionId, p.name, o.name, p.startPrice, a.auctionStatus, a.startTime, a.endTime
+            """,
+        countQuery = """
+            SELECT COUNT(a)
+            FROM AuctionEntity a
+            JOIN a.productEntity p
+            LEFT JOIN p.organizationEntity o
+            WHERE (:keyword IS NULL
+                OR p.name LIKE CONCAT('%', :keyword, '%')
+                OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%'))
+            AND (:status IS NULL OR a.auctionStatus = :status)
+            AND (:organization IS NULL OR o.name = :organization)
+            AND (:startDate IS NULL OR a.startTime >= :startDate)
+            AND (:endDate IS NULL OR a.endTime <= :endDate)
+            """
+    )
+    Page<AuctionFindAllDto> searchAuctions(
         @Param("keyword") String keyword,
         @Param("status") String status,
         @Param("organization") String organization,
@@ -117,6 +180,37 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, Integer>
         @Param("endDate") LocalDateTime endDate,
         Pageable pageable
     );
+
+
+    // // * 검색 쿼리
+    // @Query(value = "SELECT a FROM AuctionEntity a " +
+    //                "JOIN FETCH a.productEntity p " +
+    //                "LEFT JOIN FETCH p.organizationEntity o " +
+    //                "WHERE (:keyword IS NULL " +
+    //                "   OR p.name LIKE CONCAT('%', :keyword, '%') " +
+    //                "   OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%')) " +
+    //                "AND (:status IS NULL OR a.auctionStatus = :status) " +
+    //                "AND (:organization IS NULL OR o.name = :organization) " +
+    //                "AND (:startDate IS NULL OR a.startTime >= :startDate) " +
+    //                "AND (:endDate IS NULL OR a.endTime <= :endDate)",
+    //        countQuery = "SELECT COUNT(a) FROM AuctionEntity a " +
+    //                "JOIN a.productEntity p " +
+    //                "LEFT JOIN p.organizationEntity o " +
+    //                "WHERE (:keyword IS NULL " +
+    //                "   OR p.name LIKE CONCAT('%', :keyword, '%') " +
+    //                "   OR CAST(a.auctionId AS string) LIKE CONCAT('%', :keyword, '%')) " +
+    //                "AND (:status IS NULL OR a.auctionStatus = :status) " +
+    //                "AND (:organization IS NULL OR o.name = :organization) " +
+    //                "AND (:startDate IS NULL OR a.startTime >= :startDate) " +
+    //                "AND (:endDate IS NULL OR a.endTime <= :endDate)")
+    // Page<AuctionEntity> searchAuctions(
+    //     @Param("keyword") String keyword,
+    //     @Param("status") String status,
+    //     @Param("organization") String organization,
+    //     @Param("startDate") LocalDateTime startDate,
+    //     @Param("endDate") LocalDateTime endDate,
+    //     Pageable pageable
+    // );
 
 
     // @Query(value = """
