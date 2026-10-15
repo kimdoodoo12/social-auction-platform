@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.socialauction.backend.auction.queue.AuctionQueue;
 import com.socialauction.backend.auction.user.dto.AuctionConfirmDto;
 import com.socialauction.backend.auction.user.dto.AuctionBidRequest;
-import com.socialauction.backend.global.exception.LoginRequiredException;
+
 import com.socialauction.backend.auction.user.dto.AuctionDetailProjection;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
 import com.socialauction.backend.auction.user.dto.ProductDetailProjection;
@@ -99,9 +99,9 @@ public class UserAuctionController {
             @Valid @RequestBody AuctionBidRequest request,
             @CookieValue(name = "accessToken", required = false) String token) {
         Long memberId = token == null ? null : jwtUtil.getMnoFromToken(token);
-        if (memberId == null) {
-            throw new LoginRequiredException();
-        }
+        // if (memberId == null) {
+        //     throw new LoginRequiredException();
+        // }
 
         // ! 큐 실행 전에 인증된 ID를 확정한다. 작업 스레드는 HTTP 쿠키에 접근하지 않는다.
         AuctionConfirmDto auctionConfirmDto = new AuctionConfirmDto(

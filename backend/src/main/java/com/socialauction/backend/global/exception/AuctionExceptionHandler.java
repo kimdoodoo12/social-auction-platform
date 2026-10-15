@@ -24,11 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 })
 public class AuctionExceptionHandler {
 
-    @ExceptionHandler(LoginRequiredException.class)
-    public ResponseEntity<ErrorResponse> handleLoginRequired(LoginRequiredException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "LOGIN_REQUIRED", "로그인이 필요합니다."));
-    }
+    // @ExceptionHandler(LoginRequiredException.class)
+    // public ResponseEntity<ErrorResponse> handleLoginRequired(LoginRequiredException e) {
+    //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    //         .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "LOGIN_REQUIRED", "로그인이 필요합니다."));
+    // }
 
     // ! 입력값이나 내부 검증 상세 대신 고정된 메시지를 반환한다.
     @ExceptionHandler(MethodArgumentNotValidException.class)
