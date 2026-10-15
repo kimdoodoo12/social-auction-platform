@@ -68,19 +68,21 @@ export const api = {
   delete: (path, params) => request('DELETE', path, { params }),
 }
 
-// Spring Data Page 응답을 화면에서 쓰기 쉬운 형태로 변환한다.
-// Spring Boot 3.3+ 의 { content, page: { size, number, totalElements, totalPages } } 형식과
-// 이전 형식 { content, number, totalElements, totalPages } 모두 지원한다.
+// 목록 응답을 화면에서 쓰는 { content, page, size, totalElements, totalPages }로 맞춘다.
+// - 백엔드 공통 PageResponse: { content, page(번호), totalElements, totalPages }  ← 대부분의 목록 API
+// - Spring Page 그대로: { content, number, size, totalElements, totalPages }  ← 아직 /bid/detail
+//   (설정에 따라 { content, page: { size, number, ... } } 로 올 수도 있어 함께 받는다)
 export function toPage(data) {
   if (!data) return { content: [], page: 0, size: 0, totalElements: 0, totalPages: 0 }
   if (Array.isArray(data)) {
     return { content: data, page: 0, size: data.length, totalElements: data.length, totalPages: 1 }
   }
+  const content = data.content ?? []
   const meta = data.page && typeof data.page === 'object' ? data.page : data
   return {
-    content: data.content ?? [],
-    page: meta.number ?? 0,
-    size: meta.size ?? 0,
+    content,
+    page: typeof data.page === 'number' ? data.page : (meta.number ?? 0),
+    size: meta.size ?? content.length, // PageResponse에는 size가 없다
     totalElements: meta.totalElements ?? 0,
     totalPages: meta.totalPages ?? 0,
   }

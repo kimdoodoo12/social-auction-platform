@@ -7,7 +7,7 @@ const BASE = '/ieum/admin/organization'
 const FILE_DIR = '/organization/'
 
 // 목록. 검색 조건이 하나라도 있으면 /search, 없으면 전체 목록을 호출한다.
-// page는 0부터 시작한다. 응답: Page<OrganizationListResponse>
+// page는 0부터 시작한다. 응답: PageResponse<OrganizationListResponse>
 export async function fetchOrganizations({ name, agreementStatus, page = 0, size = 10 } = {}) {
   const hasFilter = Boolean(name) || agreementStatus === true || agreementStatus === false
   const path = hasFilter ? `${BASE}/search` : BASE

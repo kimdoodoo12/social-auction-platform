@@ -3,12 +3,12 @@ import { api, BASE_URL, toPage } from './client'
 // 상품 API (backend products/admin/controller/ProductController.java)
 // 상품 API 주소는 백엔드 관리자 상품 컨트롤러 매핑과 맞춘다.
 export const PRODUCT_API = {
-  list: '/ieum/admin/product/main', // GET  Pageable(size 8, createdAt·productId DESC) → Page<ProductListResponse>
+  list: '/ieum/admin/product/main', // GET  Pageable(size 8, createdAt·productId DESC) → PageResponse<ProductListResponse>
   detail: '/ieum/admin/product/detail', // GET  /{productId} → ProductDto
   stop: '/ieum/admin/product/stop', // POST ?productId → boolean (판매 중지)
   create: '/ieum/admin/product/add', // POST body ProductDto → boolean
   update: '/ieum/admin/product/update', // PUT  body ProductDto → boolean
-  search: '/ieum/admin/product/search', // GET  ?productName&organizationName&auctionStatus&categoryName&page → Page<ProductManageDto>
+  search: '/ieum/admin/product/search', // GET  ?productName&organizationName&auctionStatus&categoryName&page → PageResponse<ProductManageDto>
 }
 
 // 폼/필터 선택지용 (읽기 전용)
@@ -108,7 +108,7 @@ export async function fetchCategoryOptions() {
   return list.map((c) => ({ id: c.categoryId, name: c.name }))
 }
 
-// GET /ieum/admin/organization → Page<OrganizationListResponse> (기본 size 4라 크게 요청한다)
+// GET /ieum/admin/organization → PageResponse<OrganizationListResponse> (기본 size 4라 크게 요청한다)
 export async function fetchOrganizationOptions() {
   const { content } = toPage(await api.get(ORGANIZATION_API, { size: 1000 }))
   return content.map((o) => ({ id: o.organizationId, name: o.name }))

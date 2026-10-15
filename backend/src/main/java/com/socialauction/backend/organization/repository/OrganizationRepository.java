@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationListResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationProductResponse;
-import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.entity.OrganizationEntity;
 
 @Repository 

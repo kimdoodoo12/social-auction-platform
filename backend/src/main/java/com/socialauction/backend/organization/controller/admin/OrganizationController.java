@@ -4,9 +4,7 @@ import com.socialauction.backend.global.FileService;
 import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.global.upload.UploadFolder;
 
-import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -15,18 +13,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.reactive.config.EnableWebFlux;
+
 
 import com.socialauction.backend.organization.dto.admin.OrganizationDetailResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationInfoRequest;
-import com.socialauction.backend.organization.dto.admin.OrganizationInfoResponse;
 import com.socialauction.backend.organization.dto.admin.OrganizationListResponse;
-import com.socialauction.backend.organization.dto.admin.OrganizationSearchRequest;
 import com.socialauction.backend.organization.service.OrganizationService;
 
 import jakarta.servlet.http.HttpServletResponse;
