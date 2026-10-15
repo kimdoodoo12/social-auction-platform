@@ -2,6 +2,7 @@ package com.socialauction.backend.dashboard.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.dashboard.dto.DashboardResponse;
+import com.socialauction.backend.global.encryption.AESdecryption;
 import com.socialauction.backend.member.repository.MemberRepository;
 import com.socialauction.backend.organization.repository.OrganizationRepository;
 import com.socialauction.backend.payment.dto.PaymentListResponse;
@@ -27,6 +29,9 @@ public class DashboardService {
     private final OrganizationRepository oRepository;
     private final PaymentRepository paymentRepository;
 
+    @Value   ("${jwt.secret}") 
+    private String key;
+
     // 대시보드 DTO로 조립하여 반환
     public DashboardResponse findDashboardResponse(){
         List<ProductDto> newProductDtos = findNewProduct();
@@ -38,6 +43,8 @@ public class DashboardService {
         Integer auctionEndCount = findAuctionCount("완료");
         Integer memberCount = findMemberCount();
         Integer organizationCount = findOrganizationCount();
+
+        paymentListResponses.forEach((response)->{ response.setMemeberName(AESdecryption.AESDecryption(response.getMemeberName(), key));});
 
         return DashboardResponse.builder()
             .newProductDtos(newProductDtos)

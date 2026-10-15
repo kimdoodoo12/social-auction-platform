@@ -2,6 +2,7 @@ package com.socialauction.backend.auction.admin.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.auction.repository.AuctionRepository.AdminBidStatsProjection;
 import com.socialauction.backend.global.PageResponse;
+import com.socialauction.backend.global.encryption.AESdecryption;
 import com.socialauction.backend.products.admin.dto.ImageDto;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class AdminAuctionService {
     
     private final AuctionRepository auctionRepository;
+
+    @Value ("${jwt.secret}") 
+    private String key;
 
     @Transactional(readOnly = true)
     public PageResponse<AuctionFindAllDto> auctionFindAll(int page, int size) {
@@ -56,7 +61,7 @@ public class AdminAuctionService {
         AdminBidStatsProjection stats = auctionRepository.findBidStatsByAuctionId(auctionId);
         auctionDetailDto.getAuctionFindAllDto().setTopPrice(stats.getTopPrice() != null ? stats.getTopPrice() : 0);
         auctionDetailDto.getAuctionFindAllDto().setBidCount(stats.getBidCount() != null ? stats.getBidCount() : 0);
-        auctionDetailDto.setUserName(stats.getTopBidUserName());
+        auctionDetailDto.setUserName(AESdecryption.AESDecryption(stats.getTopBidUserName(), key));
         auctionDetailDto.setCountUser(stats.getCountUser() != null ? stats.getCountUser() : 0);
 
         return auctionDetailDto;
