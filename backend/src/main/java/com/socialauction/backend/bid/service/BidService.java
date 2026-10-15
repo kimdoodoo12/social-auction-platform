@@ -29,7 +29,7 @@ public class BidService {
 
     //입찰 기록 전체 조회
     @Transactional (readOnly = true)
-    public Page<BidDto> bidFindAll(Integer auctionId, int page, int size){
+    public PageResponse<BidDto> bidFindAll(Integer auctionId, int page, int size){
         Pageable pageable = PageRequest.of(
             page,
             size,
@@ -39,13 +39,13 @@ public class BidService {
         Page<BidEntity> bids = bidRepository.findByAuctionEntity_AuctionId(auctionId, pageable);
 
             
-        return bids.map(bid -> {
+        return new PageResponse<>(bids.map(bid -> {
         BidDto dto = BidDto.from(bid);
         if (dto.getName() != null) {
             dto.setName(AESdecryption.AESDecryption(dto.getName(), key));
         }
         return dto;
-        });
+        }));
     }
     //최종 낙찰 결과 
     //! 조회 쿼리 추후에 바꿀 예정 

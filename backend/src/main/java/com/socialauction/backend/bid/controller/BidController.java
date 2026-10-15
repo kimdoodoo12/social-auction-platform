@@ -12,6 +12,7 @@ import com.socialauction.backend.bid.dto.BidDto;
 import com.socialauction.backend.bid.dto.BidResultDto;
 import com.socialauction.backend.bid.entity.BidEntity;
 import com.socialauction.backend.bid.service.BidService;
+import com.socialauction.backend.global.PageResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,7 @@ public class BidController {
 
     //입찰 전체 조회 7개씩 페이징 하여 조회 쿼리스트링: ?auctionId=1&page=0&size=7
     @GetMapping("/detail")
-    public Page<BidDto> bidFindAll( @RequestParam(name="auctionId") Integer auctionId,
+    public PageResponse<BidDto> bidFindAll( @RequestParam(name="auctionId") Integer auctionId,
         @RequestParam(name="page", defaultValue = "0") int page,
         @RequestParam(name="size", defaultValue = "7") int size
         ) {
