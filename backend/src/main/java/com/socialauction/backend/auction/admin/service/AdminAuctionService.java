@@ -15,6 +15,7 @@ import com.socialauction.backend.auction.admin.dto.AuctionSearchDto;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.auction.repository.AuctionRepository.AdminBidStatsProjection;
+import com.socialauction.backend.global.PageResponse;
 import com.socialauction.backend.products.admin.dto.ImageDto;
 
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,14 @@ public class AdminAuctionService {
     private final AuctionRepository auctionRepository;
 
     @Transactional(readOnly = true)
-    public Page<AuctionFindAllDto> auctionFindAll(int page, int size) {
+    public PageResponse<AuctionFindAllDto> auctionFindAll(int page, int size) {
         Pageable pageable = PageRequest.of(
             page,
             size,
             Sort.by("auctionId").ascending()
         );
         // 검색 조건에 모두 null을 넘겨 searchAuctions 한 방 쿼리를 그대로 재사용
-        return auctionRepository.searchAuctions(null, null, null, null, null, pageable);
+        return new PageResponse<>(auctionRepository.searchAuctions(null, null, null, null, null, pageable));
     }
 
     //* */ 2.  경매 상세 조회 (기존 8번 쿼리 -> 단 2번 쿼리로 해결!)
@@ -63,21 +64,21 @@ public class AdminAuctionService {
 
     //* */ 3. 경매 검색 기능 (기존 18번 쿼리 -> 단 1번 쿼리로 해결!)
     @Transactional(readOnly = true)
-    public Page<AuctionFindAllDto> auctionSearch(AuctionSearchDto auctionSearchDto, int page, int size) {
+    public PageResponse<AuctionFindAllDto> auctionSearch(AuctionSearchDto auctionSearchDto, int page, int size) {
         Pageable pageable = PageRequest.of(
             page,
             size,
             Sort.by("auctionId").ascending()
         );
 
-        return auctionRepository.searchAuctions(
+        return new PageResponse<>(auctionRepository.searchAuctions(
             auctionSearchDto.getKeyword(),
             auctionSearchDto.getStatus(),
             auctionSearchDto.getOrganization(),
             auctionSearchDto.getStartDate(),
             auctionSearchDto.getEndDate(),
             pageable
-        );
+        ));
     }
 
     

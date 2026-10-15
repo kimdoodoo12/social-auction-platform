@@ -10,6 +10,7 @@ import com.socialauction.backend.auction.admin.dto.AuctionSearchDto;
 import com.socialauction.backend.auction.admin.service.AdminAuctionService;
 import com.socialauction.backend.auction.user.dto.AuctionFindDto;
 import com.socialauction.backend.bid.dto.BidDto;
+import com.socialauction.backend.global.PageResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public class AdminAuctionController {
 
     // * 전체 경매 정보
    @GetMapping("")
-    public Page<AuctionFindAllDto> auctionFindAll(@RequestParam(name="page", defaultValue = "0") int page, 
+    public PageResponse<AuctionFindAllDto> auctionFindAll(@RequestParam(name="page", defaultValue = "0") int page, 
                                     @RequestParam(name="size", defaultValue = "8") int size) {
             return auctionService.auctionFindAll(page, size);
             
@@ -47,7 +48,7 @@ public class AdminAuctionController {
 
     // * 경매 검색
     @GetMapping("/search")
-    public Page<AuctionFindAllDto> auctionSearch(@ModelAttribute  AuctionSearchDto auctionSearchDto,
+    public PageResponse<AuctionFindAllDto> auctionSearch(@ModelAttribute  AuctionSearchDto auctionSearchDto,
         @RequestParam(name = "page") int page,
         @RequestParam(name = "size") int size) {
         return auctionService.auctionSearch(auctionSearchDto,page,size);

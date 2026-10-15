@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import lombok.Getter;
+
+@Getter 
 public class PageResponse<T> {
     private List<T> content;
     private int page;
