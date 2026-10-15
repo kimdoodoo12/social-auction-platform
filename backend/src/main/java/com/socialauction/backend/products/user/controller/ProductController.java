@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.socialauction.backend.global.PageResponse;
+import com.socialauction.backend.global.jwt.JWTutil;
 import com.socialauction.backend.organization.dto.user.OrganizationMainResponse;
 import com.socialauction.backend.category.service.CategoryService;
 import com.socialauction.backend.global.jwt.JWTutil;
@@ -74,7 +76,7 @@ public class ProductController {
     /* ------------- 상품목록 페이지 ------------------- */
     // 상품 목록
     @GetMapping("/list")
-    public Page<ProductDto> findList(
+    public PageResponse<ProductDto> findList(
         @PageableDefault (size = 9) Pageable pageable,
         @RequestParam (value = "productName", defaultValue = "") String productName,
         @RequestParam (value = "organizationId", required = false) Integer organizationId,

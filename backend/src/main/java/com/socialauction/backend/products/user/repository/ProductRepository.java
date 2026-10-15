@@ -17,41 +17,6 @@ import com.socialauction.backend.products.user.dto.RecommendDto;
 @Repository("userProductRepository") 
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer>{
 
-    // 입찰·조회 이력이 없는 회원의 랜덤 상품 4개 조회
-    @Query(value = """
-        SELECT
-            a.auction_status AS auctionStatus,
-            i.image AS image,
-            o.name AS organizationName,
-            p.name AS productName,
-            CAST(COALESCE(bs.current_price, p.start_price) AS SIGNED) AS currentPrice, /* 반환 타입을 Long(BIGINT)으로 고정 */
-            a.end_time AS endTime,
-            COALESCE(bs.bid_count, 0) AS bidCount,
-            p.product_id AS productId,
-            a.auction_id AS auctionId
-        FROM products p
-        JOIN organization o
-            ON o.organization_id = p.organization_id
-        JOIN auction a
-            ON a.product_id = p.product_id
-        JOIN image i
-            ON i.product_id = p.product_id
-            AND i.sort_order = 1
-        LEFT JOIN (
-            SELECT
-                auction_id,
-                MAX(bid_price) AS current_price,
-                COUNT(*) AS bid_count
-            FROM bid
-            GROUP BY auction_id
-        ) bs
-            ON bs.auction_id = a.auction_id
-        WHERE a.auction_status IN ('대기', '진행')
-        ORDER BY RAND()
-        LIMIT 4
-        """, nativeQuery = true)
-    List<ProductDto> findRandomProducts();
-
     // 대기·진행 중인 전체 추천 후보와 회원 관심 정보 조회
     @Query(value = """
         SELECT
