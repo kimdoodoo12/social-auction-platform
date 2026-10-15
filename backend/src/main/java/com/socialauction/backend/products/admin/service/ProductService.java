@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.socialauction.backend.auction.entity.AuctionEntity;
 import com.socialauction.backend.auction.repository.AuctionRepository;
 import com.socialauction.backend.category.repository.CategoryRepository;
+import com.socialauction.backend.global.encryption.AESdecryption;
 import com.socialauction.backend.global.Checks;
 import com.socialauction.backend.global.FileService;
 import com.socialauction.backend.global.PageResponse;
@@ -48,6 +50,9 @@ public class ProductService {
     private final AuctionRepository auctionRepository;
     private final FileService fileService;
 
+    @Value("${aes.secret}")
+    private String key;
+
     // 상품 첫 화면(상품관리) 조회
     @Transactional(readOnly = true)
     public PageResponse<ProductListResponse> findProductList(Pageable pageable) {
@@ -69,6 +74,11 @@ public class ProductService {
 
         ProductAuctionInfo auctionInfo = productRepository.findAuctionInfo(productId);
         List<RecentBid> bidInfo = productRepository.findRecentBids(auctionInfo.getAuctionId());
+        for (RecentBid bid : bidInfo) {
+            if (bid.getMemberName() != null) {
+                bid.setMemberName(AESdecryption.AESDecryption(bid.getMemberName(), key));
+            }
+        }
         
         TotalDto totalDto = new TotalDto();
         totalDto.setProductAuctionInfo(auctionInfo);
