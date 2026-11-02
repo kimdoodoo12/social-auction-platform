@@ -13,7 +13,7 @@
 | Backend | Java 17, Spring Boot 4.1, Spring Data JPA, Validation |
 | 인증·보안 | JWT (Access 쿠키) + Redis Refresh Token, AES 개인정보 암호화, BCrypt |
 | 실시간 | SSE (Server-Sent Events) 현재가 방송 |
-| DB | MySQL 8 (`ieum`), Redis |
+| DB | MySQL (`ieum`), Redis |
 
 ## 경매 규칙
 
@@ -62,7 +62,7 @@
 - 서버가 재시작되면 메모리의 예약 작업이 사라지므로, 기동 시 `AuctionRecovery`가 진행 중인 경매를 다시 예약하거나 이미 지난 경매는 즉시 종료합니다.
 
 ### 인증
-- 로그인 시 Access Token은 쿠키로, Refresh Token은 Redis에 저장하고 `/reissue`로 재발급합니다.
+- 로그인 시 Access·Refresh Token을 쿠키로 내려주고, Refresh Token은 Redis에도 7일간 저장해 `/reissue`에서 대조합니다.
 - 입찰자 ID는 클라이언트 값이 아닌 검증된 토큰에서 꺼내 사용합니다.
 - 로그인 아이디·이름 등 개인정보는 AES로 암호화해 저장하고, 비밀번호는 BCrypt로 해시합니다.
 
@@ -75,11 +75,11 @@ frontend/  React + Vite (pages/user, pages/admin)
 
 ## 실행 방법
 
-사전 준비: JDK 17, Node.js 20+, MySQL 8, Redis (localhost:6379)
+사전 준비: JDK 17, Node.js, MySQL, Redis (Spring 기본 접속 설정 localhost:6379 사용)
 
 ```bash
 # 1. DB 생성
-mysql -u root -p -e "CREATE DATABASE ieum DEFAULT CHARACTER SET utf8mb4;"
+#    application.properties의 접속 주소가 jdbc:mysql://localhost:3306/ieum 이므로 ieum 데이터베이스가 있어야 합니다.
 
 # 2. backend/src/main/resources/application.properties 에서 DB 계정, jwt.secret, aes.secret 설정
 #    (ddl-auto=create-drop, 기동 시 sql/sample.sql 샘플 데이터 적재)
@@ -98,7 +98,7 @@ npm run dev
 
 | 이름 | 담당 |
 | --- | --- |
-| 김두현 (팀장) | 기관·카테고리 관리, 관리자 대시보드, 일정 총괄 |
+| 김두현 (팀장) | 프로젝트 총괄, 일정 관리 |
 | 최윤성 | 상품 관리, 관심 기반 추천 |
 | 서현욱 | 회원·인증(JWT/Redis), AES 암호화 |
 | 안현준 | 경매·입찰 로직, 입찰 큐, SSE |
