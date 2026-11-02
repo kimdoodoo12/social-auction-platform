@@ -103,6 +103,7 @@ public class AuctionQueue {
             );
         }
 
+        // 여기서 블로킹 큐 pending에 지정한 명령어를 줄을 세움
         if (!pending.offer(command)) {
             throw new QueueFullException();
         }
@@ -119,6 +120,7 @@ public class AuctionQueue {
             Command command = null;
 
             try {
+                // 블로킹 큐에서 take, 만약 큐에 null이면 take함수 내에서 쓰레드가 잠들어 busy-wait을 방지함
                 command = pending.take();
                 // ! 로그
                 log.info("QUEUE OUT auctionId={} thread={}",
