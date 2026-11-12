@@ -49,16 +49,7 @@
 
 **왜 첫 입찰부터인가?** 시작 시각을 미리 정하면, 아직 소비자에게 알려지지 않은 상품이 입찰 없이 마감될 수 있습니다. 누군가 입찰해 관심이 확인된 뒤에야 시간이 흐르게 해서, 입찰 없는 마감을 막았습니다.
 
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> 대기: 관리자 상품 등록
-    대기 --> 진행: 첫 입찰 (시작가 이상), 종료 시각 예약
-    진행 --> 진행: 입찰 (최고가 +1,000원 이상)
-    진행 --> 완료: 24시간 경과, 낙찰·payment 생성
-    대기 --> 판매중지: 관리자
-    진행 --> 판매중지: 관리자
-```
+![경매 규칙: 대기 → 첫 입찰부터 24시간 진행 → 낙찰](docs/images/auction-rules.png)
 
 > 시연을 위해 코드상 종료 시간은 첫 입찰 후 3분으로 설정되어 있습니다 (`UserAuctionService`). 위 시연 영상도 3분 설정으로 촬영했습니다.
 
@@ -74,20 +65,7 @@ stateDiagram-v2
 
 ## 시스템 구성
 
-```mermaid
-flowchart LR
-    U["사용자 / 관리자<br>React + Vite"]
-    subgraph BE ["Spring Boot"]
-        C[Controller] --> Q["AuctionQueue<br>입찰·종료 명령"]
-        T["TaskScheduler<br>종료 예약"] --> Q
-        Q --> SV["Service<br>@Transactional"]
-        SV -. 커밋 후 이벤트 .-> E[SSE 방송]
-    end
-    U -- REST --> C
-    E -- priceUpdate --> U
-    SV --> DB[(MySQL)]
-    C --> R[("Redis<br>Refresh Token")]
-```
+![시스템 구성도](docs/images/architecture.png)
 
 <details>
 <summary>ERD (JPA 엔티티 기준)</summary>
